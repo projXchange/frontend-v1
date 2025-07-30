@@ -182,17 +182,18 @@ const ProjectListing = () => {
   const ProjectCard = ({ project }: { project: typeof projects[0] }) => (
     <Link 
       to={`/project/${project.id}`}
-      className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-gray-100 relative"
+      className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.03] hover:-translate-y-2 border border-gray-100 relative animate-cardSlideIn"
+      style={{ animationDelay: `${Math.random() * 200}ms` }}
     >
       {/* Discount Badge */}
       {project.originalPrice > project.price && (
-        <span className="absolute top-4 left-4 z-20 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce">
+        <span className="absolute top-4 left-4 z-20 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
           {Math.round((1 - project.price / project.originalPrice) * 100)}% OFF
         </span>
       )}
       {/* Best Seller/Popular Badge */}
       {project.sales > 100 && (
-        <span className="absolute top-4 right-4 z-20 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
+        <span className="absolute top-4 right-4 z-20 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce">
           Popular
         </span>
       )}
@@ -200,29 +201,29 @@ const ProjectListing = () => {
         <img 
           src={project.thumbnail} 
           alt={project.title}
-          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-700"
         />
         {project.featured && (
-          <div className="absolute bottom-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-pulse">
+          <div className="absolute bottom-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-bounce">
             <Award className="w-3 h-3 inline mr-1" />
             Featured
           </div>
         )}
         {/* Interactive Favorite Button */}
         <button 
-          className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 flex items-center justify-center hover:bg-pink-100 transition z-20 shadow group/fav"
+          className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 flex items-center justify-center hover:bg-pink-100 hover:scale-110 transition-all duration-200 z-20 shadow-lg group/fav"
           title="Add to favorites"
           type="button"
           onClick={e => { e.preventDefault(); /* Add favorite logic here */ }}
         >
           <Heart className="w-5 h-5 text-pink-500 group-hover/fav:scale-125 transition-transform" />
         </button>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>
       
-      <div className="p-6 flex flex-col h-full">
+      <div className="p-6 flex flex-col h-full bg-gradient-to-b from-white to-gray-50/50">
         <div className="flex items-center justify-between mb-3">
-          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+          <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-full text-sm font-semibold shadow-sm">
             {project.category}
           </span>
           <div className="flex items-center">
@@ -232,15 +233,15 @@ const ProjectListing = () => {
           </div>
         </div>
         
-        <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+        <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
           {project.title}
         </h3>
-        <p className="text-gray-600 mb-3 font-medium line-clamp-2">{project.description}</p>
+        <p className="text-gray-600 mb-3 font-medium line-clamp-2 leading-relaxed">{project.description}</p>
         <div className="flex items-center mb-4">
           <img 
             src={project.seller.avatar} 
             alt={project.seller.name}
-            className="w-8 h-8 rounded-full object-cover mr-3 ring-2 ring-blue-100"
+            className="w-8 h-8 rounded-full object-cover mr-3 ring-2 ring-blue-100 group-hover:ring-blue-200 transition-all duration-300"
           />
           <div>
             <div className="font-semibold text-gray-900 text-sm">{project.seller.name}</div>
@@ -257,12 +258,12 @@ const ProjectListing = () => {
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           {project.techStack.slice(0, 3).map((tech, index) => (
-            <span key={index} className="px-2 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-lg text-xs font-medium">
+            <span key={index} className="px-2 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-lg text-xs font-medium shadow-sm hover:shadow-md transition-shadow duration-200">
               {tech}
             </span>
           ))}
           {project.techStack.length > 3 && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
+            <span className="px-2 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg text-xs font-medium shadow-sm">
               +{project.techStack.length - 3} more
             </span>
           )}
@@ -283,12 +284,12 @@ const ProjectListing = () => {
         <div className="flex flex-col gap-2 mt-auto">
           <Link
             to={`/project/${project.id}`}
-            className="inline-block px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full font-semibold shadow hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 hover:scale-105 text-center"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-teal-700 transition-all duration-300 hover:scale-105 text-center"
           >
             View Details
           </Link>
           <button
-            className="inline-block px-6 py-2 bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-full font-semibold shadow hover:from-green-500 hover:to-teal-600 transition-all duration-200 hover:scale-105 text-center"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 hover:scale-105 text-center"
             type="button"
             onClick={e => { e.preventDefault(); /* Add buy logic here */ }}
           >
@@ -302,7 +303,8 @@ const ProjectListing = () => {
   const ProjectListItem = ({ project }: { project: typeof projects[0] }) => (
     <Link 
       to={`/project/${project.id}`}
-      className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 flex gap-6 border border-gray-100"
+      className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 flex gap-6 border border-gray-100 animate-cardSlideIn"
+      style={{ animationDelay: `${Math.random() * 200}ms` }}
     >
       <div className="flex-shrink-0">
         <div className="relative">
@@ -312,7 +314,7 @@ const ProjectListing = () => {
             className="w-40 h-32 object-cover rounded-xl group-hover:scale-110 transition-transform duration-300"
           />
           {project.featured && (
-            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
               Featured
             </div>
           )}
@@ -321,7 +323,7 @@ const ProjectListing = () => {
       <div className="flex-1">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+            <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-full text-sm font-semibold shadow-sm">
               {project.category}
             </span>
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${
@@ -338,7 +340,7 @@ const ProjectListing = () => {
             <span className="ml-1 text-sm text-gray-500">({project.reviews})</span>
           </div>
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300">
           {project.title}
         </h3>
         <div className="flex items-center mb-3">
@@ -349,10 +351,10 @@ const ProjectListing = () => {
           />
           <span className="font-semibold text-gray-900">{project.seller.name}</span>
         </div>
-        <p className="text-gray-600 mb-4">{project.description}</p>
+        <p className="text-gray-600 mb-4 leading-relaxed">{project.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {project.techStack.map((tech, index) => (
-            <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+            <span key={index} className="px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-shadow duration-200">
               {tech}
             </span>
           ))}
@@ -370,7 +372,7 @@ const ProjectListing = () => {
           </div>
           <div className="text-right">
             <div className="text-sm text-green-600 font-medium">{project.sales} sales</div>
-            <span className="text-blue-600 group-hover:text-blue-700 font-semibold flex items-center">
+            <span className="text-blue-600 group-hover:text-blue-700 font-semibold flex items-center transition-colors duration-300">
               View Details 
               <TrendingUp className="w-4 h-4 ml-1" />
             </span>
@@ -381,10 +383,10 @@ const ProjectListing = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center animate-slideInDown">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Discover Amazing Projects
           </h1>
@@ -394,7 +396,7 @@ const ProjectListing = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl mb-8 border border-white/20">
+        <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl mb-8 border border-white/20 animate-slideInUp">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Search */}
             <div className="flex-1 relative">
@@ -404,7 +406,7 @@ const ProjectListing = () => {
                 placeholder="Search projects or tech stack..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
+                className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/90 backdrop-blur-sm shadow-sm focus:shadow-md transition-shadow duration-200"
               />
             </div>
 
@@ -413,7 +415,7 @@ const ProjectListing = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="appearance-none bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="appearance-none bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm focus:shadow-md transition-shadow duration-200"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>
@@ -429,7 +431,7 @@ const ProjectListing = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="appearance-none bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm focus:shadow-md transition-shadow duration-200"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -445,16 +447,16 @@ const ProjectListing = () => {
             <div className="flex bg-gray-100 rounded-xl p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-3 rounded-lg transition-all duration-200 ${
-                  viewMode === 'grid' ? 'bg-white shadow-md' : 'hover:bg-gray-200'
+                className={`p-3 rounded-lg transition-all duration-300 ${
+                  viewMode === 'grid' ? 'bg-white shadow-lg scale-105' : 'hover:bg-gray-200 hover:scale-105'
                 }`}
               >
                 <Grid className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-3 rounded-lg transition-all duration-200 ${
-                  viewMode === 'list' ? 'bg-white shadow-md' : 'hover:bg-gray-200'
+                className={`p-3 rounded-lg transition-all duration-300 ${
+                  viewMode === 'list' ? 'bg-white shadow-lg scale-105' : 'hover:bg-gray-200 hover:scale-105'
                 }`}
               >
                 <List className="w-5 h-5" />
@@ -463,7 +465,7 @@ const ProjectListing = () => {
           </div>
 
           {/* Price Range */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="mt-6 pt-6 border-t border-gray-200 animate-slideInUp">
             <div className="flex items-center gap-4">
               <span className="text-sm font-semibold text-gray-700">Price Range:</span>
               <div className="flex items-center gap-2">
@@ -492,7 +494,7 @@ const ProjectListing = () => {
         </div>
 
         {/* Results */}
-        <div className="mb-6">
+        <div className="mb-6 animate-slideInUp">
           <p className="text-gray-600 text-lg">
             Showing <span className="font-semibold text-gray-900">{filteredProjects.length}</span> of <span className="font-semibold text-gray-900">{projects.length}</span> projects
           </p>
@@ -501,7 +503,7 @@ const ProjectListing = () => {
         {/* Projects Grid/List */}
         <div className={
           viewMode === 'grid' 
-            ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-8' 
+            ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-staggerChildren' 
             : 'flex flex-col gap-6'
         }>
           {filteredProjects.map(project => (
@@ -512,7 +514,7 @@ const ProjectListing = () => {
         </div>
 
         {filteredProjects.length === 0 && (
-          <div className="text-center py-16">
+          <div className="text-center py-16 animate-slideInUp">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Filter className="w-12 h-12 text-blue-600" />
             </div>
@@ -520,7 +522,7 @@ const ProjectListing = () => {
             <p className="text-gray-600 text-lg mb-6">Try adjusting your search criteria or filters to find more projects.</p>
             <Link
               to="/upload"
-              className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
+              className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               🚀 Upload Your Project
             </Link>

@@ -232,46 +232,46 @@ For questions or issues, please contact the seller through the StudyStack platfo
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 py-8 animate-fadeIn">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="mb-6 animate-fadeInDown">
+        <div className="mb-6 animate-slideInDown">
           <nav className="flex text-sm text-gray-500">
-            <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-blue-600 transition-colors duration-200">Home</Link>
             <span className="mx-2">/</span>
-            <Link to="/projects" className="hover:text-blue-600 transition-colors">Projects</Link>
+            <Link to="/projects" className="hover:text-blue-600 transition-colors duration-200">Projects</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">{project.title}</span>
           </nav>
         </div>
-        <div className="grid lg:grid-cols-3 gap-8 animate-fadeInUp">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Project Header */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl mb-10 border border-white/30 animate-fadeInUp">
+            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl mb-10 border border-white/30 animate-slideInLeft">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="px-4 py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-700 rounded-full text-sm font-bold animate-bounceIn">
+                  <span className="px-4 py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-700 rounded-full text-sm font-bold shadow-sm animate-slideInUp">
                     {project.category}
                   </span>
-                  <span className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 rounded-full text-sm font-bold flex items-center animate-bounceIn">
+                  <span className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 rounded-full text-sm font-bold flex items-center shadow-sm animate-slideInUp" style={{ animationDelay: '100ms' }}>
                     <Award className="w-3 h-3 mr-1" />
                     Featured
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-500 transition-colors rounded-xl hover:bg-red-50 animate-fadeInUp">
+                  <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp" style={{ animationDelay: '200ms' }}>
                     <Heart className="w-5 h-5" />
                     <span className="text-sm font-medium">{project.likes}</span>
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-500 transition-colors rounded-xl hover:bg-blue-50 animate-fadeInUp">
+                  <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp" style={{ animationDelay: '300ms' }}>
                     <Share2 className="w-5 h-5" />
                     <span className="text-sm font-medium">Share</span>
                   </button>
                 </div>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-6 animate-fadeInUp">{project.title}</h1>
-              <div className="flex flex-wrap items-center gap-8 text-sm text-gray-600 mb-8 animate-fadeInUp">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6 animate-slideInUp" style={{ animationDelay: '400ms' }}>{project.title}</h1>
+              <div className="flex flex-wrap items-center gap-8 text-sm text-gray-600 mb-8 animate-slideInUp" style={{ animationDelay: '500ms' }}>
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-400 fill-current" />
                   <span className="font-bold text-lg">{project.rating}</span>
@@ -291,7 +291,7 @@ For questions or issues, please contact the seller through the StudyStack platfo
                 </div>
               </div>
               {/* Video */}
-              <div className="aspect-video bg-gray-900 rounded-2xl overflow-hidden mb-8 shadow-2xl animate-fadeInUp">
+              <div className="aspect-video bg-gray-900 rounded-2xl overflow-hidden mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300" style={{ animationDelay: '600ms' }}>
                 <iframe
                   src={project.videoUrl}
                   title="Project Demo"
@@ -301,7 +301,7 @@ For questions or issues, please contact the seller through the StudyStack platfo
                 />
               </div>
               {/* Tabs */}
-              <div className="border-b border-gray-200 mb-8 animate-fadeInUp">
+              <div className="border-b border-gray-200 mb-8 animate-slideInUp" style={{ animationDelay: '700ms' }}>
                 <nav className="flex space-x-8">
                   {['description', 'features', 'instructions', 'screenshots'].map((tab) => (
                     <button
@@ -309,8 +309,8 @@ For questions or issues, please contact the seller through the StudyStack platfo
                       onClick={() => setActiveTab(tab)}
                       className={`py-4 px-2 border-b-2 font-semibold text-sm transition-colors animate-fadeInUp ${
                         activeTab === tab
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                          ? 'border-blue-500 text-blue-600 scale-105'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:scale-105'
                       }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -319,15 +319,15 @@ For questions or issues, please contact the seller through the StudyStack platfo
                 </nav>
               </div>
               {/* Tab Content */}
-              <div className="min-h-[400px] animate-fadeInUp">
+              <div className="min-h-[400px] animate-slideInUp" style={{ animationDelay: '800ms' }}>
                 {activeTab === 'description' && (
                   <div>
-                    <h3 className="text-2xl font-bold mb-6">About This Project</h3>
-                    <p className="text-gray-700 leading-relaxed mb-8 text-lg">{project.description}</p>
-                    <h4 className="text-xl font-bold mb-4">Tech Stack</h4>
+                    <h3 className="text-2xl font-bold mb-6 animate-slideInUp">About This Project</h3>
+                    <p className="text-gray-700 leading-relaxed mb-8 text-lg animate-slideInUp" style={{ animationDelay: '100ms' }}>{project.description}</p>
+                    <h4 className="text-xl font-bold mb-4 animate-slideInUp" style={{ animationDelay: '200ms' }}>Tech Stack</h4>
                     <div className="flex flex-wrap gap-3">
                       {project.techStack.map((tech, index) => (
-                        <span key={index} className="px-4 py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-800 rounded-xl text-sm font-semibold shadow-sm animate-cardFadeIn" style={{ animationDelay: `${index * 80}ms` }}>
+                        <span key={index} className="px-4 py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-800 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp" style={{ animationDelay: `${300 + index * 80}ms` }}>
                           {tech}
                         </span>
                       ))}
@@ -336,11 +336,11 @@ For questions or issues, please contact the seller through the StudyStack platfo
                 )}
                 {activeTab === 'features' && (
                   <div>
-                    <h3 className="text-2xl font-bold mb-6">Key Features</h3>
+                    <h3 className="text-2xl font-bold mb-6 animate-slideInUp">Key Features</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       {project.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 animate-cardFadeIn" style={{ animationDelay: `${index * 80}ms` }}>
-                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full" />
+                        <div key={index} className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp" style={{ animationDelay: `${100 + index * 80}ms` }}>
+                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full animate-pulse" />
                           <span className="text-gray-800 font-medium">{feature}</span>
                         </div>
                       ))}
@@ -350,16 +350,16 @@ For questions or issues, please contact the seller through the StudyStack platfo
                 {activeTab === 'instructions' && (
                   <div>
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-2xl font-bold">Setup Instructions</h3>
+                      <h3 className="text-2xl font-bold animate-slideInUp">Setup Instructions</h3>
                       {!isPurchased && (
-                        <div className="flex items-center gap-2 text-gray-500 bg-gray-100 px-4 py-2 rounded-xl animate-fadeInUp">
+                        <div className="flex items-center gap-2 text-gray-500 bg-gray-100 px-4 py-2 rounded-xl animate-slideInUp">
                           <Lock className="w-5 h-5" />
                           <span className="font-medium">Purchase to unlock</span>
                         </div>
                       )}
                     </div>
-                    <div className={`${!isPurchased ? 'filter blur-sm' : ''} animate-fadeInUp`}>
-                      <div className="bg-gray-900 rounded-2xl p-8 font-mono text-sm shadow-2xl">
+                    <div className={`${!isPurchased ? 'filter blur-sm' : ''} animate-slideInUp transition-all duration-300`} style={{ animationDelay: '100ms' }}>
+                      <div className="bg-gray-900 rounded-2xl p-8 font-mono text-sm shadow-2xl hover:shadow-3xl transition-shadow duration-300">
                         <pre className="whitespace-pre-wrap text-green-400">
                           {project.instructions}
                         </pre>
@@ -369,14 +369,14 @@ For questions or issues, please contact the seller through the StudyStack platfo
                 )}
                 {activeTab === 'screenshots' && (
                   <div>
-                    <h3 className="text-2xl font-bold mb-6">Project Screenshots</h3>
+                    <h3 className="text-2xl font-bold mb-6 animate-slideInUp">Project Screenshots</h3>
                     <div className="grid md:grid-cols-2 gap-6">
                       {project.screenshots.map((screenshot, index) => (
-                        <div key={index} className="aspect-video bg-gray-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow animate-cardFadeIn" style={{ animationDelay: `${index * 100}ms` }}>
+                        <div key={index} className="aspect-video bg-gray-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${100 + index * 100}ms` }}>
                           <img 
                             src={screenshot} 
                             alt={`Screenshot ${index + 1}`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                       ))}
@@ -389,17 +389,17 @@ For questions or issues, please contact the seller through the StudyStack platfo
           {/* Sidebar */}
           <div className="space-y-8">
             {/* Purchase Card */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl sticky top-8 border border-white/30 animate-fadeInRight">
+            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl sticky top-8 border border-white/30 animate-slideInRight">
               <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="flex items-center justify-center gap-3 mb-4 animate-slideInUp">
                   <div className="text-4xl font-bold text-gray-900">${project.price}</div>
                   <div className="text-2xl text-gray-500 line-through">${project.originalPrice}</div>
                 </div>
-                <div className="text-sm text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full inline-block animate-bounceIn">
+                <div className="text-sm text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full inline-block animate-pulse">
                   Save ${project.originalPrice - project.price}
                 </div>
               </div>
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4 mb-8 animate-slideInUp" style={{ animationDelay: '200ms' }}>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600 flex items-center">
                     <Clock className="w-4 h-4 mr-2" />
@@ -419,23 +419,23 @@ For questions or issues, please contact the seller through the StudyStack platfo
               {!isPurchased ? (
                 <button
                   onClick={handlePurchase}
-                  className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-200 flex items-center justify-center gap-3 mb-6 shadow-lg hover:shadow-xl transform hover:scale-105 animate-bounceIn"
+                  className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-3 mb-6 shadow-lg hover:shadow-xl transform hover:scale-105 animate-slideInUp" style={{ animationDelay: '300ms' }}
                 >
                   <ShoppingCart className="w-6 h-6" />
                   Continue (${project.price})
                 </button>
               ) : (
                 <div className="space-y-4 mb-6">
-                  <div className="text-center text-green-600 font-bold text-lg mb-4 bg-green-100 py-3 rounded-xl animate-fadeInUp">
+                  <div className="text-center text-green-600 font-bold text-lg mb-4 bg-green-100 py-3 rounded-xl animate-slideInUp">
                     ✅ Project Purchased
                   </div>
-                  <button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl animate-bounceIn">
+                  <button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 animate-slideInUp">
                     <Download className="w-6 h-6" />
                     Download Files
                   </button>
                 </div>
               )}
-              <div className="space-y-3 text-center text-sm text-gray-600">
+              <div className="space-y-3 text-center text-sm text-gray-600 animate-slideInUp" style={{ animationDelay: '400ms' }}>
                 <div className="flex items-center justify-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
                   <span>Lifetime access</span>
@@ -455,13 +455,13 @@ For questions or issues, please contact the seller through the StudyStack platfo
               </div>
             </div>
             {/* Seller Info */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl border border-white/30 animate-fadeInRight">
+            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl border border-white/30 animate-slideInRight" style={{ animationDelay: '200ms' }}>
               <h3 className="text-xl font-bold mb-6">About the Seller</h3>
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-4 mb-6 animate-slideInUp">
                 <img 
                   src={project.seller.avatar} 
                   alt={project.seller.name}
-                  className="w-16 h-16 rounded-full object-cover ring-4 ring-blue-100"
+                  className="w-16 h-16 rounded-full object-cover ring-4 ring-blue-100 hover:ring-blue-200 transition-all duration-300"
                 />
                 <div>
                   <h4 className="font-bold text-gray-900 text-lg">{project.seller.name}</h4>
@@ -469,12 +469,12 @@ For questions or issues, please contact the seller through the StudyStack platfo
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <span className="font-semibold">{project.seller.rating}</span>
                   </div>
-                  <span className="px-3 py-1 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 rounded-full text-xs font-bold animate-bounceIn">
+                  <span className="px-3 py-1 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 rounded-full text-xs font-bold animate-pulse">
                     {project.seller.level}
                   </span>
                 </div>
               </div>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-3 text-sm animate-slideInUp" style={{ animationDelay: '100ms' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Projects</span>
                   <span className="font-semibold text-gray-900">{project.seller.totalProjects}</span>
@@ -492,28 +492,28 @@ For questions or issues, please contact the seller through the StudyStack platfo
                   <span className="font-semibold text-gray-900">{new Date(project.seller.joinedDate).toLocaleDateString()}</span>
                 </div>
               </div>
-              <button className="w-full mt-6 bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors animate-fadeInUp">
+              <button className="w-full mt-6 bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp" style={{ animationDelay: '200ms' }}>
                 Contact Seller
               </button>
             </div>
             {/* Related Projects */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl border border-white/30 animate-fadeInRight">
+            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-10 shadow-2xl border border-white/30 animate-slideInRight" style={{ animationDelay: '400ms' }}>
               <h3 className="text-xl font-bold mb-6">Related Projects</h3>
               <div className="space-y-6">
                 {relatedProjects.map((relatedProject, idx) => (
                   <Link 
                     key={relatedProject.id}
                     to={`/project/${relatedProject.id}`}
-                    className="flex gap-4 p-4 rounded-xl hover:bg-blue-50 transition-colors group animate-cardFadeIn"
+                    className="flex gap-4 p-4 rounded-xl hover:bg-blue-50 hover:scale-105 transition-all duration-300 group animate-slideInUp"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <img 
                       src={relatedProject.thumbnail} 
                       alt={relatedProject.title}
-                      className="w-20 h-16 object-cover rounded-lg group-hover:scale-105 transition-transform"
+                      className="w-20 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 text-sm mb-2 group-hover:text-blue-600 transition-colors">{relatedProject.title}</h4>
+                      <h4 className="font-semibold text-gray-900 text-sm mb-2 group-hover:text-blue-600 transition-colors duration-300">{relatedProject.title}</h4>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1">
                           <Star className="w-3 h-3 text-yellow-400 fill-current" />
@@ -534,32 +534,31 @@ For questions or issues, please contact the seller through the StudyStack platfo
       </div>
       {/* Animations */}
       <style>{`
-        @keyframes fadeInUp {
-          0% { opacity: 0; transform: translateY(30px); }
+        @keyframes slideInUp {
+          0% { opacity: 0; transform: translateY(40px); }
           100% { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeInUp { animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1); }
-        @keyframes fadeInDown {
-          0% { opacity: 0; transform: translateY(-30px); }
+        .animate-slideInUp { animation: slideInUp 0.8s cubic-bezier(.4,0,.2,1) both; }
+        @keyframes slideInDown {
+          0% { opacity: 0; transform: translateY(-40px); }
           100% { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeInDown { animation: fadeInDown 0.7s cubic-bezier(.4,0,.2,1); }
-        @keyframes fadeInRight {
-          0% { opacity: 0; transform: translateX(40px); }
+        .animate-slideInDown { animation: slideInDown 0.8s cubic-bezier(.4,0,.2,1) both; }
+        @keyframes slideInLeft {
+          0% { opacity: 0; transform: translateX(-50px); }
           100% { opacity: 1; transform: translateX(0); }
         }
-        .animate-fadeInRight { animation: fadeInRight 0.7s cubic-bezier(.4,0,.2,1); }
-        @keyframes bounceIn {
-          0% { opacity: 0; transform: scale(0.7); }
-          60% { opacity: 1; transform: scale(1.1); }
-          100% { opacity: 1; transform: scale(1); }
+        .animate-slideInLeft { animation: slideInLeft 0.8s cubic-bezier(.4,0,.2,1) both; }
+        @keyframes slideInRight {
+          0% { opacity: 0; transform: translateX(50px); }
+          100% { opacity: 1; transform: translateX(0); }
         }
-        .animate-bounceIn { animation: bounceIn 0.7s cubic-bezier(.4,0,.2,1); }
-        @keyframes cardFadeIn {
-          0% { opacity: 0; transform: translateY(40px) scale(0.98); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
+        .animate-slideInRight { animation: slideInRight 0.8s cubic-bezier(.4,0,.2,1) both; }
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
         }
-        .animate-cardFadeIn { animation: cardFadeIn 0.6s cubic-bezier(.4,0,.2,1) both; }
+        .animate-fadeIn { animation: fadeIn 0.6s ease-out both; }
       `}</style>
     </div>
   );
