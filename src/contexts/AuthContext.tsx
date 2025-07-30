@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -18,12 +17,16 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStudent: boolean;
+  isAuthModalOpen: boolean;
+  isLoginMode: boolean;
+  openAuthModal: (isLogin?: boolean) => void;
+  closeAuthModal: () => void;
 }
 
+// Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-
-// Mock users database
+// Mock data
 const mockUsers: User[] = [
   {
     id: '1',
@@ -51,7 +54,6 @@ const mockUsers: User[] = [
   }
 ];
 
-// Mock passwords (in real app, these would be hashed)
 const mockPasswords: Record<string, string> = {
   'john@studystack.com': 'student123',
   'admin@studystack.com': 'admin123',
@@ -60,8 +62,10 @@ const mockPasswords: Record<string, string> = {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+
   useEffect(() => {
-    // Check for stored user session
     const storedUser = localStorage.getItem('studystack_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -69,9 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-
     const foundUser = mockUsers.find(u => u.email === email);
     const correctPassword = mockPasswords[email];
 
@@ -84,13 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = async (name: string, email: string, password: string, role: 'student' | 'admin'): Promise<boolean> => {
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Check if user already exists
-    if (mockUsers.find(u => u.email === email)) {
-      return false;
-    }
+    if (mockUsers.find(u => u.email === email)) return false;
 
     const newUser: User = {
       id: Date.now().toString(),
@@ -111,8 +108,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('studystack_user');
-
   };
+
+  const openAuthModal = (isLogin: boolean = true) => {
+    setIsLoginMode(isLogin);
+    setAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => setAuthModalOpen(false);
 
   const value: AuthContextType = {
     user,
@@ -121,19 +124,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
-    isStudent: user?.role === 'student'
+    isStudent: user?.role === 'student',
+    isAuthModalOpen,
+    isLoginMode,
+    openAuthModal,
+    closeAuthModal
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

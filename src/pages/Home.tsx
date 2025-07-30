@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Code, Database, Globe, Smartphone, Star, ArrowRight, Users, Award, TrendingUp, Clock, BookOpen, Brain, DollarSign } from 'lucide-react';
-import LoginForm from '../components/LoginForm';
+import { useAuth } from '../contexts/AuthContext';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showLogin, setShowLogin] = useState(false);
+  const { openAuthModal } = useAuth();
 
   const categories = [
     { name: 'Java', icon: Code, color: 'bg-gradient-to-br from-orange-500 to-red-500', count: 45, growth: '+12%' },
@@ -255,7 +255,7 @@ const Home = () => {
 
           <div className="mt-20 text-center">
             <button
-              onClick={() => setShowLogin(true)}
+              onClick={() => openAuthModal(false)}
               className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
             >
               🚀 Join Projxchange Now
@@ -263,15 +263,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <LoginForm
-        isOpen={showLogin}
-        onClose={() => setShowLogin(false)}
-        onSwitchToSignup={() => {
-          setShowLogin(false);
-          // Optional: open signup modal if you have it
-        }}
-        onSuccess={() => setShowLogin(false)}
-      />
+
 
       {/* Categories Section */}
       <section className="py-20 bg-gray-50">

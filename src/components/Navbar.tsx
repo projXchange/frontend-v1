@@ -10,14 +10,12 @@ import AuthModal from './AuthModal';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [authModal, setAuthModal] = useState({ open: false, isLogin: true });
+
   const location = useLocation();
-  
-  const { user, logout, isAuthenticated, isAdmin } = useAuth();
-const navigate = useNavigate(); // ⬅️ Hook
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated, isAdmin, isAuthModalOpen, isLoginMode, openAuthModal, closeAuthModal } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
-
 
   const handleLogout = () => {
     logout();
@@ -44,9 +42,8 @@ const navigate = useNavigate(); // ⬅️ Hook
             <div className="hidden lg:flex items-center space-x-4 ml-auto">
               <Link
                 to="/"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${
-                  isActive('/') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                }`}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isActive('/') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
               >
                 <Home className="w-5 h-5" />
                 <span>Home</span>
@@ -54,9 +51,8 @@ const navigate = useNavigate(); // ⬅️ Hook
 
               <Link
                 to="/projects"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${
-                  isActive('/projects') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                }`}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isActive('/projects') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
               >
                 <span>Projects</span>
               </Link>
@@ -65,15 +61,13 @@ const navigate = useNavigate(); // ⬅️ Hook
                 <>
                   <Link
                     to="/upload"
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${
-                      isActive('/upload') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                    }`}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isActive('/upload') ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                      }`}
                   >
                     <Upload className="w-5 h-5" />
                     <span>Sell</span>
                   </Link>
 
-                  {/* Notifications */}
                   <div className="relative group">
                     <button className="relative p-2 hover:bg-blue-50 rounded-full transition">
                       <Bell className="w-5 h-5 text-gray-600 group-hover:text-blue-600" />
@@ -84,7 +78,6 @@ const navigate = useNavigate(); // ⬅️ Hook
                     </span>
                   </div>
 
-                  {/* Wishlist */}
                   <div className="relative group">
                     <button className="p-2 hover:bg-blue-50 rounded-full transition">
                       <Heart className="w-5 h-5 text-gray-600 group-hover:text-blue-600" />
@@ -94,7 +87,6 @@ const navigate = useNavigate(); // ⬅️ Hook
                     </span>
                   </div>
 
-                  {/* Profile Dropdown */}
                   <div className="relative">
                     <button
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -159,22 +151,24 @@ const navigate = useNavigate(); // ⬅️ Hook
               {!isAuthenticated && (
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => setAuthModal({ open: true, isLogin: true })}
+                    onClick={() => openAuthModal(true)} // false = signup
+
                     className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600"
                   >
                     Sign In
                   </button>
                   <button
-                    onClick={() => setAuthModal({ open: true, isLogin: false })}
+                    onClick={() => openAuthModal(false)} // true = login
+
                     className="px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white text-sm font-semibold rounded-full hover:from-blue-700 hover:to-teal-700 transition"
                   >
                     Join Now
                   </button>
+
                 </div>
               )}
             </div>
 
-            {/* Mobile Menu Toggle */}
             <button
               className="lg:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -183,7 +177,6 @@ const navigate = useNavigate(); // ⬅️ Hook
             </button>
           </div>
 
-          {/* Mobile Dropdown */}
           {isMenuOpen && (
             <div className="lg:hidden mt-2 bg-white border-t border-gray-200 py-4 space-y-2">
               <Link to="/" className="block px-4 py-2 text-gray-700" onClick={() => setIsMenuOpen(false)}>Home</Link>
@@ -200,23 +193,24 @@ const navigate = useNavigate(); // ⬅️ Hook
               )}
               {!isAuthenticated && (
                 <>
-                  <button onClick={() => { setAuthModal({ open: true, isLogin: true }); setIsMenuOpen(false); }} className="block px-4 py-2 text-gray-700">Sign In</button>
-                  <button onClick={() => { setAuthModal({ open: true, isLogin: false }); setIsMenuOpen(false); }} className="block px-4 py-2 text-blue-600 font-medium">Join Now</button>
+                  <button onClick={() => openAuthModal(true)} className="block px-4 py-2 text-gray-700">Sign In</button>
+                  <button onClick={() => openAuthModal(false)} className="block px-4 py-2 text-blue-600 font-medium">Join Now</button>
                 </>
               )}
             </div>
           )}
         </div>
 
-        {/* Overlay for profile dropdown */}
         {isProfileOpen && <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />}
       </nav>
 
-      {/* Auth Modal */}
       <AuthModal
-        isOpen={authModal.open}
-        onClose={() => setAuthModal({ ...authModal, open: false })}
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode={isLoginMode ? 'login' : 'signup'}
+        onSuccess={closeAuthModal}
       />
+
     </>
   );
 };
