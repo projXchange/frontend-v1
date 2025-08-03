@@ -72,38 +72,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const foundUser = mockUsers.find(u => u.email === email);
-    const correctPassword = mockPasswords[email];
+const login = async (email: string, password: string): Promise<boolean> => {
+  try {
+    const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-    if (foundUser && correctPassword === password) {
-      setUser(foundUser);
-      localStorage.setItem('studystack_user', JSON.stringify(foundUser));
-      return true;
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
+
+    // Shape the user object based on your API response
+    const loggedInUser = {
+      id: data.user.id || '',
+      name: data.user.full_name,
+      email: data.user.email,
+      role: data.user.role || 'student', // fallback role
+      avatar: data.user.avatar || '',     // if available
+      joinedDate: data.user.created_at || new Date().toISOString()
+    };
+
+    setUser(loggedInUser);
+    localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
+
+    if (data.token) {
+      localStorage.setItem('token', data.token); // optional
     }
+
+    return true;
+  } catch (err) {
+    console.error('Login Error:', err);
     return false;
-  };
+  }
+};
 
-  const signup = async (name: string, email: string, password: string, role: 'student' | 'admin'): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    if (mockUsers.find(u => u.email === email)) return false;
+  const signup = async (
+  name: string,
+  email: string,
+  password: string,
+  role: 'student' | 'admin'
+): Promise<boolean> => {
+  try {
+    const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        password,
+        username: email.split('@')[0], // or generate from name
+        full_name: name
+      })
+    });
 
-    const newUser: User = {
-      id: Date.now().toString(),
-      name,
-      email,
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+    // You can shape this however your backend responds
+    const newUser = {
+      id: data.user.id || '',
+      name: data.user.full_name,
+      email: data.user.email,
       role,
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
+      avatar: '', // or generate a default avatar
       joinedDate: new Date().toISOString()
     };
 
-    mockUsers.push(newUser);
-    mockPasswords[email] = password;
     setUser(newUser);
     localStorage.setItem('studystack_user', JSON.stringify(newUser));
     return true;
-  };
+  } catch (err) {
+    console.error('Signup Error:', err);
+    return false;
+  }
+};
+
 
   const logout = () => {
     setUser(null);
