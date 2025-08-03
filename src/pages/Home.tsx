@@ -4,6 +4,7 @@ import { Search, Code, Database, Globe, Smartphone, Star, ArrowRight, Users, Awa
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import DemoVideo from '../assets/Demo.mp4';
+import { ProjectCard } from '../components/ProjectCard';
 
 
 const Home = () => {
@@ -286,78 +287,78 @@ const Home = () => {
       </section>
 
       <section className="py-12 sm:py-16 lg:py-20 mt-12 sm:mt-16 lg:mt-20 bg-white">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    {/* Header */}
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      viewport={{ once: true }}
-      className="text-center mb-12 sm:mb-16"
-    >
-      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
-        Everything students need in one place
-      </h2>
-      <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-        Join thousands of students who are already accelerating their learning journey
-      </p>
-    </motion.div>
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+              Everything students need in one place
+            </h2>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands of students who are already accelerating their learning journey
+            </p>
+          </motion.div>
 
-    {/* Feature Cards */}
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      variants={{
-        visible: { transition: { staggerChildren: 0.15 } },
-      }}
-      viewport={{ once: true }}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mt-12 sm:mt-20"
-    >
-      {features.map((feature, index) => (
-        <motion.div
-          key={index}
-          variants={{
-            hidden: { opacity: 0, y: 30 },
-            visible: { opacity: 1, y: 0 },
-          }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          viewport={{ once: true }}
-          className="text-center group hover:scale-105 transition-all duration-300"
-        >
-          <div className="mb-6 flex justify-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-100 to-teal-100 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-              <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
-            </div>
-          </div>
-          <div className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-            {feature.title}
-          </div>
-          <div className="text-sm sm:text-base text-gray-600">
-            {feature.subtitle}
-          </div>
-        </motion.div>
-      ))}
-    </motion.div>
+          {/* Feature Cards */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.15 } },
+            }}
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mt-12 sm:mt-20"
+          >
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                viewport={{ once: true }}
+                className="text-center group hover:scale-105 transition-all duration-300"
+              >
+                <div className="mb-6 flex justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-100 to-teal-100 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                  </div>
+                </div>
+                <div className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                  {feature.title}
+                </div>
+                <div className="text-sm sm:text-base text-gray-600">
+                  {feature.subtitle}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
 
-    {/* CTA Button */}
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut', delay: 1 }}
-      viewport={{ once: true }}
-      className="mt-16 sm:mt-20 text-center"
-    >
-      <button
-        onClick={() => openAuthModal(false)}
-        className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
-      >
-        🚀 Join Projxchange Now
-      </button>
-    </motion.div>
+          {/* CTA Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 1 }}
+            viewport={{ once: true }}
+            className="mt-16 sm:mt-20 text-center"
+          >
+            <button
+              onClick={() => openAuthModal(false)}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
+            >
+              🚀 Join Projxchange Now
+            </button>
+          </motion.div>
 
-  </div>
-</section>
+        </div>
+      </section>
 
       {/* Categories Section */}
       <section className="py-20 bg-gray-50">
@@ -430,165 +431,7 @@ const Home = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredProjects.map((project, idx) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 60, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{
-                  duration: 0.6,
-                  delay: idx * 0.15,
-                  ease: "easeOut"
-                }}
-                viewport={{ once: true }}
-                whileHover={{
-                  scale: 1.05,
-                  transition: { duration: 0.3 }
-                }}
-              >
-                <Link
-                  to={`/project/${project.id}`}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 relative block"
-                >
-                  {/* Discount Badge */}
-                  {parseInt(project.originalPrice.replace(/\₹/g, '')) > parseInt(project.price.replace(/\₹/g, '')) && (
-                    <motion.span
-                      initial={{ scale: 0, rotate: -180 }}
-                      whileInView={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: idx * 0.15 + 0.3, duration: 0.5 }}
-                      viewport={{ once: true }}
-                      className="absolute top-4 left-4 z-20 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
-                    >
-                      {Math.round((1 - parseInt(project.price.replace(/\$/g, '')) / parseInt(project.originalPrice.replace(/\$/g, ''))) * 100)}% OFF
-                    </motion.span>
-                  )}
-                  {/* Best Seller Badge */}
-                  {idx === 0 && (
-                    <motion.span
-                      initial={{ scale: 0, rotate: 180 }}
-                      whileInView={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: idx * 0.15 + 0.4, duration: 0.5 }}
-                      viewport={{ once: true }}
-                      className="absolute top-4 right-4 z-20 bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
-                    >
-                      Best Seller
-                    </motion.span>
-                  )}
-
-                  <div className="relative overflow-hidden">
-                    <motion.img
-                      src={project.thumbnail}
-                      alt={project.title}
-                      className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-                      initial={{ scale: 1.2, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: idx * 0.15 + 0.2, duration: 0.6 }}
-                      viewport={{ once: true }}
-                    />
-                    {/* Favorite Button */}
-                    <motion.button
-                      initial={{ scale: 0, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: idx * 0.15 + 0.5, duration: 0.3 }}
-                      viewport={{ once: true }}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 flex items-center justify-center hover:bg-pink-100 transition z-20 shadow"
-                      title="Add to favorites"
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        // Add favorite logic here
-                      }}
-                    >
-                      <svg
-                        className="w-5 h-5 text-pink-500"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
-                        />
-                      </svg>
-                    </motion.button>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-
-                  <motion.div
-                    className="p-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.15 + 0.3, duration: 0.5 }}
-                    viewport={{ once: true }}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                        {project.category}
-                      </span>
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="ml-1 text-sm font-semibold text-gray-700">{project.rating}</span>
-                        <span className="ml-1 text-sm text-gray-500">({project.reviews})</span>
-                      </div>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition">
-                      {project.title}
-                    </h3>
-
-                    <p className="text-gray-600 text-sm mb-3">
-                      A high-quality, ready-to-use {project.category} project for students.
-                    </p>
-
-                    <div className="flex items-center mb-4">
-                      <img
-                        src={project.seller.avatar}
-                        alt={project.seller.name}
-                        className="w-8 h-8 rounded-full object-cover mr-3"
-                      />
-                      <div>
-                        <div className="font-semibold text-gray-900 text-sm">{project.seller.name}</div>
-                        <div className="flex items-center text-xs text-gray-600">
-                          <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
-                          {project.seller.rating}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-lg text-xs font-medium"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold text-gray-900">{project.price}</span>
-                        <span className="text-base text-gray-500 line-through">{project.originalPrice}</span>
-                      </div>
-                      <div className="text-right text-sm">
-                        <div className="text-gray-600">{project.sales} sales</div>
-                        <div className="text-green-600 font-medium">{project.deliveryTime} delivery</div>
-                      </div>
-                    </div>
-
-                    {/* ✅ Replaced inner Link with div */}
-                    <div className="text-center">
-                      <div className="inline-block px-6 py-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-full font-semibold shadow hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 hover:scale-105">
-                        View Details
-                      </div>
-                    </div>
-                  </motion.div>
-                </Link>
-              </motion.div>
+              <ProjectCard key={project.id} project={project} index={idx} />
             ))}
           </div>
 
