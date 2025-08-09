@@ -4,19 +4,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import GirlPoster from '../assets/Girl_Poster.png';
 
-
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  initialMode?: 'login' | 'signup'; // Add this line
+  initialMode?: 'login' | 'signup';
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initialMode }) => {
-  const { login, signup } = useAuth();
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initialMode }) => {
+  const { login, signup, resetPassword } = useAuth(); // Make sure these are implemented in your AuthContext
   const navigate = useNavigate();
 
-  const [mode, setMode] = useState<'login' | 'signup'>('signup');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('signup');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -28,17 +27,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initi
   const slideAnim = mode === 'signup' ? 'animate-slideInRight' : 'animate-slideInLeft';
 
   useEffect(() => {
-  if (isOpen) {
-    setIsVisible(true);
-    setIsClosing(false);
-    setEmail('');
-    setName('');
-    setPassword('');
-    setErrorMsg('');
-    setShowPassword(false);
-    setMode(initialMode || 'signup'); // Use prop or fallback
-  }
-}, [isOpen, initialMode]);
+    if (isOpen) {
+      setIsVisible(true);
+      setIsClosing(false);
+      setEmail('');
+      setName('');
+      setPassword('');
+      setErrorMsg('');
+      setShowPassword(false);
+      setMode(initialMode || 'signup');
+    }
+  }, [isOpen, initialMode]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -48,35 +47,55 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initi
     }, 300);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setErrorMsg('');
 
-    if (!email || !password || (mode === 'signup' && !name)) {
-      setErrorMsg('Please fill in all fields.');
+  if (!email || (mode !== 'forgot' && !password)) {
+    setErrorMsg('Please fill in all fields.');
+    return;
+  }
+
+  if (mode === 'signup' && !name) {
+    setErrorMsg('Please enter your full name.');
+    return;
+  }
+
+  if (mode === 'signup' && password.length < 6) {
+    setErrorMsg('Password must be at least 6 characters long.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    let result: { success: boolean; message?: string } = { success: false };
+
+    if (mode === 'signup') {
+      result = await signup(name, email, password, 'student');
+    } else if (mode === 'login') {
+      result = await login(email, password);
+    } else if (mode === 'forgot') {
+      await resetPassword(email);
+      setMode('login');
+      setLoading(false);
       return;
     }
 
-    if (mode === 'signup' && password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters long.');
-      return;
-    }
-
-    setLoading(true);
-    const success =
-      mode === 'signup'
-        ? await signup(name, email, password, 'student')
-        : await login(email, password);
-    setLoading(false);
-
-    if (success) {
+    if (result.success) {
       onSuccess();
       handleClose();
       navigate('/dashboard');
     } else {
-      setErrorMsg(`${mode === 'signup' ? 'Signup' : 'Login'} failed. Please try again.`);
+      setErrorMsg(result.message || `${mode === 'signup' ? 'Signup' : 'Login'} failed. Please try again.`);
     }
-  };
+  } catch (err: any) {
+    setErrorMsg(err.message || 'Something went wrong.');
+  }
+
+  setLoading(false);
+};
+
 
   if (!isVisible) return null;
 
@@ -96,13 +115,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initi
         {/* Left Panel */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-teal-600/90 z-10" />
-          <img
-            src={GirlPoster}
-            alt="Join Community"
-            className="w-full h-full object-cover object-top"
-          />
+          <img src={GirlPoster} alt="Join Community" className="w-full h-full object-cover object-top" />
           <div
-            key={mode} // Re-render on mode change
+            key={mode}
             className={`absolute inset-0 z-20 flex flex-col justify-center items-center text-white px-8 py-12 text-center space-y-6 ${slideAnim}`}
           >
             <h2 className="text-3xl xl:text-4xl font-bold leading-tight">
@@ -116,53 +131,41 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initi
                 ? 'Connect with thousands of students and access premium academic projects'
                 : 'Access your projects, network, and resources in one place'}
             </p>
-            <div className="flex items-center justify-center space-x-6 text-sm mt-4">
-              <div className="flex items-center justify-center space-x-8 text-sm">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">Free</div>
-                  <div className="text-blue-200">To Join</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">24/7</div>
-                  <div className="text-blue-200">Support</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">100%</div>
-                  <div className="text-blue-200">Secure</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Right Panel */}
-        <div className="w-full lg:w-1/2 px-4 sm:px-6 md:px-10 py-8 lg:py-12 relative">
+        <div className="w-full lg:w-1/2 px-6 py-10 sm:px-10 relative">
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="max-w-md mx-auto">
-            {/* Animated Heading & Toggle */}
             <div key={mode} className={`text-center mb-6 sm:mb-8 ${slideAnim}`}>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
+                {mode === 'signup'
+                  ? 'Create Account'
+                  : mode === 'login'
+                  ? 'Welcome Back'
+                  : 'Reset Password'}
               </h2>
-              <p className="text-gray-600 text-sm sm:text-base">
-                {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <button
-                  onClick={() => setMode(mode === 'signup' ? 'login' : 'signup')}
-                  className="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-colors"
-                >
-                  {mode === 'signup' ? 'Sign in here' : 'Sign up now'}
-                </button>
-              </p>
+              {mode !== 'forgot' && (
+                <p className="text-gray-600 text-sm sm:text-base">
+                  {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
+                  <button
+                    onClick={() => setMode(mode === 'signup' ? 'login' : 'signup')}
+                    className="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-colors"
+                  >
+                    {mode === 'signup' ? 'Sign in here' : 'Sign up now'}
+                  </button>
+                </p>
+              )}
             </div>
 
-            {/* Animated Form */}
-            <form key={mode + '-form'} className={`space-y-6 ${slideAnim}`} onSubmit={handleSubmit}>
+            <form onSubmit={handleAuthSubmit} className={`space-y-6 ${slideAnim}`}>
               {mode === 'signup' && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
@@ -171,12 +174,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initi
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-4 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
 
-              {/* Email Field */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
                 <input
@@ -184,79 +186,74 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess ,initi
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full px-4 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                  className="w-full px-4 py-4 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              {/* Password Field */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-4 pr-12 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {mode === 'signup' && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    Must be at least 6 characters long
-                  </p>
-                )}
-              </div>
-
-              {/* Error Message */}
-              {errorMsg && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl animate-shake">
-                  <p className="text-red-600 text-sm font-medium">{errorMsg}</p>
+              {mode !== 'forgot' && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="w-full px-4 py-4 pr-12 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {mode === 'login' && (
+                    <div className="text-right mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setMode('forgot')}
+                        className="text-xs text-blue-600 hover:underline"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* Submit Button */}
+              {errorMsg && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl animate-shake text-sm text-red-600 font-medium">
+                  {errorMsg}
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:scale-105 disabled:opacity-70"
               >
-                {loading ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Signing In...
-                  </>
-                ) : (
-                  <span key={mode} className={slideAnim}>
-                    {mode === 'signup' ? 'Create Account' : 'Login'}
-                  </span>
-                )}
+                {loading
+                  ? 'Please wait...'
+                  : mode === 'signup'
+                  ? 'Create Account'
+                  : mode === 'login'
+                  ? 'Login'
+                  : 'Send Reset Link'}
               </button>
+
+              {mode === 'forgot' && (
+                <div className="text-sm text-center mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Back to Login
+                  </button>
+                </div>
+              )}
             </form>
 
             <div className="text-xs text-gray-500 text-center mt-8">

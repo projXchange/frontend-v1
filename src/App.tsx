@@ -9,10 +9,13 @@ import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import UploadProject from './pages/UploadProject';
 import Footer from './components/Footer';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
+    
     <AuthProvider>
+     <Toaster position="top-right" reverseOrder={false} />  
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Navbar/>

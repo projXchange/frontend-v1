@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 interface User {
   id: string;
@@ -11,9 +12,10 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
-  signup: (name: string, email: string, password: string, role: 'student' | 'admin') => Promise<boolean>;
+  signup: (name: string, email: string, password: string, role: 'student' | 'admin') => Promise<{ success: boolean; message?: string }>;
+  resetPassword: (email: string) => Promise<boolean>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStudent: boolean;
@@ -26,40 +28,6 @@ interface AuthContextType {
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock data
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@studystack.com',
-    role: 'student',
-    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
-    joinedDate: '2023-09-15'
-  },
-  {
-    id: '2',
-    name: 'Admin User',
-    email: 'admin@studystack.com',
-    role: 'admin',
-    avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150',
-    joinedDate: '2023-01-01'
-  },
-  {
-    id: '3',
-    name: 'Sarah Wilson',
-    email: 'sarah@studystack.com',
-    role: 'student',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
-    joinedDate: '2023-10-20'
-  }
-];
-
-const mockPasswords: Record<string, string> = {
-  'john@studystack.com': 'student123',
-  'admin@studystack.com': 'admin123',
-  'sarah@studystack.com': 'student123'
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
@@ -71,87 +39,128 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(JSON.parse(storedUser));
     }
   }, []);
+  const login = async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-const login = async (email: string, password: string): Promise<boolean> => {
-  try {
-    const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+      const data = await res.json();
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Login failed');
+      if (!res.ok) {
+        const errorMsg = data.message || 'Login failed';
+        toast.error(errorMsg);
+        return { success: false, message: errorMsg };
+      }
 
-    // Shape the user object based on your API response
-    const loggedInUser = {
-      id: data.user.id || '',
-      name: data.user.full_name,
-      email: data.user.email,
-      role: data.user.role || 'student', // fallback role
-      avatar: data.user.avatar || '',     // if available
-      joinedDate: data.user.created_at || new Date().toISOString()
-    };
+      // Shape the user object based on your API response
+      const loggedInUser = {
+        id: data.user.id || '',
+        name: data.user.full_name,
+        email: data.user.email,
+        role: data.user.role || 'student', // fallback role
+        avatar: data.user.avatar || '',
+        joinedDate: data.user.created_at || new Date().toISOString()
+      };
 
-    setUser(loggedInUser);
-    localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
+      setUser(loggedInUser);
+      localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
 
-    if (data.token) {
-      localStorage.setItem('token', data.token); // optional
+      if (data.token) {
+        localStorage.setItem('token', data.token); // optional
+      }
+      toast.success("User Logged In Successfuly..")
+      return { success: true };
+    } catch (err) {
+      console.error('Login Error:', err);
+      toast.error('Something went wrong. Please try again.');
+      return { success: false, message: 'Something went wrong. Please try again.' };
     }
+  };
 
-    return true;
-  } catch (err) {
-    console.error('Login Error:', err);
-    return false;
-  }
-};
 
   const signup = async (
-  name: string,
-  email: string,
-  password: string,
-  role: 'student' | 'admin'
-): Promise<boolean> => {
-  try {
-    const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        password,
-        username: email.split('@')[0], // or generate from name
-        full_name: name
-      })
-    });
+    name: string,
+    email: string,
+    password: string,
+    role: 'student' | 'admin'
+  ): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          username: email.split('@')[0], // or generate from name
+          full_name: name
+        })
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Signup failed');
+      const data = await res.json();
+      if (!res.ok) {
+        const errorMsg = data.message || data.error || 'Signup failed';
+        return { success: false, message: errorMsg };
+      }
 
-    // You can shape this however your backend responds
-    const newUser = {
-      id: data.user.id || '',
-      name: data.user.full_name,
-      email: data.user.email,
-      role,
-      avatar: '', // or generate a default avatar
-      joinedDate: new Date().toISOString()
-    };
+      // You can shape this however your backend responds
+      const newUser = {
+        id: data.user.id || '',
+        name: data.user.full_name,
+        email: data.user.email,
+        role,
+        avatar: '', // or generate a default avatar
+        joinedDate: new Date().toISOString()
+      };
 
-    setUser(newUser);
-    localStorage.setItem('studystack_user', JSON.stringify(newUser));
-    return true;
-  } catch (err) {
-    console.error('Signup Error:', err);
-    return false;
-  }
-};
-
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('studystack_user');
+      setUser(newUser);
+      localStorage.setItem('studystack_user', JSON.stringify(newUser));
+      toast.success("User Created Successfully")
+      return { success: true, message: "" };
+    } catch (err) {
+      console.error('Signup Error:', err);
+      return { success: false, message: 'Something went wrong. Please try again.' };
+    }
   };
+
+
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || 'Logout failed');
+        return;
+      }
+
+      // Clear local storage and user state
+      setUser(null);
+      localStorage.removeItem('studystack_user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
+      toast.success(data.message || 'User logged out successfully');
+    } catch (err) {
+      console.error('Logout error:', err);
+      toast.error('Something went wrong while logging out');
+    }
+  };
+
 
   const openAuthModal = (isLogin: boolean = true) => {
     setIsLoginMode(isLogin);
@@ -165,6 +174,7 @@ const login = async (email: string, password: string): Promise<boolean> => {
     login,
     logout,
     signup,
+    resetPassword,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     isStudent: user?.role === 'student',
@@ -176,6 +186,32 @@ const login = async (email: string, password: string): Promise<boolean> => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+const resetPassword = async (email: string): Promise<boolean> => {
+  try {
+    const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || 'Failed to send reset email');
+      return false;
+    }
+
+    toast.success(data.message || 'Password reset email sent successfully');
+    return true;
+  } catch (error) {
+    console.error('Reset Password Error:', error);
+    toast.error('Something went wrong while sending reset email');
+    return false;
+  }
+};
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
