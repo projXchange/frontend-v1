@@ -51,6 +51,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
   e.preventDefault();
   setErrorMsg('');
 
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+    setErrorMsg("Please enter a valid email address.");
+    return;
+  }
+
   if (!email || (mode !== 'forgot' && !password)) {
     setErrorMsg('Please fill in all fields.');
     return;
@@ -95,9 +102,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
 
   setLoading(false);
 };
+useEffect(() => {
+    if (errorMsg) {
+      const timer = setTimeout(() => {
+        setErrorMsg("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMsg]);
 
 
   if (!isVisible) return null;
+  
 
   return (
     <div
