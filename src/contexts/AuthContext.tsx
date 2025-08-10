@@ -53,8 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await res.json();
 
       if (!res.ok) {
-        const errorMsg = data.message || 'Login failed';
-        toast.error(errorMsg);
+        const errorMsg = data.error || 'Login failed';
         return { success: false, message: errorMsg };
       }
 
@@ -77,7 +76,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success("User Logged In Successfuly..")
       return { success: true };
     } catch (err) {
-      console.error('Login Error:', err);
       toast.error('Something went wrong. Please try again.');
       return { success: false, message: 'Something went wrong. Please try again.' };
     }
@@ -97,7 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({
           email,
           password,
-          username: email.split('@')[0], // or generate from name
           full_name: name
         })
       });
@@ -123,7 +120,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success("User Created Successfully")
       return { success: true, message: "" };
     } catch (err) {
-      console.error('Signup Error:', err);
       return { success: false, message: 'Something went wrong. Please try again.' };
     }
   };
@@ -156,7 +152,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast.success(data.message || 'User logged out successfully');
     } catch (err) {
-      console.error('Logout error:', err);
       toast.error('Something went wrong while logging out');
     }
   };
