@@ -1,30 +1,38 @@
 export interface Project {
-  id: number | string;
+  id: string;
   title: string;
-  description?: string;
-  coverImage?: string;
-  techStack: string[];
-  author: {
-    name: string;
-    avatar: string;
-    level?: string;
+  description: string;
+  key_features: string;
+  category: string;
+  author_id: string;
+  buyers: string[];
+  difficulty_level: string;
+  tech_stack: string[];
+  github_url: string;
+  demo_url: string;
+  documentation: string;
+  pricing: {
+    sale_price: number;
+    original_price: number;
+    currency: string;
   };
-  stats: {
-    stars?: number;
-    likes?: number;
-    views?: number;
-    downloads?: number;
-    sales?: number;
+  delivery_time: number;
+  status: string;
+  is_featured: boolean;
+  view_count: number;
+  purchase_count: number;
+  download_count: number;
+  created_at: string;
+  updated_at: string;
+  discount_percentage: number;
+}
+
+export interface ProjectResponse {
+  data: Project[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
   };
-  price?: number;
-  originalPrice?: number;
-  rating?: number;
-  reviews?: number;
-  githubUrl?: string;
-  liveDemo?: string;
-  featured?: boolean;
-  trending?: boolean;
-  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
-  deliveryTime?: string;
-  dateAdded?: string;
 }

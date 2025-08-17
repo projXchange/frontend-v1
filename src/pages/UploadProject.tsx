@@ -23,7 +23,20 @@ const UploadProject = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
 
-  const categories = ['React', 'Java', 'Python', 'PHP', 'Node.js', 'Mobile', 'Full Stack', 'AI/ML', 'DevOps'];
+  const categories = [
+    { label: 'Web Development', value: 'web_development' },
+    { label: 'Mobile Development', value: 'mobile_development' },
+    { label: 'Desktop Application', value: 'desktop_application' },
+    { label: 'AI/Machine Learning', value: 'ai_machine_learning' },
+    { label: 'Blockchain', value: 'blockchain' },
+    { label: 'Game Development', value: 'game_development' },
+    { label: 'Data Science', value: 'data_science' },
+    { label: 'DevOps', value: 'devops' },
+    { label: 'API/Backend', value: 'api_backend' },
+    { label: 'Automation Scripts', value: 'automation_scripts' },
+    { label: 'UI/UX Design', value: 'ui_ux_design' },
+    { label: 'Other', value: 'other' }
+  ];
   const difficulties = ['Beginner', 'Intermediate', 'Advanced'];
 
   const validateField = (name: string, value: string) => {
@@ -144,7 +157,7 @@ const UploadProject = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate all fields
@@ -155,24 +168,141 @@ const UploadProject = () => {
     });
 
     if (Object.keys(errors).length === 0) {
-      alert('Project submitted for review! You will receive notification once it\'s approved.');
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        category: '',
-        price: '',
-        originalPrice: '',
-        youtubeUrl: '',
-        githubUrl: '',
-        liveDemo: '',
-        difficulty: 'Beginner',
-        features: [''],
-        techStack: ['']
-      });
-      setUploadedFiles([]);
-      setPreviewImage('');
-      setCurrentStep(1);
+      try {
+        // First API call - Create project
+        const projectData = {
+          title: formData.title,
+          description: formData.description,
+          key_features: formData.features.filter(f => f.trim()).join(', '),
+                     category: formData.category,
+          difficulty_level: formData.difficulty.toLowerCase(),
+          tech_stack: formData.techStack.filter(tech => tech.trim()),
+          github_url: formData.githubUrl,
+          demo_url: formData.liveDemo,
+          status: "pending_review",
+          documentation: formData.description, // Using description as documentation for now
+          pricing: {
+            sale_price: parseFloat(formData.price),
+            original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : parseFloat(formData.price),
+            currency: "INR"
+          },
+          delivery_time: 1 // Default delivery time
+        
+        };
+
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication token not found. Please login again.');
+        }
+        console.log('Sending project data:', projectData);
+        
+        const projectResponse = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(projectData)
+        });
+
+        console.log('Project response status:', projectResponse.status);
+        
+        if (!projectResponse.ok) {
+          const errorData = await projectResponse.json();
+          console.error('Project creation error:', errorData);
+          throw new Error(`Failed to create project: ${errorData.error || projectResponse.statusText}`);
+        }
+
+        const projectResult = await projectResponse.json();
+        console.log('Project creation response:', projectResult);
+        
+        // Extract project ID from the response
+        const projectId = projectResult.project?.id || projectResult.data?.id || projectResult.data?._id || projectResult.id || projectResult._id;
+        
+        if (!projectId) {
+          throw new Error('Project ID not found in response');
+        }
+
+        // Second API call - Add additional details
+        const dumpData = {
+          thumbnail: previewImage || "",
+          images: uploadedFiles.filter(file => file.type.startsWith('image/')).map(file => file.name),
+          demo_video: formData.youtubeUrl,
+          features: formData.features.filter(f => f.trim()),
+          tags: formData.techStack.filter(tech => tech.trim()),
+          files: {
+            source_files: uploadedFiles.filter(file => file.name.endsWith('.zip') || file.name.endsWith('.rar')).map(file => file.name),
+            documentation_files: uploadedFiles.filter(file => file.name.endsWith('.pdf') || file.name.endsWith('.md')).map(file => file.name),
+            assets: uploadedFiles.filter(file => !file.name.endsWith('.zip') && !file.name.endsWith('.rar') && !file.name.endsWith('.pdf') && !file.name.endsWith('.md')).map(file => file.name),
+            size_mb: uploadedFiles.reduce((total, file) => total + (file.size / 1024 / 1024), 0)
+          },
+          requirements: {
+            system_requirements: ["Windows 10 or higher", "Node.js 16+", "Modern web browser"],
+            dependencies: formData.techStack.filter(tech => tech.trim()),
+            installation_steps: ["Clone the repository", "Install dependencies", "Run the application"]
+          },
+          stats: {
+            total_downloads: 0,
+            total_views: 0,
+            total_likes: 0,
+            completion_rate: 0
+          },
+          rating: {
+            average_rating: 0,
+            total_ratings: 0,
+            rating_distribution: {
+              "5": 0,
+              "4": 0,
+              "3": 0,
+              "2": 0,
+              "1": 0
+            }
+          }
+        };
+
+        console.log('Calling dump API with project ID:', projectId);
+        console.log('Dump data:', dumpData);
+        
+        const dumpResponse = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${projectId}/dump`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(dumpData)
+        });
+
+        if (!dumpResponse.ok) {
+          const errorData = await dumpResponse.json();
+          console.error('Dump API error:', errorData);
+          throw new Error(`Failed to add project details: ${errorData.error || dumpResponse.statusText}`);
+        }
+
+        alert('Project submitted successfully! You will receive notification once it\'s approved.');
+        
+        // Reset form
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          price: '',
+          originalPrice: '',
+          youtubeUrl: '',
+          githubUrl: '',
+          liveDemo: '',
+          difficulty: 'Beginner',
+          features: [''],
+          techStack: ['']
+        });
+        setUploadedFiles([]);
+        setPreviewImage('');
+        setCurrentStep(1);
+        
+      } catch (error) {
+        console.error('Error submitting project:', error);
+        alert('Failed to submit project. Please try again.');
+      }
     }
   };
 
@@ -187,9 +317,9 @@ const UploadProject = () => {
           </div>
         )}
         <div className="absolute top-4 left-4 flex gap-2">
-          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-            {formData.category || 'Category'}
-          </span>
+                     <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+             {categories.find(cat => cat.value === formData.category)?.label || 'Category'}
+           </span>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${formData.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
               formData.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
                 'bg-red-100 text-red-700'
@@ -325,9 +455,9 @@ const UploadProject = () => {
                             className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                           >
                             <option value="">Select a category</option>
-                            {categories.map(category => (
-                              <option key={category} value={category}>{category}</option>
-                            ))}
+                                                         {categories.map(category => (
+                               <option key={category.value} value={category.value}>{category.label}</option>
+                             ))}
                           </select>
                         </div>
 

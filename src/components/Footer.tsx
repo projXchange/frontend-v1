@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">StudyStack</span>
+              <span className="text-xl font-bold">projXchange</span>
             </div>
             <p className="text-gray-400 text-sm">
               Empowering Indian students to share knowledge, build skills, and create opportunities in tech.
@@ -59,7 +59,7 @@ const Footer = () => {
           <div className="flex items-center space-x-6 text-sm text-gray-400">
             <div className="flex items-center space-x-2">
               <Mail className="w-4 h-4" />
-              <span>support@studystack.in</span>
+              <span>support@projXchange.in</span>
             </div>
             <div className="flex items-center space-x-2">
               <Phone className="w-4 h-4" />
@@ -71,7 +71,7 @@ const Footer = () => {
             </div>
           </div>
           <div className="text-sm text-gray-400 mt-4 md:mt-0">
-            © 2024 StudyStack. All rights reserved.
+            © 2024 projXchange. All rights reserved.
           </div>
         </div>
       </div>

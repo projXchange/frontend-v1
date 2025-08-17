@@ -97,7 +97,7 @@ const Navbar = () => {
                         alt={user?.name}
                         className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-100"
                       />
-                      <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+                      <span className="text-sm font-medium text-gray-700">{user?.full_name}</span>
                     </button>
 
                     {isProfileOpen && (
@@ -110,10 +110,10 @@ const Navbar = () => {
                               className="w-10 h-10 rounded-full object-cover"
                             />
                             <div>
-                              <p className="font-semibold text-gray-800">{user?.name}</p>
+                              <p className="font-semibold text-gray-800">{user?.full_name}</p>
                               <p className="text-sm text-gray-500">{user?.email}</p>
                               <p className="text-xs text-blue-600 font-medium capitalize">
-                                {user?.role}
+                                {user?.user_type}
                               </p>
                             </div>
                           </div>

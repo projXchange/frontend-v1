@@ -1,84 +1,123 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Code, Database, Globe, Smartphone, Star, ArrowRight, Users, Award, TrendingUp, Clock, BookOpen, Brain, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import DemoVideo from '../assets/Demo.mp4';
 import { ProjectCard } from '../components/ProjectCard';
-
+import { Project, ProjectResponse } from '../types/Project';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<any[]>([]);
   const { openAuthModal } = useAuth();
 
-  const categories = [
-    { name: 'Java', icon: Code, color: 'bg-gradient-to-br from-orange-500 to-red-500', count: 45, growth: '+12%' },
-    { name: 'Python', icon: Database, color: 'bg-gradient-to-br from-blue-500 to-indigo-600', count: 38, growth: '+8%' },
-    { name: 'PHP', icon: Globe, color: 'bg-gradient-to-br from-purple-500 to-pink-500', count: 32, growth: '+15%' },
-    { name: 'React', icon: Code, color: 'bg-gradient-to-br from-cyan-500 to-blue-500', count: 28, growth: '+20%' },
-    { name: 'Node.js', icon: Database, color: 'bg-gradient-to-br from-green-500 to-emerald-500', count: 25, growth: '+18%' },
-    { name: 'Mobile', icon: Smartphone, color: 'bg-gradient-to-br from-pink-500 to-rose-500', count: 22, growth: '+10%' },
-  ];
+  // Fetch projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=published');
+        const data: ProjectResponse = await response.json();
+        setProjects(data.data || []);
+        console.log(data.data);
+        
+        // Generate categories from real data
+        const categoryCounts: { [key: string]: number } = {};
+        data.data?.forEach(project => {
+          categoryCounts[project.category] = (categoryCounts[project.category] || 0) + 1;
+        });
 
-  const featuredProjects = [
-    {
-      id: 1,
-      title: 'E-commerce Web App',
-      category: 'React',
-      price: '₹29',
-      originalPrice: '₹49',
-      rating: 4.9,
-      reviews: 127,
-      thumbnail: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400',
-      seller: {
-        name: 'John Doe',
-        avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100',
-        level: 'Top Rated',
-        rating: 4.9
-      },
-      tags: ['React', 'Node.js', 'MongoDB'],
-      deliveryTime: '2 days',
-      sales: 89
-    },
-    {
-      id: 2,
-      title: 'Hospital Management System',
-      category: 'Java',
-      price: '₹45',
-      originalPrice: '₹65',
-      rating: 4.8,
-      reviews: 94,
-      thumbnail: 'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=400',
-      seller: {
-        name: 'Sarah Wilson',
-        avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
-        level: 'Level 2',
-        rating: 4.8
-      },
-      tags: ['Java', 'Spring', 'MySQL'],
-      deliveryTime: '3 days',
-      sales: 67
-    },
-    {
-      id: 3,
-      title: 'Social Media Dashboard',
-      category: 'Python',
-      price: '₹35',
-      originalPrice: '₹55',
-      rating: 4.7,
-      reviews: 156,
-      thumbnail: 'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=400',
-      seller: {
-        name: 'Mike Johnson',
-        avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
-        level: 'Top Rated',
-        rating: 4.9
-      },
-      tags: ['Python', 'Django', 'PostgreSQL'],
-      deliveryTime: '1 day',
-      sales: 134
-    }
-  ];
+        const categoryIcons = {
+          'Java': Code,
+          'Python': Database,
+          'PHP': Globe,
+          'React': Code,
+          'Node.js': Database,
+          'Mobile': Smartphone,
+          'JavaScript': Code,
+          'TypeScript': Code,
+          'Angular': Code,
+          'Vue.js': Code,
+          'Django': Database,
+          'Flask': Database,
+          'Laravel': Globe,
+          'Express.js': Database,
+          'MongoDB': Database,
+          'MySQL': Database,
+          'PostgreSQL': Database,
+          'Firebase': Database,
+          'AWS': Globe,
+          'Docker': Globe
+        };
+
+        const generatedCategories = Object.entries(categoryCounts).map(([name, count]) => ({
+          name,
+          icon: categoryIcons[name as keyof typeof categoryIcons] || Code,
+          color: getRandomGradient(),
+          count,
+          growth: `+${Math.floor(Math.random() * 20) + 5}%`
+        }));
+
+        // If no categories from API, use default ones
+        if (generatedCategories.length === 0) {
+          setCategories([
+            { name: 'Java', icon: Code, color: 'bg-gradient-to-br from-orange-500 to-red-500', count: 45, growth: '+12%' },
+            { name: 'Python', icon: Database, color: 'bg-gradient-to-br from-blue-500 to-indigo-600', count: 38, growth: '+8%' },
+            { name: 'PHP', icon: Globe, color: 'bg-gradient-to-br from-purple-500 to-pink-500', count: 32, growth: '+15%' },
+            { name: 'React', icon: Code, color: 'bg-gradient-to-br from-cyan-500 to-blue-500', count: 28, growth: '+20%' },
+            { name: 'Node.js', icon: Database, color: 'bg-gradient-to-br from-green-500 to-emerald-500', count: 25, growth: '+18%' },
+            { name: 'Mobile', icon: Smartphone, color: 'bg-gradient-to-br from-pink-500 to-rose-500', count: 22, growth: '+10%' },
+          ]);
+        } else {
+          setCategories(generatedCategories.slice(0, 6)); // Limit to 6 categories
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        // Fallback to default categories
+        setCategories([
+          { name: 'Java', icon: Code, color: 'bg-gradient-to-br from-orange-500 to-red-500', count: 45, growth: '+12%' },
+          { name: 'Python', icon: Database, color: 'bg-gradient-to-br from-blue-500 to-indigo-600', count: 38, growth: '+8%' },
+          { name: 'PHP', icon: Globe, color: 'bg-gradient-to-br from-purple-500 to-pink-500', count: 32, growth: '+15%' },
+          { name: 'React', icon: Code, color: 'bg-gradient-to-br from-cyan-500 to-blue-500', count: 28, growth: '+20%' },
+          { name: 'Node.js', icon: Database, color: 'bg-gradient-to-br from-green-500 to-emerald-500', count: 25, growth: '+18%' },
+          { name: 'Mobile', icon: Smartphone, color: 'bg-gradient-to-br from-pink-500 to-rose-500', count: 22, growth: '+10%' },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Helper function to get random gradient colors
+  const getRandomGradient = () => {
+    const gradients = [
+      'bg-gradient-to-br from-orange-500 to-red-500',
+      'bg-gradient-to-br from-blue-500 to-indigo-600',
+      'bg-gradient-to-br from-purple-500 to-pink-500',
+      'bg-gradient-to-br from-cyan-500 to-blue-500',
+      'bg-gradient-to-br from-green-500 to-emerald-500',
+      'bg-gradient-to-br from-pink-500 to-rose-500',
+      'bg-gradient-to-br from-yellow-500 to-orange-500',
+      'bg-gradient-to-br from-indigo-500 to-purple-500',
+      'bg-gradient-to-br from-teal-500 to-cyan-500',
+      'bg-gradient-to-br from-red-500 to-pink-500'
+    ];
+    return gradients[Math.floor(Math.random() * gradients.length)];
+  };
+
+  // Get featured projects from API data
+  const featuredProjects = projects
+    .filter(project => project.is_featured)
+    .slice(0, 3);
+
+  // If no featured projects from API, use first 3 projects or fallback
+  const displayProjects = featuredProjects.length > 0 
+    ? featuredProjects 
+    : projects.slice(0, 3);
 
   const testimonials = [
     {
@@ -112,7 +151,7 @@ const Home = () => {
 
   const stats = [
     { number: '10,000+', label: 'Happy Students', icon: Users },
-    { number: '500+', label: 'Quality Projects', icon: Award },
+    { number: `${projects.length}+`, label: 'Quality Projects', icon: Award },
     { number: '98%', label: 'Success Rate', icon: TrendingUp },
     { number: '24/7', label: 'Support', icon: Clock }
   ];
@@ -124,9 +163,6 @@ const Home = () => {
       transition: { delay: i * 0.2, duration: 0.6 },
     }),
   };
-
-
-
 
   const features = [
     {
@@ -249,24 +285,26 @@ const Home = () => {
             {/* Right Side - Floating Cards */}
             <div className="hidden lg:flex flex-col space-y-6 animate-slideInRight" style={{ animationDelay: '1s' }}>
               {/* Floating Project Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
-                    <Code className="w-6 h-6 text-white" />
+              {displayProjects.length > 0 && (
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
+                      <Code className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold">{displayProjects[0].title.length > 20 ? `${displayProjects[0].title.substring(0, 20)}...` : displayProjects[0].title}</h3>
+                      <p className="text-blue-200 text-sm">{displayProjects[0].category} project</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-white font-semibold">React E-commerce</h3>
-                    <p className="text-blue-200 text-sm">Full-stack project</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-white">₹{displayProjects[0].pricing.sale_price}</span>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-white text-sm">4.8</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-white">₹2,499</span>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-white text-sm">4.9</span>
-                  </div>
-                </div>
-              </div>
+              )}
 
               {/* Floating Stats Card */}
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation" style={{ animationDelay: '0.5s' }}>
@@ -276,7 +314,7 @@ const Home = () => {
                     <div className="text-blue-200 text-sm">Students</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">500+</div>
+                    <div className="text-2xl font-bold text-white">{projects.length}+</div>
                     <div className="text-blue-200 text-sm">Projects</div>
                   </div>
                 </div>
@@ -382,34 +420,46 @@ const Home = () => {
           {/* Technologies Grid */}
           <div className="mb-20">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-              {categories.map((category) => (
-                <motion.div
-                  key={category.name}
-                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{
-                    duration: 0.5, delay: 0.5 * 0.1,
-                    ease: "easeOut"
-                  }}
-                  viewport={{ once: true }}
-                  whileHover={{
-                    scale: 1.05,
-                    transition: { duration: 0.2 }
-                  }}
-                >
-                  <Link to={`/projects?category=${category.name.toLowerCase()}`} className="group bg-white rounded-2xl p-6 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 block">
-                    <div className={`w-16 h-16 ${category.color} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110`}>
-                      <category.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{category.name}</h3>
-                    <p className="text-gray-600 text-sm">{category.count} projects</p>
-                    <div className="mt-2 inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      {category.growth}
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
+              {loading ? (
+                // Loading skeleton for categories
+                Array.from({ length: 6 }).map((_, idx) => (
+                  <div key={idx} className="bg-white rounded-2xl p-6 text-center border border-gray-100 animate-pulse">
+                    <div className="w-16 h-16 bg-gray-200 rounded-xl mx-auto mb-4"></div>
+                    <div className="h-5 bg-gray-200 rounded mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded"></div>
+                  </div>
+                ))
+              ) : (
+                categories.map((category) => (
+                  <motion.div
+                    key={category.name}
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      duration: 0.5, delay: 0.5 * 0.1,
+                      ease: "easeOut"
+                    }}
+                    viewport={{ once: true }}
+                    whileHover={{
+                      scale: 1.05,
+                      transition: { duration: 0.2 }
+                    }}
+                  >
+                    <Link to={`/projects?category=${category.name.toLowerCase()}`} className="group bg-white rounded-2xl p-6 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 block">
+                      <div className={`w-16 h-16 ${category.color} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110`}>
+                        <category.icon className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{category.name}</h3>
+                      <p className="text-gray-600 text-sm">{category.count} projects</p>
+                      <div className="mt-2 inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                        <TrendingUp className="w-3 h-3 mr-1" />
+                        {category.growth}
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))
+              )}
             </div>
           </div>
 
@@ -430,9 +480,34 @@ const Home = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProjects.map((project, idx) => (
-              <ProjectCard key={project.id} project={project} index={idx} />
-            ))}
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} className="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse">
+                  <div className="h-56 bg-gray-200"></div>
+                  <div className="p-5">
+                    <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="flex gap-2 mb-4">
+                      <div className="h-6 bg-gray-200 rounded w-16"></div>
+                      <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    </div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))
+            ) : displayProjects.length > 0 ? (
+              displayProjects.map((project, idx) => (
+                <ProjectCard key={project.id} project={project} index={idx} />
+              ))
+            ) : (
+              // No projects message
+              <div className="col-span-full text-center py-12">
+                <div className="text-gray-500 text-lg mb-4">No projects available at the moment</div>
+                <p className="text-gray-400">Check back soon for new projects!</p>
+              </div>
+            )}
           </div>
 
         </div>

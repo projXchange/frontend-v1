@@ -1,22 +1,31 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Tag, Flame } from "lucide-react";
+import { Project } from "../types/Project";
 
 interface ProjectCardProps {
-  project: any;
+  project: Project;
   index: number;
 }
 
 export const ProjectCard = ({ project, index }: ProjectCardProps) => {
-  const discount =
-    parseInt(project.originalPrice.replace(/\₹|\$/g, '')) >
-    parseInt(project.price.replace(/\₹|\$/g, ''));
-  const discountPercent = Math.round(
-    (1 -
-      parseInt(project.price.replace(/\₹|\$/g, '')) /
-        parseInt(project.originalPrice.replace(/\₹|\$/g, ''))) *
-      100
-  );
+  const discount = project.pricing.original_price > project.pricing.sale_price;
+  const discountPercent = discount 
+    ? Math.round((1 - project.pricing.sale_price / project.pricing.original_price) * 100)
+    : 0;
+
+  // Generate a placeholder image based on category
+  const getPlaceholderImage = (category: string) => {
+    const images = {
+      'React': 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400',
+      'Java': 'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=400',
+      'Python': 'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=400',
+      'PHP': 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=400',
+      'Node.js': 'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=400',
+      'Mobile': 'https://images.pexels.com/photos/1181676/pexels-photo-1181676.jpeg?auto=compress&cs=tinysrgb&w=400'
+    };
+    return images[category as keyof typeof images] || images['React'];
+  };
 
   return (
     <motion.div
@@ -34,7 +43,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
         {/* Image */}
         <div className="relative overflow-hidden">
           <motion.img
-            src={project.thumbnail}
+            src={getPlaceholderImage(project.category)}
             alt={project.title}
             className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
             initial={{ scale: 1.2, opacity: 0 }}
@@ -42,6 +51,21 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             transition={{ delay: index * 0.15 + 0.2, duration: 0.6 }}
             viewport={{ once: true }}
           />
+
+          {/* Discount Badge */}
+          {discount && (
+            <div className="absolute top-4 left-4 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+              -{discountPercent}%
+            </div>
+          )}
+
+          {/* Featured Badge */}
+          {project.is_featured && (
+            <div className="absolute top-4 right-4 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <Flame className="w-3 h-3" />
+              Featured
+            </div>
+          )}
 
           {/* Favorite */}
           <motion.button
@@ -91,8 +115,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </span>
             <div className="flex items-center">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              <span className="ml-1 text-sm font-semibold text-gray-800">{project.rating}</span>
-              <span className="ml-1 text-sm text-gray-500">({project.reviews})</span>
+              <span className="ml-1 text-sm font-semibold text-gray-800">4.8</span>
+              <span className="ml-1 text-sm text-gray-500">({project.purchase_count})</span>
             </div>
           </div>
 
@@ -101,26 +125,35 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
           </h3>
 
           <p className="text-gray-600 text-sm mb-3">
-            {project.description ?? `A high-quality, ready-to-use ${project.category} project for students.`}
+            {project.description.length > 100 
+              ? `${project.description.substring(0, 100)}...` 
+              : project.description}
           </p>
 
           <div className="flex flex-wrap gap-2 mb-4">
-            {project.tags.map((tag: string, i: number) => (
+            {project.tech_stack.slice(0, 3).map((tech: string, i: number) => (
               <span
                 key={i}
                 className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-medium"
               >
-                <Tag className="w-3 h-3" /> {tag}
+                <Tag className="w-3 h-3" /> {tech}
               </span>
             ))}
+            {project.tech_stack.length > 3 && (
+              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                +{project.tech_stack.length - 3} more
+              </span>
+            )}
           </div>
 
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-gray-900">{project.price}</span>
-              <span className="text-sm text-gray-500 line-through">{project.originalPrice}</span>
+              <span className="text-lg font-bold text-gray-900">₹{project.pricing.sale_price}</span>
+              {discount && (
+                <span className="text-sm text-gray-500 line-through">₹{project.pricing.original_price}</span>
+              )}
             </div>
-            <div className="text-sm text-gray-600">{project.sales} sales</div>
+            <div className="text-sm text-gray-600">{project.purchase_count} sales</div>
           </div>
 
           <div className="text-center">

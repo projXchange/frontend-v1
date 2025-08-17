@@ -1,14 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { AuthResult, User } from '../types/User';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'student' | 'admin';
-  avatar?: string;
-  joinedDate: string;
-}
 
 interface AuthContextType {
   user: User | null;
@@ -36,13 +29,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const storedUser = localStorage.getItem('studystack_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+   }
   }, []);
-  const login = async (
-    email: string,
-    password: string
-  ): Promise<{ success: boolean; message?: string }> => {
+
+
+  const login = async (email: string, password: string): Promise<AuthResult> => {
     try {
       const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signin', {
         method: 'POST',
@@ -53,41 +46,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await res.json();
 
       if (!res.ok) {
-        const errorMsg = data.error || 'Login failed';
-        return { success: false, message: errorMsg };
+        return { success: false, message: data.error || 'Login failed' };
       }
 
-      // Shape the user object based on your API response
-      const loggedInUser = {
-        id: data.user.id || '',
-        name: data.user.full_name,
+      const loggedInUser: User = {
+        id: data.user.id,
         email: data.user.email,
-        role: data.user.role || 'student', // fallback role
-        avatar: data.user.avatar || '',
-        joinedDate: data.user.created_at || new Date().toISOString()
+        full_name: data.user.full_name,
+        user_type: data.user.user_type,
+        verification_status: data.user.verification_status,
+        created_at: data.user.created_at,
+        updated_at: data.user.updated_at,
+        email_verified: data.user.email_verified
       };
 
       setUser(loggedInUser);
       localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
+      localStorage.setItem('token', data.refreshToken);
 
-      if (data.token) {
-        localStorage.setItem('token', data.token); // optional
-      }
-      toast.success("User Logged In Successfuly..")
-      return { success: true };
-    } catch (err) {
+      
+      toast.success('User Logged In Successfully');
+      return { success: true, user: loggedInUser };
+    } catch {
       toast.error('Something went wrong. Please try again.');
       return { success: false, message: 'Something went wrong. Please try again.' };
     }
   };
-
 
   const signup = async (
     name: string,
     email: string,
     password: string,
     role: 'student' | 'admin'
-  ): Promise<{ success: boolean; message?: string }> => {
+  ): Promise<AuthResult> => {
     try {
       const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signup', {
         method: 'POST',
@@ -95,39 +86,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({
           email,
           password,
-          full_name: name
+          full_name: name,
+          user_type: role
         })
       });
 
       const data = await res.json();
+
       if (!res.ok) {
-        const errorMsg = data.message || data.error || 'Signup failed';
-        return { success: false, message: errorMsg };
+        return { success: false, message: data.message || data.error || 'Signup failed' };
       }
 
-      // You can shape this however your backend responds
-      const newUser = {
-        id: data.user.id || '',
-        name: data.user.full_name,
+      const newUser: User = {
+        id: data.user.id,
         email: data.user.email,
-        role,
-        avatar: '', // or generate a default avatar
-        joinedDate: new Date().toISOString()
+        full_name: data.user.full_name,
+        user_type: data.user.user_type,
+        verification_status: data.user.verification_status,
+        created_at: data.user.created_at,
+        updated_at: data.user.updated_at,
+        email_verified: data.user.email_verified
       };
 
       setUser(newUser);
       localStorage.setItem('studystack_user', JSON.stringify(newUser));
-      toast.success("User Created Successfully")
-      return { success: true, message: "" };
-    } catch (err) {
+      localStorage.setItem('token', data.accessToken);
+
+      // Create default profile entry
+      await fetch('https://projxchange-backend-v1.vercel.app/users/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${data.accessToken}`
+        },
+        body: JSON.stringify({
+          id: data.user.id,
+          rating: 0,
+          total_sales: 0,
+          total_purchases: 0,
+          experience_level: "beginner",
+          avatar: "",
+          bio: "",
+          location: "",
+          website: "",
+          social_links: {
+            additionalProp1: "",
+            additionalProp2: "",
+            additionalProp3: ""
+          },
+          skills: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          status: "active"
+        })
+      });
+
+
+      toast.success('User Created Successfully');
+      return { success: true, user: newUser };
+    } catch (error) {
+      console.error(error);
       return { success: false, message: 'Something went wrong. Please try again.' };
     }
   };
 
-
   const logout = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('token');
 
       const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/logout', {
         method: 'POST',
@@ -144,11 +169,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Clear local storage and user state
       setUser(null);
       localStorage.removeItem('studystack_user');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('token');
 
       toast.success(data.message || 'User logged out successfully');
     } catch (err) {
@@ -156,6 +179,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resetPassword = async (email: string): Promise<boolean> => {
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || 'Failed to send reset email');
+        return false;
+      }
+
+      toast.success(data.message || 'Password reset email sent successfully');
+      return true;
+    } catch (error) {
+      console.error('Reset Password Error:', error);
+      toast.error('Something went wrong while sending reset email');
+      return false;
+    }
+  };
 
   const openAuthModal = (isLogin: boolean = true) => {
     setIsLoginMode(isLogin);
@@ -171,8 +219,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     resetPassword,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
-    isStudent: user?.role === 'student',
+    isAdmin: user?.user_type === 'admin',
+    isStudent: user?.user_type === 'student',
     isAuthModalOpen,
     isLoginMode,
     openAuthModal,
@@ -181,32 +229,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-const resetPassword = async (email: string): Promise<boolean> => {
-  try {
-    const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/forgot-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      toast.error(data.message || 'Failed to send reset email');
-      return false;
-    }
-
-    toast.success(data.message || 'Password reset email sent successfully');
-    return true;
-  } catch (error) {
-    console.error('Reset Password Error:', error);
-    toast.error('Something went wrong while sending reset email');
-    return false;
-  }
-};
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

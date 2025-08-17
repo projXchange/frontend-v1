@@ -1,25 +1,85 @@
-import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Eye, Check, X, Calendar, DollarSign, Users, User, ShoppingBag, Clock, TrendingUp, AlertCircle, BarChart3, Award, Star, Activity, Zap, Target, Filter, Search, ChevronDown, Bell, Settings } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Plus, Edit, Trash2, Eye, Check, X, Calendar, DollarSign, Users, ShoppingBag, Clock, TrendingUp, AlertCircle, BarChart3, Award, Star, Activity, Zap, Target, Filter, Search, ChevronDown, Bell, Settings, FileText, Tag, Upload, IndianRupee, Video, Image, Shield, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-
+import { User, UsersApiResponse } from '../types/User';
+import { Project, ProjectResponse } from '../types/Project';
+import ProjectDetailsModal from '../components/ProjectDetailsModal';
+import UserDetailsModal from '../components/UserDetailsModal';
+import { useNavigate } from 'react-router-dom';
+import { Transaction, TransactionsApiResponse } from '../types/Transaction';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const { user } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [updatingProject, setUpdatingProject] = useState<string | null>(null);
+  const [updatingUser, setUpdatingUser] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [fetchingUserDetails, setFetchingUserDetails] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [projectUpdateData, setProjectUpdateData] = useState({
+    status: '',
+    is_featured: false
+  });
+  const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [pendingProjects, setPendingProjects] = useState<Project[]>([]); // new state
 
-  const stats = {
-    totalProjects: 45,
-    pendingApproval: 8,
-    totalSales: 2540,
-    totalUsers: 156,
-    monthlyGrowth: 24,
-    avgRating: 4.8,
-    activeUsers: 89,
-    revenue: 12450,
-    conversionRate: 3.2
-  };
+  
+const fetchAllStats = async () => {
+  setLoading(true);
+  setError('');
+  const token = localStorage.getItem("token");
+
+  try {
+    // Fetch in parallel for efficiency
+    const [usersRes, projectsRes, transactionsRes, pendingProjectsRes] = await Promise.all([
+      fetch('https://projxchange-backend-v1.vercel.app/admin/users', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      }),
+      fetch('https://projxchange-backend-v1.vercel.app/projects', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      }),
+      fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      }),
+      fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending_review', {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      }),
+    ]);
+
+    if (!usersRes.ok || !projectsRes.ok || !transactionsRes.ok || !pendingProjectsRes.ok) {
+      throw new Error('Failed to fetch one or more resources');
+    }
+
+    // Parse JSON in parallel
+    const [usersData, projectsData, transactionsData, pendingProjectsData] = await Promise.all([
+      usersRes.json(),
+      projectsRes.json(),
+      transactionsRes.json(),
+      pendingProjectsRes.json(),
+    ]);
+
+    setUsers(usersData.users);
+    setProjects(projectsData.data || []);
+    setTransactions(transactionsData.transactions);
+    setPendingProjects(pendingProjectsData.data || []); // ✅ store pending projects
+
+  } catch (err) {
+    console.error(err);
+    setError('Could not load dashboard stats. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const recentActivity = [
     { id: 1, action: 'New project submitted', user: 'John Doe', time: '2 hours ago', type: 'project', avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100', status: 'pending' },
@@ -38,157 +98,377 @@ const AdminDashboard = () => {
     { month: 'Jun', sales: 2800, projects: 35, users: 156 }
   ];
 
-  const projects = [
-    {
-      id: 1,
-      title: 'E-commerce Web Application',
-      seller: 'John Doe',
-      category: 'React',
-      price: 29,
-      originalPrice: 49,
-      status: 'approved',
-      dateSubmitted: '2024-01-15',
-      sales: 23,
-      rating: 4.9,
-      thumbnail: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=100',
-      featured: true,
-      trending: true
-    },
-    {
-      id: 2,
-      title: 'Hospital Management System',
-      seller: 'Sarah Wilson',
-      category: 'Java',
-      price: 45,
-      originalPrice: 65,
-      status: 'approved',
-      dateSubmitted: '2024-01-10',
-      sales: 18,
-      rating: 4.8,
-      thumbnail: 'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=100',
-      featured: false,
-      trending: false
-    },
-    {
-      id: 3,
-      title: 'Social Media Dashboard',
-      seller: 'Mike Johnson',
-      category: 'Python',
-      price: 35,
-      originalPrice: 55,
-      status: 'pending',
-      dateSubmitted: '2024-01-08',
-      sales: 0,
-      rating: 0,
-      thumbnail: 'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=100',
-      featured: false,
-      trending: true
-    },
-    {
-      id: 4,
-      title: 'Task Management App',
-      seller: 'Emma Davis',
-      category: 'React',
-      price: 22,
-      originalPrice: 35,
-      status: 'pending',
-      dateSubmitted: '2024-01-05',
-      sales: 0,
-      rating: 0,
-      thumbnail: 'https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=100',
-      featured: false,
-      trending: false
-    }
-  ];
+  const stats = {
+  totalProjects: projects.length,
+  pendingApproval: pendingProjects.length,
+  totalSales: transactions.length, // or derive from transactions
+  totalUsers: users.length,
+  monthlyGrowth: 24, // could be derived later
+  avgRating: 4.8,   // placeholder for now
+  activeUsers: users.filter(u => u.status === 'active').length,
+  revenue: transactions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
+  conversionRate: 3.2
+};
 
-  const users = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@studystack.com',
-      role: 'student',
-      joinedDate: '2023-09-15',
-      projectsOwned: 3,
-      totalSpent: 109,
-      status: 'active',
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100',
-      lastActive: '2024-01-20'
-    },
-    {
-      id: 2,
-      name: 'Sarah Wilson',
-      email: 'sarah@studystack.com',
-      role: 'student',
-      joinedDate: '2023-10-20',
-      projectsOwned: 2,
-      totalSpent: 74,
-      status: 'active',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
-      lastActive: '2024-01-19'
-    },
-    {
-      id: 3,
-      name: 'Mike Johnson',
-      email: 'mike@studystack.com',
-      role: 'student',
-      joinedDate: '2023-11-05',
-      projectsOwned: 1,
-      totalSpent: 35,
-      status: 'inactive',
-      avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
-      lastActive: '2024-01-10'
-    }
-  ];
 
-  const transactions = [
-    {
-      id: 1,
-      project: 'E-commerce Web Application',
-      buyer: 'Alice Johnson',
-      seller: 'John Doe',
-      amount: 29,
-      commission: 2.9,
-      date: '2024-01-20',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      project: 'Hospital Management System',
-      buyer: 'Bob Smith',
-      seller: 'Sarah Wilson',
-      amount: 45,
-      commission: 4.5,
-      date: '2024-01-19',
-      status: 'completed'
-    },
-    {
-      id: 3,
-      project: 'Social Media Dashboard',
-      buyer: 'Carol Brown',
-      seller: 'Mike Johnson',
-      amount: 35,
-      commission: 3.5,
-      date: '2024-01-18',
-      status: 'pending'
-    }
-  ];
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-  const handleApprove = (id: number) => {
-    alert(`Project ${id} approved!`);
+      if (!res.ok) throw new Error('Failed to fetch users');
+
+      const data: UsersApiResponse = await res.json();
+      setUsers(data.users);
+    } catch (err) {
+      console.error(err);
+      setError('Could not load users. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReject = (id: number) => {
-    alert(`Project ${id} rejected!`);
+  const fetchProjects = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch projects');
+
+      const data: ProjectResponse = await res.json();
+      setProjects(data.data || []);
+    } catch (err) {
+      console.error(err);
+      setError('Could not load projects. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id: number) => {
+  const fetchPendingProjects = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending_review', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch pending projects');
+
+      const data: ProjectResponse = await res.json();
+      setPendingProjects(data.data || []);
+    } catch (err) {
+      console.error(err);
+      setError('Could not load pending projects. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // API function to update project status
+  const updateProjectStatus = async (projectId: string, status: string, isFeatured: boolean) => {
+    setUpdatingProject(projectId);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/projects/${projectId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: status,
+          is_featured: isFeatured
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update project status');
+      }
+
+      const data = await response.json();
+
+      // Update the project in the local state
+      setProjects(prevProjects =>
+        prevProjects.map(project =>
+          project.id === projectId
+            ? { ...project, status: data.project.status, is_featured: data.project.is_featured }
+            : project
+        )
+      );
+
+      alert(`Project ${status === 'approved' ? 'approved' : status === 'suspended' ? 'suspended' : 'updated'} successfully!`);
+    } catch (error) {
+      console.error('Error updating project status:', error);
+      alert('Failed to update project status. Please try again.');
+    } finally {
+      setUpdatingProject(null);
+    }
+  };
+
+  // API function to update user status
+  const updateUserStatus = async (userId: string, verificationStatus: string, emailVerified: boolean) => {
+    setUpdatingUser(userId);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          verification_status: verificationStatus,
+          email_verified: emailVerified
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to update user status');
+      }
+
+      const data = await response.json();
+
+      // Update the user in the local state
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === userId
+            ? { ...user, verification_status: verificationStatus }
+            : user
+        )
+      );
+      alert(`User status updated successfully!`);
+      setIsUserModalOpen(false);
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      alert(`Failed to update user status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setUpdatingUser(null);
+    }
+  };
+
+  // API function to delete user
+  const deleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      const data = await response.json();
+
+      // Remove the user from the local state
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+
+      alert('User deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user. Please try again.');
+    }
+  };
+
+  // API function to fetch user details
+  const fetchUserDetails = async (userId: string) => {
+    setFetchingUserDetails(true);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user details');
+      }
+
+      const data = await response.json();
+      setSelectedUser(data.user);
+      setIsUserModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      alert('Failed to fetch user details. Please try again.');
+    } finally {
+      setFetchingUserDetails(false);
+    }
+  };
+
+  const openProjectModal = (project: Project) => {
+    setSelectedProject(project);
+    setProjectUpdateData({
+      status: project.status,
+      is_featured: project.is_featured
+    });
+    setIsProjectModalOpen(true);
+  };
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch transactions');
+
+      const data: TransactionsApiResponse = await res.json();
+      setTransactions(data.transactions);
+    } catch (err) {
+      console.error(err);
+      setError('Could not load transactions. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProjectStatusUpdate = async () => {
+    if (!selectedProject) return;
+
+    setUpdatingProjectStatus(true);
+    const token = localStorage.getItem("token");
+
+    // Check if token exists
+    if (!token) {
+      alert('Authentication token not found. Please login again.');
+      setUpdatingProjectStatus(false);
+      return;
+    }
+
+    // Debug logging
+    console.log('Updating project:', selectedProject.id);
+    console.log('Project ID type:', typeof selectedProject.id);
+    console.log('Update data:', projectUpdateData);
+    console.log('API URL:', `https://projxchange-backend-v1.vercel.app/admin/projects/${selectedProject.id}/status`);
+    console.log('Token exists:', !!token);
+
+    // Check if project ID is valid
+    if (!selectedProject.id || selectedProject.id.trim() === '') {
+      alert('Invalid project ID');
+      setUpdatingProjectStatus(false);
+      return;
+    }
+
+    try {
+      const requestBody = {
+        status: projectUpdateData.status,
+        is_featured: projectUpdateData.is_featured
+      };
+
+      console.log('Request body:', requestBody);
+      console.log('Request body JSON:', JSON.stringify(requestBody));
+
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/projects/${selectedProject.id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to update project status: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Update the project in the local state
+      setProjects(prevProjects =>
+        prevProjects.map(project =>
+          project.id === selectedProject.id
+            ? { ...project, status: data.project.status, is_featured: data.project.is_featured }
+            : project
+        )
+      );
+
+      alert('Project status updated successfully!');
+      setIsProjectModalOpen(false);
+      setSelectedProject(null);
+
+      // Refresh the projects list
+      if (activeTab === 'approval') {
+        fetchPendingProjects();
+      } else if (activeTab === 'projects') {
+        fetchProjects();
+      }
+    } catch (error) {
+      console.error('Error updating project status:', error);
+      alert('Failed to update project status. Please try again.');
+    } finally {
+      setUpdatingProjectStatus(false);
+    }
+  };
+
+ 
+
+  const handleReject = (id: string) => {
+    updateProjectStatus(id, 'suspended', false);
+  };
+
+  const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this project?')) {
+      // Note: There's no delete project API provided, so this will just show an alert
       alert(`Project ${id} deleted!`);
     }
   };
 
+  const handleToggleFeatured = (id: string, currentFeatured: boolean) => {
+    const project = projects.find(p => p.id === id);
+    if (project) {
+      updateProjectStatus(id, project.status, !currentFeatured);
+    }
+  };
+
+
   const StatCard = ({ title, value, subtitle, icon: Icon, color, trend, onClick }: any) => (
-    <div 
+    <div
       className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group"
       onClick={onClick}
     >
@@ -209,85 +489,26 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  );
+  );  
+ // fetchAllStats will load everything once when dashboard mounts
+useEffect(() => {
+  fetchAllStats();
+}, []);
 
-  const AddProjectModal = () => (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-white rounded-3xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-slideInUp">
-        <h2 className="text-3xl font-bold mb-8 text-gray-900">Add New Project</h2>
-        <form className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Project Title</label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow duration-200"
-              placeholder="Enter project title"
-            />
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Category</label>
-              <select className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow duration-200">
-                <option>React</option>
-                <option>Java</option>
-                <option>Python</option>
-                <option>PHP</option>
-                <option>Mobile</option>
-                <option>Node.js</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Price ($)</label>
-              <input
-                type="number"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow duration-200"
-                placeholder="0"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Description</label>
-            <textarea
-              rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow duration-200 resize-none"
-              placeholder="Project description"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">YouTube Video URL</label>
-            <input
-              type="url"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow duration-200"
-              placeholder="https://youtube.com/watch?v=..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Project Files</label>
-            <input
-              type="file"
-              accept=".zip,.rar"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow duration-200"
-            />
-          </div>
-          <div className="flex gap-4 pt-6">
-            <button
-              type="submit"
-              className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              Add Project
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(false)}
-              className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+// tab-specific fetching (only when you want fresh detail view)
+useEffect(() => {
+  if (activeTab === 'users') {
+    fetchUsers();
+  } else if (activeTab === 'projects') {
+    fetchProjects();
+  } else if (activeTab === 'approval') {
+    fetchPendingProjects();
+  } else if (activeTab === 'transactions') {
+    fetchTransactions();
+  }
+}, [activeTab]);
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -303,7 +524,7 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div className="animate-slideInLeft">
               <h1 className="text-4xl font-bold mb-3">Admin Dashboard</h1>
-              <p className="text-blue-100 text-lg">Welcome back, {user?.name}! Manage your platform with ease.</p>
+              <p className="text-blue-100 text-lg">Welcome back, {user?.full_name}! Manage your platform with ease.</p>
               <div className="flex items-center gap-6 mt-4">
                 <div className="flex items-center gap-2">
                   <Activity className="w-5 h-5 text-green-300" />
@@ -371,8 +592,8 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
             <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setIsAddModalOpen(true)}
+              <button
+                onClick={() => navigate("/upload")}
                 className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
               >
                 <Plus className="w-4 h-4" />
@@ -405,11 +626,10 @@ const AdminDashboard = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 py-6 px-2 border-b-2 font-semibold text-sm transition-all duration-300 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600 scale-105'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:scale-105'
-                  }`}
+                  className={`flex items-center gap-3 py-6 px-2 border-b-2 font-semibold text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600 scale-105'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:scale-105'
+                    }`}
                 >
                   <tab.icon className="w-5 h-5" />
                   {tab.label}
@@ -427,7 +647,7 @@ const AdminDashboard = () => {
             {activeTab === 'overview' && (
               <div className="animate-slideInUp">
                 <h2 className="text-2xl font-bold text-gray-900 mb-8">Platform Overview</h2>
-                
+
                 <div className="grid lg:grid-cols-3 gap-8">
                   {/* Recent Activity */}
                   <div className="lg:col-span-2">
@@ -440,18 +660,17 @@ const AdminDashboard = () => {
                         {recentActivity.map((activity, index) => (
                           <div key={activity.id} className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                             <div className="flex items-center gap-4">
-                              <img 
-                                src={activity.avatar} 
+                              <img
+                                src={activity.avatar}
                                 alt={activity.user}
                                 className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-100"
                               />
-                              <div className={`w-3 h-3 rounded-full ${
-                                activity.type === 'project' ? 'bg-blue-500' :
+                              <div className={`w-3 h-3 rounded-full ${activity.type === 'project' ? 'bg-blue-500' :
                                 activity.type === 'approval' ? 'bg-green-500' :
-                                activity.type === 'user' ? 'bg-purple-500' :
-                                activity.type === 'payment' ? 'bg-yellow-500' :
-                                'bg-red-500'
-                              }`} />
+                                  activity.type === 'user' ? 'bg-purple-500' :
+                                    activity.type === 'payment' ? 'bg-yellow-500' :
+                                      'bg-red-500'
+                                }`} />
                               <div>
                                 <span className="text-gray-900 font-semibold">{activity.action}</span>
                                 <div className="text-sm text-gray-600">by {activity.user}</div>
@@ -459,13 +678,12 @@ const AdminDashboard = () => {
                             </div>
                             <div className="text-right">
                               <span className="text-sm text-gray-500 font-medium">{activity.time}</span>
-                              <div className={`text-xs px-2 py-1 rounded-full mt-1 ${
-                                activity.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                              <div className={`text-xs px-2 py-1 rounded-full mt-1 ${activity.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                                 activity.status === 'approved' ? 'bg-green-100 text-green-700' :
-                                activity.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                                activity.status === 'active' ? 'bg-purple-100 text-purple-700' :
-                                'bg-red-100 text-red-700'
-                              }`}>
+                                  activity.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                                    activity.status === 'active' ? 'bg-purple-100 text-purple-700' :
+                                      'bg-red-100 text-red-700'
+                                }`}>
                                 {activity.status}
                               </div>
                             </div>
@@ -474,7 +692,7 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Quick Stats */}
                   <div className="space-y-6">
                     <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-6 border border-blue-100">
@@ -497,7 +715,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
                       <h4 className="font-bold text-purple-900 mb-4">Platform Health</h4>
                       <div className="space-y-3">
@@ -532,7 +750,7 @@ const AdminDashboard = () => {
                   <BarChart3 className="w-7 h-7 text-blue-600" />
                   Analytics & Reports
                 </h2>
-                
+
                 <div className="grid lg:grid-cols-2 gap-8 mb-8">
                   {/* Sales Chart */}
                   <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-100 shadow-lg">
@@ -549,8 +767,8 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-3">
-                            <div 
-                              className="bg-gradient-to-r from-blue-500 to-teal-500 h-3 rounded-full transition-all duration-1000" 
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-teal-500 h-3 rounded-full transition-all duration-1000"
                               style={{ width: `${(data.sales / 3000) * 100}%` }}
                             />
                           </div>
@@ -558,7 +776,7 @@ const AdminDashboard = () => {
                       ))}
                     </div>
                   </div>
-                  
+
                   {/* Top Categories */}
                   <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-100 shadow-lg">
                     <h3 className="text-xl font-bold mb-6">Popular Categories</h3>
@@ -583,7 +801,7 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* KPI Cards */}
                 <div className="grid md:grid-cols-4 gap-6">
                   <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
@@ -632,100 +850,118 @@ const AdminDashboard = () => {
                     >
                       <option value="all">All Status</option>
                       <option value="approved">Approved</option>
-                      <option value="pending">Pending</option>
-                      <option value="rejected">Rejected</option>
+                      <option value="pending_review">Pending Review</option>
+                      <option value="published">Published</option>
+                      <option value="suspended">Suspended</option>
+                      <option value="archived">Archived</option>
                     </select>
-                    <button 
-                      onClick={() => setIsAddModalOpen(true)}
-                      className="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-                    >
-                      <Plus className="w-5 h-5" />
-                      Add Project
-                    </button>
+
                   </div>
                 </div>
-                
-                <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Seller</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Sales</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {projects.filter(p => p.status === 'approved').map((project, index) => (
-                          <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <img 
-                                  src={project.thumbnail} 
-                                  alt={project.title}
-                                  className="w-12 h-12 rounded-lg object-cover shadow-sm"
-                                />
-                                <div>
-                                  <div className="font-semibold text-gray-900">{project.title}</div>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    {project.featured && (
-                                      <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Featured</span>
-                                    )}
-                                    {project.trending && (
-                                      <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">Trending</span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {project.seller}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
-                                {project.category}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-bold text-gray-900">${project.price}</span>
-                                <span className="text-xs text-gray-500 line-through">${project.originalPrice}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm font-bold text-gray-900">
-                              {project.sales}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-green-100 text-green-800">
-                                {project.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex space-x-2">
-                                <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110">
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                <button className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110">
-                                  <Edit className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleDelete(project.id)}
-                                  className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
+
+                {loading ? (
+                  <div className="bg-white rounded-2xl p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading projects...</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Author ID</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Sales</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {projects
+                            .filter(p => filterStatus === 'all' || p.status === filterStatus)
+                            .filter(p => searchTerm === '' || p.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                            .map((project, index) => (
+                              <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                                <td className="px-6 py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
+                                      <span className="text-white font-bold text-lg">{project.title.charAt(0)}</span>
+                                    </div>
+                                    <div>
+                                      <div className="font-semibold text-gray-900">{project.title}</div>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        {project.is_featured && (
+                                          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Featured</span>
+                                        )}
+                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">{project.difficulty_level}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                  {project.author_id}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
+                                    {project.category}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-bold text-gray-900">₹{project.pricing.sale_price}</span>
+                                    <span className="text-xs text-gray-500 line-through">₹{project.pricing.original_price}</span>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                                  {project.purchase_count}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                    project.status === 'pending_review' ? 'bg-yellow-100 text-yellow-800' :
+                                      project.status === 'published' ? 'bg-blue-100 text-blue-800' :
+                                        project.status === 'suspended' ? 'bg-red-100 text-red-800' :
+                                          project.status === 'archived' ? 'bg-gray-100 text-gray-800' :
+                                            'bg-gray-100 text-gray-800'
+                                    }`}>
+                                    {project.status.replace('_', ' ')}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex space-x-2">
+                                    <button
+                                      onClick={() => openProjectModal(project)}
+                                      className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleToggleFeatured(project.id, project.is_featured)}
+                                      disabled={updatingProject === project.id}
+                                      className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${project.is_featured
+                                        ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
+                                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                      <Star className={`w-4 h-4 ${project.is_featured ? 'fill-current' : ''}`} />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(project.id)}
+                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -751,80 +987,86 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
-                <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">User</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Role</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Joined</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Projects</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Spent</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {users.map((user, index) => (
-                          <tr key={user.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-4">
-                                <img 
-                                  src={user.avatar} 
-                                  alt={user.name}
-                                  className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-100 shadow-sm"
-                                />
-                                <div>
-                                  <div className="font-semibold text-gray-900">{user.name}</div>
-                                  <div className="text-sm text-gray-600">{user.email}</div>
-                                  <div className="text-xs text-gray-500">Last active: {user.lastActive}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                              }`}>
-                                {user.role}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {new Date(user.joinedDate).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 text-sm font-bold text-gray-900">
-                              {user.projectsOwned}
-                            </td>
-                            <td className="px-6 py-4 text-sm font-bold text-green-600">
-                              ${user.totalSpent}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                              }`}>
-                                {user.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex space-x-2">
-                                <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110">
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                <button className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110">
-                                  <Edit className="w-4 h-4" />
-                                </button>
-                                <button className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110">
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+
+                {loading ? (
+                  <div className="bg-white rounded-2xl p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading users...</p>
                   </div>
-                </div>
+                ) : (
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">User</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Role</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Joined</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {users.map((user, index) => (
+                            <tr key={user.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
+                                    <span className="text-white font-bold text-lg">{user.full_name.charAt(0)}</span>
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-gray-900">{user.full_name}</div>
+                                    <div className="text-sm text-gray-600">{user.email}</div>
+                                    <div className="text-xs text-gray-500">Last active: {new Date(user.updated_at).toLocaleDateString()}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${user.user_type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                                  }`}>
+                                  {user.user_type}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                {new Date(user.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
+                                  user.verification_status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                    'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                  {user.verification_status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex space-x-2">
+                                  <button
+                                    onClick={() => fetchUserDetails(user.id)}
+                                    disabled={fetchingUserDetails}
+                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                  >
+                                    {fetchingUserDetails ? (
+                                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                      <Eye className="w-4 h-4" />
+                                    )}
+                                  </button>
+
+                                  <button
+                                    onClick={() => deleteUser(user.id)}
+                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -834,86 +1076,92 @@ const AdminDashboard = () => {
                   <AlertCircle className="w-7 h-7 text-orange-600" />
                   Pending Approval
                   <span className="bg-orange-500 text-white text-sm px-3 py-1 rounded-full animate-pulse">
-                    {projects.filter(p => p.status === 'pending').length}
+                    {pendingProjects.length}
                   </span>
                 </h2>
-                
-                <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gradient-to-r from-orange-50 to-yellow-50">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Seller</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Submitted</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {projects.filter(p => p.status === 'pending').map((project, index) => (
-                          <tr key={project.id} className="hover:bg-orange-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <img 
-                                  src={project.thumbnail} 
-                                  alt={project.title}
-                                  className="w-12 h-12 rounded-lg object-cover shadow-sm"
-                                />
-                                <div>
-                                  <div className="font-semibold text-gray-900">{project.title}</div>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">Pending Review</span>
-                                    {project.trending && (
-                                      <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">Trending</span>
-                                    )}
+
+                {loading ? (
+                  <div className="bg-white rounded-2xl p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading pending projects...</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gradient-to-r from-orange-50 to-yellow-50">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Author ID</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Submitted</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {pendingProjects.map((project, index) => (
+                            <tr key={project.id} className="hover:bg-orange-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                                    <span className="text-white font-bold text-lg">{project.title.charAt(0)}</span>
+                                  </div>
+                                  <div>
+                                    <div className="font-semibold text-gray-900">{project.title}</div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">Pending Review</span>
+                                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">{project.difficulty_level}</span>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {project.seller}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
-                                {project.category}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-bold text-gray-900">${project.price}</span>
-                                <span className="text-xs text-gray-500 line-through">${project.originalPrice}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {new Date(project.dateSubmitted).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex space-x-2">
-                                <button className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110">
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleApprove(project.id)}
-                                  className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110"
-                                >
-                                  <Check className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleReject(project.id)}
-                                  className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                {project.author_id}
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
+                                  {project.category}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-bold text-gray-900">₹{project.pricing.sale_price}</span>
+                                  <span className="text-xs text-gray-500 line-through">₹{project.pricing.original_price}</span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                {new Date(project.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex space-x-2">
+                                  <button
+                                    onClick={() => openProjectModal(project)}
+                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
+
+                                  <button
+                                    onClick={() => handleReject(project.id)}
+                                    disabled={updatingProject === project.id}
+                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                  >
+                                    {updatingProject === project.id ? (
+                                      <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                      <X className="w-4 h-4" />
+                                    )}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -923,62 +1171,94 @@ const AdminDashboard = () => {
                   <DollarSign className="w-7 h-7 text-green-600" />
                   Transaction History
                 </h2>
-                
-                <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gradient-to-r from-green-50 to-emerald-50">
+
+                {loading ? (
+                  <div className="text-center text-gray-500">Loading transactions...</div>
+                ) : error ? (
+                  <div className="text-center text-red-500">{error}</div>
+                ) : transactions.length === 0 ? (
+                  <div className="bg-white rounded-2xl p-8 text-center">
+                    <div className="text-gray-500 text-lg mb-4">No transactions found</div>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
+                    <table className="min-w-full text-left text-sm text-gray-600">
+                      <thead className="bg-gray-50 text-gray-700 font-semibold">
                         <tr>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Buyer</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Seller</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Amount</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Commission</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
-                          <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                          <th className="px-6 py-4">Transaction ID</th>
+                          <th className="px-6 py-4">Project</th>
+                          <th className="px-6 py-4">Buyer</th>
+                          <th className="px-6 py-4">Amount</th>
+                          <th className="px-6 py-4">Status</th>
+                          <th className="px-6 py-4">Date</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {transactions.map((transaction, index) => (
-                          <tr key={transaction.id} className="hover:bg-green-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                            <td className="px-6 py-4">
-                              <div className="font-semibold text-gray-900">{transaction.project}</div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {transaction.buyer}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {transaction.seller}
-                            </td>
-                            <td className="px-6 py-4 text-sm font-bold text-green-600">
-                              ${transaction.amount}
-                            </td>
-                            <td className="px-6 py-4 text-sm font-bold text-blue-600">
-                              ${transaction.commission}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                              {new Date(transaction.date).toLocaleDateString()}
+                      <tbody>
+                        {transactions.map((tx) => (
+                          <tr key={tx.id} className="border-t">
+                            <td className="px-6 py-4 font-mono">{tx.transaction_id}</td>
+                            <td className="px-6 py-4 flex items-center gap-3">
+                              <img src={tx.project.thumbnail} alt={tx.project.title} className="w-8 h-8 rounded" />
+                              {tx.project.title}
                             </td>
                             <td className="px-6 py-4">
-                              <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                transaction.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {transaction.status}
+                              <div>{tx.buyer.full_name}</div>
+                              <div className="text-xs text-gray-400">{tx.buyer.email}</div>
+                            </td>
+                            <td className="px-6 py-4 font-semibold">
+                              {tx.amount} {tx.currency}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${tx.status === 'success'
+                                    ? 'bg-green-100 text-green-600'
+                                    : tx.status === 'pending'
+                                      ? 'bg-yellow-100 text-yellow-600'
+                                      : 'bg-red-100 text-red-600'
+                                  }`}
+                              >
+                                {tx.status}
                               </span>
                             </td>
+                            <td className="px-6 py-4">{new Date(tx.created_at).toLocaleDateString()}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                </div>
+                )}
               </div>
             )}
+
           </div>
         </div>
       </div>
 
-      {isAddModalOpen && <AddProjectModal />}
+
+      {isUserModalOpen && <UserDetailsModal
+        isOpen={isUserModalOpen}
+        user={selectedUser}
+        onClose={() => {
+          setIsUserModalOpen(false);
+          setSelectedUser(null);
+        }}
+        onUpdateUserStatus={updateUserStatus}
+        updatingUser={updatingUser}
+      />}
+      {isProjectModalOpen && (
+        <ProjectDetailsModal
+          isOpen={isProjectModalOpen}
+          onClose={() => {
+            setIsProjectModalOpen(false);
+            setSelectedProject(null);
+          }}
+          project={selectedProject}
+          projectUpdateData={projectUpdateData}
+          onUpdateDataChange={setProjectUpdateData}
+          onUpdate={handleProjectStatusUpdate}
+          updatingProjectStatus={updatingProjectStatus}
+        />
+      )}
     </div>
   );
 };

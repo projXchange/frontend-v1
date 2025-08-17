@@ -3,6 +3,8 @@ import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import GirlPoster from '../assets/Girl_Poster.png';
+import { AuthResult, User } from '../types/User';
+import { div } from 'framer-motion/client';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -48,61 +50,65 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
   };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setErrorMsg('');
+    e.preventDefault();
+    setErrorMsg('');
 
-   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
-    setErrorMsg("Please enter a valid email address.");
-    return;
-  }
-
-  if (!email || (mode !== 'forgot' && !password)) {
-    setErrorMsg('Please fill in all fields.');
-    return;
-  }
-
-  if (mode === 'signup' && !name) {
-    setErrorMsg('Please enter your full name.');
-    return;
-  }
-
-  if (mode === 'signup' && password.length < 6) {
-    setErrorMsg('Password must be at least 6 characters long.');
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    let result: { success: boolean; message?: string } = { success: false };
-
-    if (mode === 'signup') {
-      result = await signup(name, email, password, 'student');
-    } else if (mode === 'login') {
-      result = await login(email, password);
-    } else if (mode === 'forgot') {
-      await resetPassword(email);
-      setMode('login');
-      setLoading(false);
+      setErrorMsg("Please enter a valid email address.");
       return;
     }
 
-    if (result.success) {
-      onSuccess();
-      handleClose();
-      navigate('/dashboard');
-    } else {
-      setErrorMsg(result.message || `${mode === 'signup' ? 'Signup' : 'Login'} failed. Please try again.`);
+    if (!email || (mode !== 'forgot' && !password)) {
+      setErrorMsg('Please fill in all fields.');
+      return;
     }
-  } catch (err: any) {
-    setErrorMsg(err.message || 'Something went wrong.');
-  }
 
-  setLoading(false);
-};
-useEffect(() => {
+    if (mode === 'signup' && !name) {
+      setErrorMsg('Please enter your full name.');
+      return;
+    }
+
+    if (mode === 'signup' && password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters long.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      let result: AuthResult = { success: false };
+      if (mode === 'signup') {
+        result = await signup(name, email, password, 'student');
+      } else if (mode === 'login') {
+        result = await login(email, password);
+      } else if (mode === 'forgot') {
+        await resetPassword(email);
+        setMode('login');
+        setLoading(false);
+        return;
+      }
+
+      if (result.success && result.user) {
+        onSuccess();
+        handleClose();
+        // Role-based redirect
+        if (result.user.user_type === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setErrorMsg(result.message || `${mode === 'signup' ? 'Signup' : 'Login'} failed. Please try again.`);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Something went wrong.');
+    }
+
+    setLoading(false);
+  };
+  useEffect(() => {
     if (errorMsg) {
       const timer = setTimeout(() => {
         setErrorMsg("");
@@ -113,19 +119,17 @@ useEffect(() => {
 
 
   if (!isVisible) return null;
-  
+
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 sm:px-4 transition-opacity duration-300 ease-out ${
-        isClosing ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 sm:px-4 transition-opacity duration-300 ease-out ${isClosing ? 'opacity-0' : 'opacity-100'
+        }`}
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden relative transform transition-all duration-500 ease-in-out ${
-          isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-        }`}
+        className={`bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden relative transform transition-all duration-500 ease-in-out ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left Panel */}
@@ -165,8 +169,8 @@ useEffect(() => {
                 {mode === 'signup'
                   ? 'Create Account'
                   : mode === 'login'
-                  ? 'Welcome Back'
-                  : 'Reset Password'}
+                    ? 'Welcome Back'
+                    : 'Reset Password'}
               </h2>
               {mode !== 'forgot' && (
                 <p className="text-gray-600 text-sm sm:text-base">
@@ -253,10 +257,10 @@ useEffect(() => {
                 {loading
                   ? 'Please wait...'
                   : mode === 'signup'
-                  ? 'Create Account'
-                  : mode === 'login'
-                  ? 'Login'
-                  : 'Send Reset Link'}
+                    ? 'Create Account'
+                    : mode === 'login'
+                      ? 'Login'
+                      : 'Send Reset Link'}
               </button>
 
               {mode === 'forgot' && (
