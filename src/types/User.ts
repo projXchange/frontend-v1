@@ -4,7 +4,6 @@ export interface User {
     full_name: string;
     user_type: string;
     verification_status: string;
-    status: string;
     created_at: string;
     updated_at: string;
     email_verified: boolean;

@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verification_status: data.user.verification_status,
         created_at: data.user.created_at,
         updated_at: data.user.updated_at,
-        email_verified: data.user.email_verified
+        email_verified: data.user.email_verified,
       };
 
       setUser(loggedInUser);
@@ -105,8 +105,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verification_status: data.user.verification_status,
         created_at: data.user.created_at,
         updated_at: data.user.updated_at,
-        email_verified: data.user.email_verified
-      };
+        email_verified: data.user.email_verified,
+     };
 
       setUser(newUser);
       localStorage.setItem('studystack_user', JSON.stringify(newUser));
@@ -172,8 +172,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       localStorage.removeItem('studystack_user');
       localStorage.removeItem('token');
-
-      toast.success(data.message || 'User logged out successfully');
+      localStorage.removeItem(`wishlist_${user?.id}`);
+      localStorage.removeItem(`cart_${user?.id}`);
+      toast.success('User logged out successfully');
     } catch (err) {
       toast.error('Something went wrong while logging out');
     }
