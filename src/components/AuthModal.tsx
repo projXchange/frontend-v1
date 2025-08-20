@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import GirlPoster from '../assets/Girl_Poster.png';
 import { AuthResult, User } from '../types/User';
-import { div } from 'framer-motion/client';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -53,7 +52,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
     e.preventDefault();
     setErrorMsg('');
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!emailRegex.test(email)) {
       setErrorMsg("Please enter a valid email address.");

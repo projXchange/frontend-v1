@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Plus, Edit, Trash2, Eye, Check, X, Calendar, DollarSign, Users, ShoppingBag, Clock, TrendingUp, AlertCircle, BarChart3, Award, Star, Activity, Zap, Target, Filter, Search, ChevronDown, Bell, Settings, FileText, Tag, Upload, IndianRupee, Video, Image, Shield, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Check, X, Calendar, DollarSign, Users, ShoppingBag, Clock, TrendingUp, AlertCircle, BarChart3, Award, Star, Activity, Zap, Target, Filter, Search, ChevronDown, Bell, Settings, FileText, Tag, Upload, IndianRupee, Video, Image, Shield, CheckCircle, MessageSquare } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { User, UsersApiResponse } from '../types/User';
-import { Project, ProjectResponse } from '../types/Project';
+import { Project, ProjectResponse, Review } from '../types/Project';
 import ProjectDetailsModal from '../components/ProjectDetailsModal';
 import UserDetailsModal from '../components/UserDetailsModal';
 import { useNavigate } from 'react-router-dom';
 import { Transaction, TransactionsApiResponse } from '../types/Transaction';
+import toast from 'react-hot-toast';
+import TransactionDetailsModal from '../components/TransactionDetailsModal';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,54 +33,61 @@ const AdminDashboard = () => {
   const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [pendingProjects, setPendingProjects] = useState<Project[]>([]); // new state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewSearchTerm, setReviewSearchTerm] = useState('');
+  const [reviewFilterStatus, setReviewFilterStatus] = useState('all');
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [updatingTransaction, setUpdatingTransaction] = useState<string | null>(null);
 
-  
-const fetchAllStats = async () => {
-  setLoading(true);
-  setError('');
-  const token = localStorage.getItem("token");
 
-  try {
-    // Fetch in parallel for efficiency
-    const [usersRes, projectsRes, transactionsRes, pendingProjectsRes] = await Promise.all([
-      fetch('https://projxchange-backend-v1.vercel.app/admin/users', {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      }),
-      fetch('https://projxchange-backend-v1.vercel.app/projects', {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      }),
-      fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      }),
-      fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending_review', {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      }),
-    ]);
 
-    if (!usersRes.ok || !projectsRes.ok || !transactionsRes.ok || !pendingProjectsRes.ok) {
-      throw new Error('Failed to fetch one or more resources');
+  const fetchAllStats = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem("token");
+
+    try {
+      // Fetch in parallel for efficiency
+      const [usersRes, projectsRes, transactionsRes, pendingProjectsRes] = await Promise.all([
+        fetch('https://projxchange-backend-v1.vercel.app/admin/users', {
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        }),
+        fetch('https://projxchange-backend-v1.vercel.app/projects', {
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        }),
+        fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        }),
+        fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending_review', {
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        }),
+      ]);
+
+      if (!usersRes.ok || !projectsRes.ok || !transactionsRes.ok || !pendingProjectsRes.ok) {
+        throw new Error('Failed to fetch one or more resources');
+      }
+
+      // Parse JSON in parallel
+      const [usersData, projectsData, transactionsData, pendingProjectsData] = await Promise.all([
+        usersRes.json(),
+        projectsRes.json(),
+        transactionsRes.json(),
+        pendingProjectsRes.json(),
+      ]);
+
+      setUsers(usersData.users);
+      setProjects(projectsData.data || []);
+      setTransactions(transactionsData.transactions);
+      setPendingProjects(pendingProjectsData.data || []); // ✅ store pending projects
+
+    } catch (err) {
+      console.error(err);
+      setError('Could not load dashboard stats. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-
-    // Parse JSON in parallel
-    const [usersData, projectsData, transactionsData, pendingProjectsData] = await Promise.all([
-      usersRes.json(),
-      projectsRes.json(),
-      transactionsRes.json(),
-      pendingProjectsRes.json(),
-    ]);
-
-    setUsers(usersData.users);
-    setProjects(projectsData.data || []);
-    setTransactions(transactionsData.transactions);
-    setPendingProjects(pendingProjectsData.data || []); // ✅ store pending projects
-
-  } catch (err) {
-    console.error(err);
-    setError('Could not load dashboard stats. Please try again later.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
   const recentActivity = [
@@ -99,16 +108,16 @@ const fetchAllStats = async () => {
   ];
 
   const stats = {
-  totalProjects: projects.length,
-  pendingApproval: pendingProjects.length,
-  totalSales: transactions.length, // or derive from transactions
-  totalUsers: users.length,
-  monthlyGrowth: 24, // could be derived later
-  avgRating: 4.8,   // placeholder for now
-  activeUsers: users.filter(u => u.status === 'active').length,
-  revenue: transactions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
-  conversionRate: 3.2
-};
+    totalProjects: projects.length,
+    pendingApproval: pendingProjects.length,
+    totalSales: transactions.length, // or derive from transactions
+    totalUsers: users.length,
+    monthlyGrowth: 24, // could be derived later
+    avgRating: 4.8,   // placeholder for now
+    activeUsers: users.filter(u => u.verification_status === 'active').length,
+    revenue: transactions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
+    conversionRate: 3.2
+  };
 
 
   const fetchUsers = async () => {
@@ -363,6 +372,134 @@ const fetchAllStats = async () => {
     }
   };
 
+  const handleUpdateTransactionStatus = async (transactionId: string, status: string, paymentGatewayResponse?: string, metadata?: string) => {
+    setUpdatingTransaction(transactionId);
+    const token = localStorage.getItem('token');
+    try {
+      const requestBody: any = { status };
+      if (paymentGatewayResponse) requestBody.payment_gateway_response = paymentGatewayResponse;
+      if (metadata) requestBody.metadata = metadata;
+
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/transactions/${transactionId}/status`, {
+        method: 'PATCH', // or PATCH depending on your API
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Replace with your auth token
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update transaction status');
+      }
+
+      const updatedTransaction = await response.json();
+
+      // Update the transaction in your transactions array
+      setTransactions(prev =>
+        prev.map(tx =>
+          tx.id === transactionId
+            ? { ...tx, ...updatedTransaction }
+            : tx
+        )
+      );
+
+      // Update the selected transaction if it's the one being updated
+      if (selectedTransaction?.id === transactionId) {
+        setSelectedTransaction(prev => prev ? { ...prev, ...updatedTransaction } : null);
+      }
+
+      // Show success message (optional)
+      console.log('Transaction updated successfully');
+
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+      // Show error message to user (you might want to use a toast notification)
+      alert('Failed to update transaction status');
+    } finally {
+      setUpdatingTransaction(null);
+    }
+  };
+
+  const fetchReviews = async () => {
+    setLoading(true);
+    setError('');
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/reviews/pending', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch reviews');
+
+      const data = await res.json();
+      setReviews(data.reviews || []);
+    } catch (err) {
+      console.error(err);
+      setError('Could not load reviews. Please try again later.');
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReviewApproval = async (reviewId: string, isApproved: boolean) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}/approval`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ is_approved: isApproved }),
+      });
+
+      if (response.ok) {
+        setReviews(prev => prev.map(review =>
+          review.id === reviewId ? { ...review, is_approved: isApproved } : review
+        ));
+        toast.success(`Review ${isApproved ? 'approved' : 'rejected'} successfully!`);
+      } else {
+        throw new Error('Failed to update review approval status');
+      }
+    } catch (error) {
+      console.error('Error updating review approval:', error);
+      toast.error('Failed to update review approval status. Please try again.');
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setReviews(prev => prev.filter(review => review.id !== reviewId));
+        toast.success('Review deleted successfully!');
+      } else {
+        throw new Error('Failed to delete review');
+      }
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast.error('Failed to delete review. Please try again.');
+    }
+  };
+
   const handleProjectStatusUpdate = async () => {
     if (!selectedProject) return;
 
@@ -375,14 +512,6 @@ const fetchAllStats = async () => {
       setUpdatingProjectStatus(false);
       return;
     }
-
-    // Debug logging
-    console.log('Updating project:', selectedProject.id);
-    console.log('Project ID type:', typeof selectedProject.id);
-    console.log('Update data:', projectUpdateData);
-    console.log('API URL:', `https://projxchange-backend-v1.vercel.app/admin/projects/${selectedProject.id}/status`);
-    console.log('Token exists:', !!token);
-
     // Check if project ID is valid
     if (!selectedProject.id || selectedProject.id.trim() === '') {
       alert('Invalid project ID');
@@ -409,7 +538,6 @@ const fetchAllStats = async () => {
       });
 
       console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -446,18 +574,66 @@ const fetchAllStats = async () => {
     }
   };
 
- 
+
 
   const handleReject = (id: string) => {
     updateProjectStatus(id, 'suspended', false);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this project?')) {
-      // Note: There's no delete project API provided, so this will just show an alert
-      alert(`Project ${id} deleted!`);
+  const handleDelete = async (projectId: string) => {
+    if (!confirm("Are you sure you want to delete this project and its dump? This action cannot be undone.")) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You are not authorized. Please log in again.");
+      return;
+    }
+
+    try {
+      // Step 1: Delete project dump
+      // const dumpResponse = await fetch(
+      //   `https://projxchange-backend-v1.vercel.app/projects/${projectId}/dump`,
+      //   {
+      //     method: "DELETE",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
+      // );
+
+      // if (!dumpResponse.ok) {
+      //   throw new Error("Failed to delete project dump");
+      // }
+
+      // Step 2: Delete project
+      const projectResponse = await fetch(
+        `https://projxchange-backend-v1.vercel.app/projects/${projectId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!projectResponse.ok) {
+        throw new Error("Failed to delete project");
+      }
+
+      // Update state if needed
+      setProjects?.((prev: Project[]) => prev.filter((p) => p.id !== projectId));
+
+      toast.success("Project and its dump deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      toast.error("Failed to delete project. Please try again.");
     }
   };
+
 
   const handleToggleFeatured = (id: string, currentFeatured: boolean) => {
     const project = projects.find(p => p.id === id);
@@ -489,24 +665,26 @@ const fetchAllStats = async () => {
         </div>
       )}
     </div>
-  );  
- // fetchAllStats will load everything once when dashboard mounts
-useEffect(() => {
-  fetchAllStats();
-}, []);
+  );
+  // fetchAllStats will load everything once when dashboard mounts
+  useEffect(() => {
+    fetchAllStats();
+  }, []);
 
-// tab-specific fetching (only when you want fresh detail view)
-useEffect(() => {
-  if (activeTab === 'users') {
-    fetchUsers();
-  } else if (activeTab === 'projects') {
-    fetchProjects();
-  } else if (activeTab === 'approval') {
-    fetchPendingProjects();
-  } else if (activeTab === 'transactions') {
-    fetchTransactions();
-  }
-}, [activeTab]);
+  // tab-specific fetching (only when you want fresh detail view)
+  useEffect(() => {
+    if (activeTab === 'users') {
+      fetchUsers();
+    } else if (activeTab === 'projects') {
+      fetchProjects();
+    } else if (activeTab === 'approval') {
+      fetchPendingProjects();
+    } else if (activeTab === 'transactions') {
+      fetchTransactions();
+    } else if (activeTab === 'reviews') {
+      fetchReviews();
+    }
+  }, [activeTab]);
 
 
 
@@ -569,11 +747,11 @@ useEffect(() => {
           />
           <StatCard
             title="Total Sales"
-            value={`$${stats.totalSales}`}
+            value={`${stats.totalSales}`}
             subtitle="+18% this month"
             icon={DollarSign}
             color="text-green-600"
-            trend="+$450 today"
+            trend="+450 today"
             onClick={() => setActiveTab('transactions')}
           />
           <StatCard
@@ -621,7 +799,8 @@ useEffect(() => {
                 { id: 'projects', label: 'Projects', icon: ShoppingBag },
                 { id: 'users', label: 'Users', icon: Users },
                 { id: 'approval', label: 'Pending', icon: AlertCircle },
-                { id: 'transactions', label: 'Transactions', icon: DollarSign }
+                { id: 'transactions', label: 'Transactions', icon: DollarSign },
+                { id: 'reviews', label: 'Reviews', icon: MessageSquare }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1191,6 +1370,7 @@ useEffect(() => {
                           <th className="px-6 py-4">Amount</th>
                           <th className="px-6 py-4">Status</th>
                           <th className="px-6 py-4">Date</th>
+                          <th className="px-6 py-4">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1211,20 +1391,173 @@ useEffect(() => {
                             <td className="px-6 py-4">
                               <span
                                 className={`px-2 py-1 rounded-full text-xs ${tx.status === 'success'
-                                    ? 'bg-green-100 text-green-600'
-                                    : tx.status === 'pending'
-                                      ? 'bg-yellow-100 text-yellow-600'
-                                      : 'bg-red-100 text-red-600'
+                                  ? 'bg-green-100 text-green-600'
+                                  : tx.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-600'
+                                    : 'bg-red-100 text-red-600'
                                   }`}
                               >
                                 {tx.status}
                               </span>
                             </td>
                             <td className="px-6 py-4">{new Date(tx.created_at).toLocaleDateString()}</td>
+                            <td className="px-6 py-4">
+                              <button
+                                onClick={() => {
+                                  setSelectedTransaction(tx);
+                                  setIsTransactionModalOpen(true);
+                                }}
+                                className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                                title="View transaction details"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'reviews' && (
+              <div className="animate-slideInUp">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                    <MessageSquare className="w-7 h-7 text-blue-600" />
+                    Manage Reviews
+                  </h2>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        placeholder="Search reviews..."
+                        value={reviewSearchTerm}
+                        onChange={(e) => setReviewSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                      />
+                    </div>
+                    <select
+                      value={reviewFilterStatus}
+                      onChange={(e) => setReviewFilterStatus(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                    >
+                      <option value="all">All Reviews</option>
+                      <option value="approved">Approved</option>
+                      <option value="pending">Pending</option>
+                    </select>
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className="bg-white rounded-2xl p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading reviews...</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Review</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project ID</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Student</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rating</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {reviews
+                            .filter(review => reviewFilterStatus === 'all' ||
+                              (reviewFilterStatus === 'approved' && review.is_approved) ||
+                              (reviewFilterStatus === 'pending' && !review.is_approved))
+                            .filter(review => reviewSearchTerm === '' ||
+                              review.review_text.toLowerCase().includes(reviewSearchTerm.toLowerCase()) ||
+                              review.user.full_name.toLowerCase().includes(reviewSearchTerm.toLowerCase()))
+                            .map((review, index) => (
+                              <tr key={review.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                                <td className="px-6 py-4">
+                                  <div className="max-w-xs">
+                                    <p className="text-sm text-gray-900 font-medium line-clamp-2">
+                                      {review.review_text}
+                                    </p>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                  {review.project_id}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
+                                      <span className="text-white font-bold text-sm">{review.user.full_name.charAt(0)}</span>
+                                    </div>
+                                    <div>
+                                      <div className="font-semibold text-gray-900 text-sm">{review.user.full_name}</div>
+                                      <div className="text-xs text-gray-500">{review.user.email}</div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                          }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${review.is_approved
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                    {review.is_approved ? 'Approved' : 'Pending'}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                  {new Date(review.created_at).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex space-x-2">
+                                    {!review.is_approved ? (
+                                      <button
+                                        onClick={() => handleReviewApproval(review.id, true)}
+                                        className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                        title="Approve Review"
+                                      >
+                                        <Check className="w-4 h-4" />
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() => handleReviewApproval(review.id, false)}
+                                        className="p-2 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                        title="Reject Review"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={() => handleDeleteReview(review.id)}
+                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                      title="Delete Review"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1259,6 +1592,18 @@ useEffect(() => {
           updatingProjectStatus={updatingProjectStatus}
         />
       )}
+      {/* Transaction Details Modal */}
+
+      {isTransactionModalOpen && (
+        <TransactionDetailsModal
+          isOpen={isTransactionModalOpen}
+          onClose={() => setIsTransactionModalOpen(false)}
+          transaction={selectedTransaction}
+          onUpdateTransactionStatus={handleUpdateTransactionStatus}
+          updatingTransaction={updatingTransaction}
+        />
+      )}
+
     </div>
   );
 };
