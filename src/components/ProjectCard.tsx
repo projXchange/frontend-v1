@@ -39,7 +39,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const fetchProjectDump = async () => {
     try {
       console.log('Fetching project dump for ID:', index);
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${index}/dump`, {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}/dump`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -66,7 +66,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
     try {
       console.log('Fetching reviews for project ID:', index);
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${index}/reviews`,
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}/reviews`,
       {
         method: 'GET',
         headers: {

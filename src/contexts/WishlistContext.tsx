@@ -24,6 +24,9 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (isAuthenticated && user) {
       loadWishlist();
     }
+    if (!isAuthenticated) {
+      clearWishlist();
+    }
   }, [isAuthenticated, user]);
 
   const loadWishlist = async () => {

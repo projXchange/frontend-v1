@@ -121,26 +121,26 @@ const Home = () => {
 
   const testimonials = [
     {
-      name: 'Emily Chen',
-      role: 'Computer Science Student',
+      name: 'Demo Patil',
+      role: 'BTech',
       university: 'MIT',
-      text: 'StudyStack saved me weeks of development time. The projects are incredibly well-documented and the sellers are super responsive!',
+      text: 'ProjXchange saved me weeks of development time. The projects are incredibly well-documented and the sellers are super responsive!',
       rating: 5,
       avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100',
       project: 'React E-commerce App'
     },
     {
-      name: 'Alex Rodriguez',
+      name: 'Test Patil',
       role: 'Software Engineering Student',
-      university: 'Stanford',
+      university: 'Pune University',
       text: 'The quality of projects here is outstanding. I learned so much from the code structure and implementation patterns.',
       rating: 5,
       avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100',
       project: 'Java Spring Boot API'
     },
     {
-      name: 'Maria Garcia',
-      role: 'Data Science Student',
+      name: 'Dummy Pardeshi',
+      role: 'MCA Student',
       university: 'UC Berkeley',
       text: 'Perfect for students on a budget. The projects are affordable and come with excellent documentation and support.',
       rating: 5,
@@ -267,7 +267,7 @@ const Home = () => {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start animate-slideInUp" style={{ animationDelay: '2s' }}>
                 <Link
-                  to="/browse"
+                  to="/projects"
                   className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
                 >
                   Browse Projects

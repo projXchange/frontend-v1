@@ -8,7 +8,7 @@ const ProjectListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
-  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [priceRange, setPriceRange] = useState([0, 1000]); // Increased max price range
   const [viewMode, setViewMode] = useState('grid');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -31,10 +31,19 @@ const ProjectListing = () => {
           throw new Error(`Failed to fetch projects: ${res.status}`);
         }
 
-        const data: ProjectResponse = await res.json();
+        const data = await res.json();
         console.log('Projects API response:', data);
-        setProjects(data.data || []);
-        console.log(projects)
+
+        // Handle both possible response structures
+        const projectsData = data.data || data;
+
+        if (Array.isArray(projectsData)) {
+          setProjects(projectsData);
+          console.log('Projects loaded:', projectsData.length);
+        } else {
+          console.error('Unexpected data structure:', data);
+          setProjects([]);
+        }
       } catch (err) {
         console.error('Error fetching projects:', err);
         setError('Could not load projects. Please try again later.');
@@ -46,20 +55,70 @@ const ProjectListing = () => {
     fetchProjects();
   }, []);
 
-  const categories = ['all', 'React', 'Java', 'Python', 'PHP', 'Mobile', 'Node.js'];
-  const allTags = ['React', 'Node.js', 'MongoDB', 'Stripe', 'Java', 'Spring Boot', 'MySQL', 'Python', 'Django', 'PostgreSQL', 'Chart.js', 'Firebase', 'Material-UI', 'PHP', 'Laravel', 'Bootstrap', 'React Native'];
+  // Updated categories to match backend categories
+  const categories = [
+    'all',
+    'web_development',
+    'mobile_development',
+    'desktop_application',
+    'data_science',
+    'machine_learning',
+    'api_backend',
+    'other'
+  ];
+
+  // Map category display names
+  const getCategoryDisplayName = (category: string) => {
+    const categoryMap = {
+      'all': 'All Categories',
+      'web_development': 'Web Development',
+      'mobile_development': 'Mobile Development',
+      'desktop_application': 'Desktop Application',
+      'data_science': 'Data Science',
+      'machine_learning': 'Machine Learning',
+      'api_backend': 'API & Backend',
+      'other': 'Other'
+    };
+    return categoryMap[category as keyof typeof categoryMap] || category;
+  };
+
+  const allTags = ['React', 'Node.js', 'MongoDB', 'Stripe', 'Java', 'Spring Boot', 'MySQL', 'Python', 'Django', 'PostgreSQL', 'Chart.js', 'Firebase', 'Material-UI', 'PHP', 'Laravel', 'Bootstrap', 'React Native', 'Swing'];
 
   const filteredProjects = useMemo(() => {
+    console.log('Filtering projects:', projects.length, 'total projects');
+
     let filtered = projects.filter(project => {
-      const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           project.tech_stack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                           project.description.toLowerCase().includes(searchTerm.toLowerCase());
+      // Search filter
+      const matchesSearch = !searchTerm ||
+        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.tech_stack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Category filter
       const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
+
+      // Price filter - make sure to handle sale_price correctly
       const matchesPrice = project.pricing.sale_price >= priceRange[0] && project.pricing.sale_price <= priceRange[1];
+
+      // Tags filter
       const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => project.tech_stack.includes(tag));
-      
+
+      console.log('Project filter check:', {
+        title: project.title,
+        matchesSearch,
+        matchesCategory,
+        matchesPrice,
+        matchesTags,
+        category: project.category,
+        selectedCategory,
+        price: project.pricing.sale_price,
+        priceRange
+      });
+
       return matchesSearch && matchesCategory && matchesPrice && matchesTags;
     });
+
+    console.log('Filtered projects:', filtered.length);
 
     // Sort projects
     filtered.sort((a, b) => {
@@ -85,8 +144,8 @@ const ProjectListing = () => {
   }, [projects, searchTerm, selectedCategory, priceRange, selectedTags, sortBy]);
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
@@ -98,13 +157,7 @@ const ProjectListing = () => {
       <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-teal-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-teal-500/30" />
-        
-        {/* Animated Background Elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-        <div className="absolute top-32 right-20 w-16 h-16 bg-white/10 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-bounce" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-32 right-1/3 w-24 h-24 bg-white/10 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="animate-slideInUp">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
@@ -114,7 +167,7 @@ const ProjectListing = () => {
               Explore thousands of high-quality projects from talented developers worldwide
             </p>
           </div>
-          
+
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto animate-slideInUp" style={{ animationDelay: '200ms' }}>
             <div className="relative">
@@ -128,7 +181,7 @@ const ProjectListing = () => {
               />
             </div>
           </div>
-          
+
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
             <div className="text-center">
@@ -136,7 +189,7 @@ const ProjectListing = () => {
               <div className="text-blue-200 font-medium">Projects</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">50+</div>
+              <div className="text-3xl font-bold text-white mb-2">{categories.length}+</div>
               <div className="text-blue-200 font-medium">Categories</div>
             </div>
             <div className="text-center">
@@ -152,6 +205,8 @@ const ProjectListing = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+
         {/* Filters */}
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl mb-12 border border-white/30 animate-slideInUp">
           <div className="grid md:grid-cols-4 gap-6">
@@ -166,7 +221,7 @@ const ProjectListing = () => {
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>
-                      {category === 'all' ? 'All Categories' : category}
+                      {getCategoryDisplayName(category)}
                     </option>
                   ))}
                 </select>
@@ -197,13 +252,13 @@ const ProjectListing = () => {
             {/* Price Range */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Price Range: ${priceRange[0]} - ${priceRange[1]}
+                Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
               </label>
               <div className="flex items-center space-x-3">
                 <input
                   type="range"
                   min="0"
-                  max="100"
+                  max="1000"
                   value={priceRange[0]}
                   onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
                   className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
@@ -211,7 +266,7 @@ const ProjectListing = () => {
                 <input
                   type="range"
                   min="0"
-                  max="100"
+                  max="1000"
                   value={priceRange[1]}
                   onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                   className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
@@ -219,34 +274,32 @@ const ProjectListing = () => {
               </div>
             </div>
 
-            {/* View Mode */}
+            {/* View Mode
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">View</label>
               <div className="flex bg-gray-100 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium transition-all duration-300 ${
-                    viewMode === 'grid'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium transition-all duration-300 ${viewMode === 'grid'
                       ? 'bg-white text-blue-600 shadow-md scale-105'
                       : 'text-gray-600 hover:text-gray-800'
-                  }`}
+                    }`}
                 >
                   <Grid className="w-4 h-4" />
                   Grid
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium transition-all duration-300 ${
-                    viewMode === 'list'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium transition-all duration-300 ${viewMode === 'list'
                       ? 'bg-white text-blue-600 shadow-md scale-105'
                       : 'text-gray-600 hover:text-gray-800'
-                  }`}
+                    }`}
                 >
                   <List className="w-4 h-4" />
                   List
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Technology Tags */}
@@ -257,11 +310,10 @@ const ProjectListing = () => {
                 <button
                   key={tag}
                   onClick={() => toggleTag(tag)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${
-                    selectedTags.includes(tag)
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${selectedTags.includes(tag)
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                  }`}
+                    }`}
                 >
                   {tag}
                 </button>
@@ -282,7 +334,7 @@ const ProjectListing = () => {
                   ))}
                   {selectedCategory !== 'all' && (
                     <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                      {selectedCategory}
+                      {getCategoryDisplayName(selectedCategory)}
                       <button onClick={() => setSelectedCategory('all')} className="hover:text-blue-900">×</button>
                     </span>
                   )}
@@ -292,7 +344,7 @@ const ProjectListing = () => {
                     setSelectedTags([]);
                     setSelectedCategory('all');
                     setSearchTerm('');
-                    setPriceRange([0, 100]);
+                    setPriceRange([0, 1000]);
                   }}
                   className="text-sm text-gray-500 hover:text-gray-700 font-medium"
                 >
@@ -325,9 +377,9 @@ const ProjectListing = () => {
           </div>
         ) : filteredProjects.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {filteredProjects.map((project, index) => (
-  <ProjectCard key={project.id} project={project} index={index} />
-))}
+            {filteredProjects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
           </div>
         ) : (
           <div className="text-center py-16 animate-slideInUp">
@@ -343,7 +395,7 @@ const ProjectListing = () => {
                 setSelectedTags([]);
                 setSelectedCategory('all');
                 setSearchTerm('');
-                setPriceRange([0, 100]);
+                setPriceRange([0, 1000]);
               }}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >

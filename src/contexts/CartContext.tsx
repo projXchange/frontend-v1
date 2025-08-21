@@ -26,11 +26,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isAuthenticated && user) {
       loadCart();
     }
+    if (!isAuthenticated) {
+      clearCart();
+    }
   }, [isAuthenticated, user]);
 
   const loadCart = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -131,7 +134,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = localStorage.getItem('token');
       const cartItem = cart.find(item => item.project_id === projectId);
-      
+
       if (cartItem) {
         // Try to remove from backend first
         const response = await fetch(`https://projxchange-backend-v1.vercel.app/cart/${cartItem.project_id}`, {
