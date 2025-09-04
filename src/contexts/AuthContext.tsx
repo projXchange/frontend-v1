@@ -172,6 +172,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       localStorage.removeItem('studystack_user');
       localStorage.removeItem('token');
+      localStorage.removeItem(`wishlist_${user?.id}`);
+      localStorage.removeItem(`cart_${user?.id}`);
       toast.success('User logged out successfully');
     } catch (err) {
       toast.error('Something went wrong while logging out');
