@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Tag, Flame, Heart, ShoppingCart } from "lucide-react";
-import { Project, ProjectDump, Review } from "../types/Project";
+import { Project, Review } from "../types/Project";
 import { useWishlist } from "../contexts/WishlistContext";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
+
 
 interface ProjectCardProps {
   project: Project;
@@ -16,12 +17,15 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart, isInCart } = useCart();
   const { isAuthenticated, openAuthModal } = useAuth();
-  const [projectDump, setProjectDump] = useState<ProjectDump | null>(null);
-  const discount = project.pricing.original_price > project.pricing.sale_price;
-  const discountPercent = discount
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [rating, setRating] = useState(0);
+  // Calculate discount from consolidated project data
+  const discount = project.pricing?.original_price && project.pricing?.sale_price 
+    ? project.pricing.original_price > project.pricing.sale_price 
+    : false;
+  const discountPercent = discount && project.pricing?.original_price && project.pricing?.sale_price
     ? Math.round((1 - project.pricing.sale_price / project.pricing.original_price) * 100)
     : 0;
-  const [reviews, setReviews] = useState<Review[]>([]);
 
   // Generate a placeholder image based on category
   const getPlaceholderImage = (category: string) => {
@@ -36,31 +40,6 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
     return images[category as keyof typeof images] || images['React'];
   };
 
-  const fetchProjectDump = async () => {
-    try {
-      console.log('Fetching project dump for ID:', index);
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}/dump`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Project dump API response:', data);
-        setProjectDump(data.dump);
-      } else {
-        console.error('Project dump API response not ok:', response.status, response.statusText);
-        // Don't set error here, just log it since this API might fail for non-authenticated users
-        console.log('Project dump not available or requires authentication');
-      }
-    } catch (error) {
-      console.error('Failed to fetch project dump:', error);
-      // Don't set error here, just log it since this API might fail for non-authenticated users
-      console.log('Project dump not available or requires authentication');
-    }
-  };
 
   const fetchReviews = async () => {
 
@@ -79,7 +58,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
         const data = await response.json();
         console.log('Reviews API response:', data);
         setReviews(data.reviews || []);
-       // setRating(data.stats.average_rating)
+        setRating(data.stats.average_rating)
       } else {
         console.error('Reviews API response not ok:', response.status, response.statusText);
         setReviews([]); // Set empty reviews array if API fails
@@ -91,9 +70,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   };
 
   useEffect(() => {
-    fetchProjectDump();
     fetchReviews();
-
   }, [index])
 
   return (
@@ -112,7 +89,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
         {/* Image */}
         <div className="relative overflow-hidden">
           <motion.img
-            src={getPlaceholderImage(project.category)}
+            src={project.thumbnail || getPlaceholderImage(project.category)}
             alt={project.title}
             className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
             initial={{ scale: 1.2, opacity: 0 }}
@@ -213,7 +190,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </span>
             <div className="flex items-center">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              <span className="ml-1 text-sm font-semibold text-gray-800">{projectDump?.rating.average_rating || 0}</span>
+              <span className="ml-1 text-sm font-semibold text-gray-800">{rating}</span>
               <span className="ml-1 text-sm text-gray-500">({reviews.length})</span>
             </div>
           </div>
@@ -246,8 +223,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-gray-900">₹{project.pricing.sale_price}</span>
-              {discount && (
+              <span className="text-lg font-bold text-gray-900">₹{project.pricing?.sale_price || 0}</span>
+              {discount && project.pricing?.original_price && (
                 <span className="text-sm text-gray-500 line-through">₹{project.pricing.original_price}</span>
               )}
             </div>

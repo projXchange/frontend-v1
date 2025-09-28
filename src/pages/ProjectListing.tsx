@@ -1,7 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Filter, Star, ChevronDown, Grid, List, TrendingUp, Award, Clock, Heart, Eye, Code, Users, Zap, Siren as Fire, Sparkles } from 'lucide-react';
-import { Project, ProjectResponse } from '../types/Project';
+import { useState, useMemo, useEffect } from 'react';
+import { Search, Filter, ChevronDown, Zap } from 'lucide-react';
+import { Project } from '../types/Project';
 import { ProjectCard } from '../components/ProjectCard';
 
 const ProjectListing = () => {
@@ -9,7 +8,6 @@ const ProjectListing = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [priceRange, setPriceRange] = useState([0, 1000]); // Increased max price range
-  const [viewMode, setViewMode] = useState('grid');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +96,7 @@ const ProjectListing = () => {
       const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
 
       // Price filter - make sure to handle sale_price correctly
-      const matchesPrice = project.pricing.sale_price >= priceRange[0] && project.pricing.sale_price <= priceRange[1];
+      const matchesPrice = project.pricing?.sale_price ? project.pricing.sale_price >= priceRange[0] && project.pricing.sale_price <= priceRange[1] : true;
 
       // Tags filter
       const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => project.tech_stack.includes(tag));
@@ -111,7 +109,7 @@ const ProjectListing = () => {
         matchesTags,
         category: project.category,
         selectedCategory,
-        price: project.pricing.sale_price,
+          price: project.pricing?.sale_price || 0,
         priceRange
       });
 
@@ -128,9 +126,9 @@ const ProjectListing = () => {
         case 'oldest':
           return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         case 'price-low':
-          return a.pricing.sale_price - b.pricing.sale_price;
+          return (a.pricing?.sale_price || 0) - (b.pricing?.sale_price || 0);
         case 'price-high':
-          return b.pricing.sale_price - a.pricing.sale_price;
+          return (b.pricing?.sale_price || 0) - (a.pricing?.sale_price || 0);
         case 'popular':
           return b.purchase_count - a.purchase_count;
         case 'trending':

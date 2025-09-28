@@ -2,19 +2,19 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  key_features: string;
+  key_features?: string;
   category: string;
   author_id: string;
   buyers: string[];
   difficulty_level: string;
   tech_stack: string[];
-  github_url: string;
-  demo_url: string;
-  documentation: string;
-  pricing: {
+  github_url?: string;
+  demo_url?: string;
+  documentation?: string;
+  pricing?: {
     sale_price: number;
     original_price: number;
-    currency: string;
+    currency: "INR" | "USD";
   };
   delivery_time: number;
   status: string;
@@ -24,41 +24,37 @@ export interface Project {
   download_count: number;
   created_at: string;
   updated_at: string;
-  discount_percentage: number;
+  discount_percentage?: number;
+  // Consolidated dump fields
+  thumbnail?: string;
+  images?: string[];
+  demo_video?: string;
+  features?: string[];
+  tags?: string[];
+  files?: {
+    source_files?: string[];
+    documentation_files?: string[];
+    assets?: string[];
+    size_mb?: number;
+  };
+  requirements?: {
+    system_requirements?: string[];
+    dependencies?: string[];
+    installation_steps?: string[];
+  };
+  stats?: {
+    total_downloads?: number;
+    total_views?: number;
+    total_likes?: number;
+    completion_rate?: number;
+  };
+  rating?: {
+    average_rating?: number;
+    total_ratings?: number;
+    rating_distribution?: { [key: string]: number };
+  };
 }
 
-export interface ProjectDump {
-  id: string;
-  thumbnail: string;
-  images: string[];
-  demo_video: string;
-  features: string[];
-  tags: string[];
-  files: {
-    source_files: string[];
-    documentation_files: string[];
-    assets: string[];
-    size_mb: number;
-  };
-  requirements: {
-    system_requirements: string[];
-    dependencies: string[];
-    installation_steps: string[];
-  };
-  stats: {
-    total_downloads: number;
-    total_views: number;
-    total_likes: number;
-    completion_rate: number;
-  };
-  rating: {
-    average_rating: number;
-    total_ratings: number;
-    rating_distribution: Record<string, number>;
-  };
-  created_at: string;
-  updated_at: string;
-}
 
 export interface ProjectResponse {
   data: Project[];
