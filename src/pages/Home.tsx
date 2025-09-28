@@ -149,12 +149,6 @@ const Home = () => {
     }
   ];
 
-  const stats = [
-    { number: '10,000+', label: 'Happy Students', icon: Users },
-    { number: `${projects.length}+`, label: 'Quality Projects', icon: Award },
-    { number: '98%', label: 'Success Rate', icon: TrendingUp },
-    { number: '24/7', label: 'Support', icon: Clock }
-  ];
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
@@ -296,13 +290,13 @@ const Home = () => {
                       <p className="text-blue-200 text-sm">{displayProjects[0].category} project</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-white">₹{displayProjects[0].pricing.sale_price}</span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-white text-sm">4.8</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-white">₹{displayProjects[0].pricing?.sale_price || 0}</span>
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-white text-sm">4.8</span>
+                      </div>
                     </div>
-                  </div>
                 </div>
               )}
 

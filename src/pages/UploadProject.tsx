@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Video, IndianRupee, Tag, User, Award, Shield, CheckCircle, Image, X, Plus, AlertCircle, Sparkles, Code, Eye, Save, Send, Users } from 'lucide-react';
+import { Upload, FileText, Video, IndianRupee, Tag, Award, Shield, CheckCircle, Image, X, Plus, AlertCircle, Sparkles, Eye, Send, Users } from 'lucide-react';
 
 const UploadProject = () => {
   const [formData, setFormData] = useState({
@@ -169,63 +169,31 @@ const UploadProject = () => {
 
     if (Object.keys(errors).length === 0) {
       try {
-        // First API call - Create project
-        const projectData = {
-          title: formData.title,
-          description: formData.description,
-          key_features: formData.features.filter(f => f.trim()).join(', '),
-                     category: formData.category,
-          difficulty_level: formData.difficulty.toLowerCase(),
-          tech_stack: formData.techStack.filter(tech => tech.trim()),
-          github_url: formData.githubUrl,
-          demo_url: formData.liveDemo,
-          status: "pending_review",
-          documentation: formData.description, // Using description as documentation for now
-          pricing: {
-            sale_price: parseFloat(formData.price),
-            original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : parseFloat(formData.price),
-            currency: "INR"
-          },
-          delivery_time: 1 // Default delivery time
-        
-        };
-
         const token = localStorage.getItem('token');
         
         if (!token) {
           throw new Error('Authentication token not found. Please login again.');
         }
-        console.log('Sending project data:', projectData);
-        
-        const projectResponse = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+
+        // Single API call with all project data
+        const projectData = {
+          title: formData.title,
+          description: formData.description,
+          key_features: formData.features.filter(f => f.trim()).join(', '),
+          category: formData.category,
+          difficulty_level: formData.difficulty.toLowerCase(),
+          tech_stack: formData.techStack.filter(tech => tech.trim()),
+          github_url: formData.githubUrl,
+          demo_url: formData.liveDemo,
+          status: "pending_review",
+          documentation: formData.description,
+          pricing: {
+            sale_price: parseFloat(formData.price),
+            original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : parseFloat(formData.price),
+            currency: "INR"
           },
-          body: JSON.stringify(projectData)
-        });
-
-        console.log('Project response status:', projectResponse.status);
-        
-        if (!projectResponse.ok) {
-          const errorData = await projectResponse.json();
-          console.error('Project creation error:', errorData);
-          throw new Error(`Failed to create project: ${errorData.error || projectResponse.statusText}`);
-        }
-
-        const projectResult = await projectResponse.json();
-        console.log('Project creation response:', projectResult);
-        
-        // Extract project ID from the response
-        const projectId = projectResult.project?.id || projectResult.data?.id || projectResult.data?._id || projectResult.id || projectResult._id;
-        
-        if (!projectId) {
-          throw new Error('Project ID not found in response');
-        }
-
-        // Second API call - Add additional details
-        const dumpData = {
+          delivery_time: 1,
+          // Consolidated dump fields
           thumbnail: previewImage || "",
           images: uploadedFiles.filter(file => file.type.startsWith('image/')).map(file => file.name),
           demo_video: formData.youtubeUrl,
@@ -261,23 +229,27 @@ const UploadProject = () => {
           }
         };
 
-        console.log('Calling dump API with project ID:', projectId);
-        console.log('Dump data:', dumpData);
+        console.log('Sending project data:', projectData);
         
-        const dumpResponse = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${projectId}/dump`, {
+        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(dumpData)
+          body: JSON.stringify(projectData)
         });
 
-        if (!dumpResponse.ok) {
-          const errorData = await dumpResponse.json();
-          console.error('Dump API error:', errorData);
-          throw new Error(`Failed to add project details: ${errorData.error || dumpResponse.statusText}`);
+        console.log('Project response status:', response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Project creation error:', errorData);
+          throw new Error(`Failed to create project: ${errorData.error || response.statusText}`);
         }
+
+        const result = await response.json();
+        console.log('Project creation response:', result);
 
         alert('Project submitted successfully! You will receive notification once it\'s approved.');
         

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award, Clock, Shield, CheckCircle, MessageSquare, Send, Github, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { Project, ProjectDump, Review } from '../types/Project';
+import { Project, Review } from '../types/Project';
 
 interface UserStatus {
   has_purchased: boolean;
@@ -13,7 +13,6 @@ interface UserStatus {
 const ProjectDetail = () => {
   const { id } = useParams();
   const [project, setProject] = useState<Project | null>(null);
-  const [projectDump, setProjectDump] = useState<ProjectDump | null>(null);
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,14 +23,13 @@ const ProjectDetail = () => {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const [rating, setRating] = useState(0);
+  
 
 
-
-  // Fetch project data and dump on component mount
+  // Fetch project data on component mount
   useEffect(() => {
     if (id) {
       fetchProjectData();
-      fetchProjectDump();
       fetchReviews();
     }
   }, [id]);
@@ -62,31 +60,6 @@ const ProjectDetail = () => {
     }
   };
 
-  const fetchProjectDump = async () => {
-    try {
-      console.log('Fetching project dump for ID:', id);
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/dump`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Project dump API response:', data);
-        setProjectDump(data.dump);
-      } else {
-        console.error('Project dump API response not ok:', response.status, response.statusText);
-        // Don't set error here, just log it since this API might fail for non-authenticated users
-        console.log('Project dump not available or requires authentication');
-      }
-    } catch (error) {
-      console.error('Failed to fetch project dump:', error);
-      // Don't set error here, just log it since this API might fail for non-authenticated users
-      console.log('Project dump not available or requires authentication');
-    }
-  };
 
   const fetchReviews = async () => {
 
@@ -194,8 +167,8 @@ const ProjectDetail = () => {
         transaction_id: (crypto && 'randomUUID' in crypto) ? crypto.randomUUID() : `${Date.now()}`,
         project_id: project.id,
         seller_id: project.author_id,
-        amount: project.pricing.sale_price,
-        currency: project.pricing.currency || 'INR',
+        amount: project.pricing?.sale_price || 0,
+        currency: project.pricing?.currency || 'INR',
         payment_method: 'manual',
         payment_gateway_response: 'N/A',
         metadata: JSON.stringify({ projectTitle: project.title })
@@ -261,8 +234,8 @@ const ProjectDetail = () => {
     );
   }
 
-  // Check if we have basic project data but projectDump might be null
-  const hasProjectDump = projectDump !== null;
+  // Check if we have project data with dump fields
+  const hasProjectDump = project && (project.thumbnail || project.images || project.features);
 
   if (error || !project) {
     return (
@@ -321,7 +294,7 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-2 sm:gap-4 justify-start sm:justify-end">
                   <button className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm" style={{ animationDelay: '200ms' }}>
                     <Heart className={`w-4 sm:w-5 h-4 sm:h-5 ${isInWishlist ? 'text-red-500 fill-current' : ''}`} />
-                    <span className="font-medium hidden sm:inline">{hasProjectDump ? (projectDump?.stats?.total_likes || 0) : 0}</span>
+                    <span className="font-medium hidden sm:inline">{hasProjectDump ? (project?.stats?.total_likes || 0) : 0}</span>
                   </button>
                   <button className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm" style={{ animationDelay: '300ms' }}>
                     <Share2 className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -345,7 +318,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 sm:w-5 h-4 sm:h-5" />
-                  <span className="font-medium">{hasProjectDump ? (projectDump?.stats?.total_views || project.view_count || 0) : (project.view_count || 0)}</span>
+                  <span className="font-medium">{hasProjectDump ? (project?.stats?.total_views || project.view_count || 0) : (project.view_count || 0)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -357,15 +330,15 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Download className="w-4 sm:w-5 h-4 sm:h-5" />
-                  <span className="font-medium">{hasProjectDump ? (projectDump?.stats?.total_downloads || project.download_count || 0) : (project.download_count || 0)}</span>
+                  <span className="font-medium">{hasProjectDump ? (project?.stats?.total_downloads || project.download_count || 0) : (project.download_count || 0)}</span>
                 </div>
               </div>
 
               {/* Demo Video */}
-              {hasProjectDump && projectDump?.demo_video && (
+              {hasProjectDump && project?.demo_video && (
                 <div className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300" style={{ animationDelay: '600ms' }}>
                   <iframe
-                    src={projectDump.demo_video}
+                    src={project.demo_video}
                     title="Project Demo"
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -413,7 +386,7 @@ const ProjectDetail = () => {
                         }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      {tab === 'reviews' && hasProjectDump && reviews.length && projectDump.rating.total_ratings > 0 && (
+                      {tab === 'reviews' && hasProjectDump && reviews.length && project?.rating?.total_ratings && project.rating.total_ratings > 0 && (
                         <span className="ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
                           {reviews.length}
                         </span>
@@ -437,11 +410,11 @@ const ProjectDetail = () => {
                         </span>
                       ))}
                     </div>
-                    {hasProjectDump && projectDump?.tags && projectDump.tags.length > 0 && (
+                    {hasProjectDump && project?.tags && project.tags.length > 0 && (
                       <>
                         <h4 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 animate-slideInUp" style={{ animationDelay: '400ms' }}>Tags</h4>
                         <div className="flex flex-wrap gap-2 sm:gap-3">
-                          {projectDump.tags.map((tag, index) => (
+                          {project.tags.map((tag, index) => (
                             <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs sm:text-sm animate-slideInUp" style={{ animationDelay: `${500 + index * 50}ms` }}>
                               #{tag}
                             </span>
@@ -455,9 +428,9 @@ const ProjectDetail = () => {
                 {activeTab === 'features' && (
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 animate-slideInUp">Key Features</h3>
-                    {hasProjectDump && projectDump?.features && projectDump.features.length > 0 ? (
+                    {hasProjectDump && project?.features && project.features.length > 0 ? (
                       <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                        {projectDump.features.map((feature, index) => (
+                        {project.features.map((feature, index) => (
                           <div key={index} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp" style={{ animationDelay: `${100 + index * 80}ms` }}>
                             <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full animate-pulse flex-shrink-0" />
                             <span className="text-gray-800 font-medium text-sm sm:text-base">{feature}</span>
@@ -487,11 +460,11 @@ const ProjectDetail = () => {
                       {isPurchased ? (
                         <div className="space-y-4 sm:space-y-6">
                           {/* System Requirements */}
-                          {hasProjectDump && projectDump?.requirements?.system_requirements && projectDump.requirements.system_requirements.length > 0 && (
+                          {hasProjectDump && project?.requirements?.system_requirements && project.requirements.system_requirements.length > 0 && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">System Requirements</h4>
                               <ul className="space-y-2">
-                                {projectDump.requirements.system_requirements.map((req, index) => (
+                                {project.requirements.system_requirements.map((req, index) => (
                                   <li key={index} className="flex items-start gap-2 text-gray-700 text-sm sm:text-base">
                                     <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                                     {req}
@@ -502,11 +475,11 @@ const ProjectDetail = () => {
                           )}
 
                           {/* Dependencies */}
-                          {hasProjectDump && projectDump?.requirements?.dependencies && projectDump.requirements.dependencies.length > 0 && (
+                          {hasProjectDump && project?.requirements?.dependencies && project.requirements.dependencies.length > 0 && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">Dependencies</h4>
                               <ul className="space-y-2">
-                                {projectDump.requirements.dependencies.map((dep, index) => (
+                                {project.requirements.dependencies.map((dep, index) => (
                                   <li key={index} className="flex items-start gap-2 text-gray-700 text-sm sm:text-base">
                                     <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                                     <span className="text-gray-700">{dep}</span>
@@ -517,11 +490,11 @@ const ProjectDetail = () => {
                           )}
 
                           {/* Installation Steps */}
-                          {hasProjectDump && projectDump?.requirements?.installation_steps && projectDump.requirements.installation_steps.length > 0 && (
+                          {hasProjectDump && project?.requirements?.installation_steps && project.requirements.installation_steps.length > 0 && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">Installation Steps</h4>
                               <ol className="space-y-3">
-                                {projectDump.requirements.installation_steps.map((step, index) => (
+                                {project.requirements.installation_steps.map((step, index) => (
                                   <li key={index} className="flex gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
                                       {index + 1}
@@ -559,9 +532,9 @@ const ProjectDetail = () => {
                 {activeTab === 'screenshots' && (
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 animate-slideInUp">Project Screenshots</h3>
-                    {hasProjectDump && projectDump?.images && projectDump.images.length > 0 ? (
+                    {hasProjectDump && project?.images && project.images.length > 0 ? (
                       <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-                        {projectDump.images.map((image, index) => (
+                        {project.images.map((image, index) => (
                           <div key={index} className="aspect-video bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${100 + index * 100}ms` }}>
                             <img
                               src={image}
@@ -707,12 +680,12 @@ const ProjectDetail = () => {
             <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl lg:sticky lg:top-8 border border-white/30 animate-slideInRight">
               <div className="text-center mb-6 sm:mb-8">
                 <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 animate-slideInUp">
-                  <div className="text-3xl sm:text-4xl font-bold text-gray-900">₹{project.pricing.sale_price}</div>
-                  {project.pricing.original_price > project.pricing.sale_price && (
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-900">₹{project.pricing?.sale_price || 0}</div>
+                  {project.pricing?.original_price && project.pricing.original_price > (project.pricing?.sale_price || 0) && (
                     <div className="text-xl sm:text-2xl text-gray-500 line-through">₹{project.pricing.original_price}</div>
                   )}
                 </div>
-                {project.discount_percentage > 0 && (
+                {project.discount_percentage && project.discount_percentage > 0 && (
                   <div className="text-xs sm:text-sm text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full inline-block animate-pulse">
                     Save {project.discount_percentage}%
                   </div>
@@ -728,7 +701,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Files Size</span>
-                  <span className="font-semibold text-gray-900">{hasProjectDump ? `${projectDump?.files?.size_mb || 0} MB` : 'N/A'}</span>
+                  <span className="font-semibold text-gray-900">{hasProjectDump ? `${project?.files?.size_mb || 0} MB` : 'N/A'}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Total Sales</span>
@@ -736,7 +709,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-semibold text-green-600">{hasProjectDump ? `${projectDump?.stats?.completion_rate || 0}%` : 'N/A'}</span>
+                  <span className="font-semibold text-green-600">{hasProjectDump ? `${project?.stats?.completion_rate || 0}%` : 'N/A'}</span>
                 </div>
               </div>
 
@@ -748,7 +721,7 @@ const ProjectDetail = () => {
                     className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 shadow-lg hover:shadow-xl transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed" style={{ animationDelay: '300ms' }}
                   >
                     <ShoppingCart className="w-5 sm:w-6 h-5 sm:h-6" />
-                    {isAuthenticated ? (isPurchasing ? 'Processing...' : `Buy Now (₹${project.pricing.sale_price})`) : 'Login to Buy'}
+                    {isAuthenticated ? (isPurchasing ? 'Processing...' : `Buy Now (₹${project.pricing?.sale_price || 0})`) : 'Login to Buy'}
                   </button>
                   <button className="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base" style={{ animationDelay: '350ms' }}>
                     <Heart className="w-4 sm:w-5 h-4 sm:h-5 inline mr-2" />
