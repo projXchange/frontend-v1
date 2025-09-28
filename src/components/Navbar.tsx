@@ -137,13 +137,15 @@ const Navbar = () => {
                           </div>
                         </div>
                         <div className="py-2">
-                          <Link
+                          {!isAdmin && (
+                            <Link
                             to="/dashboard"
                             onClick={() => setIsProfileOpen(false)}
                             className="flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
                           >
                             <User className="w-4 h-4 mr-3" /> Dashboard
                           </Link>
+                          )}
                           {isAdmin && (
                             <Link
                               to="/admin"
