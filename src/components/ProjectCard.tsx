@@ -38,39 +38,6 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
     return images[category as keyof typeof images] || images['React'];
   };
 
-
-  // const fetchReviews = async () => {
-
-  //   try {
-  //     console.log('Fetching reviews for project ID:', index);
-  //     const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}/reviews`,
-  //     {
-  //       method: 'GET',
-  //       headers: {
-  //         'Authorization': `Bearer ${localStorage.getItem('token')}`,
-  //       },
-  //     }
-
-  //     );
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log('Reviews API response:', data);
-  //       setReviews(data.reviews || []);
-  //       setRating(data.stats.average_rating)
-  //     } else {
-  //       console.error('Reviews API response not ok:', response.status, response.statusText);
-  //       setReviews([]); // Set empty reviews array if API fails
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to fetch reviews:', error);
-  //     setReviews([]); // Set empty reviews array if API fails
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchReviews();
-  // }, [index])
-
   return (
     <motion.div
       key={project.id}
