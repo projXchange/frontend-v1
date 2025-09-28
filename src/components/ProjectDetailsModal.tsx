@@ -133,15 +133,15 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 <div className="space-y-2 sm:space-y-3">
                   <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl">
                     <span className="text-gray-600 text-sm sm:text-base">Sale Price:</span>
-                    <span className="font-bold text-gray-900 text-sm sm:text-base">₹{project.pricing.sale_price}</span>
+                    <span className="font-bold text-gray-900 text-sm sm:text-base">₹{project.pricing?.sale_price}</span>
                   </div>
                   <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl">
                     <span className="text-gray-600 text-sm sm:text-base">Original Price:</span>
-                    <span className="font-bold text-gray-900 text-sm sm:text-base">₹{project.pricing.original_price}</span>
+                    <span className="font-bold text-gray-900 text-sm sm:text-base">₹{project.pricing?.original_price}</span>
                   </div>
                   <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl">
                     <span className="text-gray-600 text-sm sm:text-base">Currency:</span>
-                    <span className="font-bold text-gray-900 text-sm sm:text-base">{project.pricing.currency}</span>
+                    <span className="font-bold text-gray-900 text-sm sm:text-base">{project.pricing?.currency}</span>
                   </div>
                 </div>
               </div>

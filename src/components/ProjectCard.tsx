@@ -17,8 +17,6 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart, isInCart } = useCart();
   const { isAuthenticated, openAuthModal } = useAuth();
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [rating, setRating] = useState(0);
   // Calculate discount from consolidated project data
   const discount = project.pricing?.original_price && project.pricing?.sale_price 
     ? project.pricing.original_price > project.pricing.sale_price 
@@ -39,39 +37,6 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
     };
     return images[category as keyof typeof images] || images['React'];
   };
-
-
-  const fetchReviews = async () => {
-
-    try {
-      console.log('Fetching reviews for project ID:', index);
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}/reviews`,
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      }
-
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Reviews API response:', data);
-        setReviews(data.reviews || []);
-        setRating(data.stats.average_rating)
-      } else {
-        console.error('Reviews API response not ok:', response.status, response.statusText);
-        setReviews([]); // Set empty reviews array if API fails
-      }
-    } catch (error) {
-      console.error('Failed to fetch reviews:', error);
-      setReviews([]); // Set empty reviews array if API fails
-    }
-  };
-
-  useEffect(() => {
-    fetchReviews();
-  }, [index])
 
   return (
     <motion.div
@@ -190,8 +155,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </span>
             <div className="flex items-center">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              <span className="ml-1 text-sm font-semibold text-gray-800">{rating}</span>
-              <span className="ml-1 text-sm text-gray-500">({reviews.length})</span>
+              <span className="ml-1 text-sm font-semibold text-gray-800">{project.rating?.average_rating || 0.0}</span>
+              <span className="ml-1 text-sm text-gray-500">({project.rating?.total_ratings || 0})</span>
             </div>
           </div>
 

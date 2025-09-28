@@ -122,7 +122,7 @@ const ProjectDetail = () => {
           user: { id: user?.id || 'user1', full_name: user?.full_name || 'Anonymous', email: user?.email || '' }
         };
 
-        setReviews(prev => [newReview, ...prev]);
+        //setReviews(prev => [newReview, ...prev]);
         setReviewText('');
         setRating(0); // reset stars
         alert('Review submitted successfully!');

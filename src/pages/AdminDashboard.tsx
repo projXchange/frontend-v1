@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Plus, Edit, Trash2, Eye, Check, X, Calendar, DollarSign, Users, ShoppingBag, Clock, TrendingUp, AlertCircle, BarChart3, Award, Star, Activity, Zap, Target, Filter, Search, ChevronDown, Bell, Settings, FileText, Tag, Upload, IndianRupee, Video, Image, Shield, CheckCircle, MessageSquare } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, Trash2, Eye, Check, X, DollarSign, Users, ShoppingBag, TrendingUp, AlertCircle, BarChart3, Star, Activity, Target, Search, Bell, Settings, MessageSquare } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { User, UsersApiResponse } from '../types/User';
 import { Project, ProjectResponse, Review } from '../types/Project';
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Transaction, TransactionsApiResponse } from '../types/Transaction';
 import toast from 'react-hot-toast';
 import TransactionDetailsModal from '../components/TransactionDetailsModal';
+import ReviewDetailsModal from '../components/ReviewDetailsModal';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +40,9 @@ const AdminDashboard = () => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [updatingTransaction, setUpdatingTransaction] = useState<string | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [updatingReview, setUpdatingReview] = useState<string | null>(null);
 
 
 
@@ -216,13 +220,11 @@ const AdminDashboard = () => {
         throw new Error('Failed to update project status');
       }
 
-      const data = await response.json();
-
       // Update the project in the local state
       setProjects(prevProjects =>
         prevProjects.map(project =>
           project.id === projectId
-            ? { ...project, status: data.project.status, is_featured: data.project.is_featured }
+            ? { ...project, status, is_featured: isFeatured }
             : project
         )
       );
@@ -257,8 +259,6 @@ const AdminDashboard = () => {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'Failed to update user status');
       }
-
-      const data = await response.json();
 
       // Update the user in the local state
       setUsers(prevUsers =>
@@ -297,8 +297,6 @@ const AdminDashboard = () => {
       if (!response.ok) {
         throw new Error('Failed to delete user');
       }
-
-      const data = await response.json();
 
       // Remove the user from the local state
       setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
@@ -426,7 +424,7 @@ const AdminDashboard = () => {
     setError('');
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/reviews/pending', {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/reviews', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -447,40 +445,125 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleReviewApproval = async (reviewId: string, isApproved: boolean) => {
+  // const handleReviewApproval = async (reviewId: string) => {
+  //   setUpdatingReview(reviewId);
+  //   const token = localStorage.getItem("token");
+  //   try {
+  //     const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}/approval`, {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({ is_approved: true }),
+  //     });
+
+  //     if (response.ok) {
+  //       setReviews(prev => prev.map(review =>
+  //         review.id === reviewId ? { ...review, is_approved: true } : review
+  //       ));
+  //       toast.success('Review approved successfully!');
+  //       setIsReviewModalOpen(false);
+  //     } else {
+  //       throw new Error('Failed to approve review');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error approving review:', error);
+  //     toast.error('Failed to approve review. Please try again.');
+  //   } finally {
+  //     setUpdatingReview(null);
+  //   }
+  // };
+
+  // const handleReviewRejection = async (reviewId: string) => {
+  //   setUpdatingReview(reviewId);
+  //   const token = localStorage.getItem("token");
+  //   try {
+  //     const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}/approval`, {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({ is_approved: false }),
+  //     });
+
+  //     if (response.ok) {
+  //       setReviews(prev => prev.map(review =>
+  //         review.id === reviewId ? { ...review, is_approved: false } : review
+  //       ));
+  //       toast.success('Review rejected successfully!');
+  //       setIsReviewModalOpen(false);
+  //     } else {
+  //       throw new Error('Failed to reject review');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error rejecting review:', error);
+  //     toast.error('Failed to reject review. Please try again.');
+  //   } finally {
+  //     setUpdatingReview(null);
+  //   }
+  // };
+
+  const handleReviewAction = async (reviewIds: string[], isApproved: boolean) => {
+    setUpdatingReview(reviewIds[0]); // show loading state for first review (or adapt for batch)
+
     const token = localStorage.getItem("token");
+
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}/approval`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ is_approved: isApproved }),
-      });
+      const response = await fetch(
+        `https://projxchange-backend-v1.vercel.app/admin/reviews/approve`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            review_ids: reviewIds,
+            is_approved: isApproved,
+          }),
+        }
+      );
 
       if (response.ok) {
-        setReviews(prev => prev.map(review =>
-          review.id === reviewId ? { ...review, is_approved: isApproved } : review
-        ));
-        toast.success(`Review ${isApproved ? 'approved' : 'rejected'} successfully!`);
+        setReviews((prev) =>
+          prev.map((review) =>
+            reviewIds.includes(review.id)
+              ? { ...review, is_approved: isApproved }
+              : review
+          )
+        );
+
+        toast.success(
+          `Review${reviewIds.length > 1 ? "s" : ""} ${isApproved ? "approved" : "rejected"
+          } successfully!`
+        );
+
+        setIsReviewModalOpen(false);
       } else {
-        throw new Error('Failed to update review approval status');
+        throw new Error(
+          `Failed to ${isApproved ? "approve" : "reject"} review(s)`
+        );
       }
     } catch (error) {
-      console.error('Error updating review approval:', error);
-      toast.error('Failed to update review approval status. Please try again.');
+      console.error(
+        `Error ${isApproved ? "approving" : "rejecting"} reviews:`,
+        error
+      );
+      toast.error(
+        `Failed to ${isApproved ? "approve" : "reject"} review(s). Please try again.`
+      );
+    } finally {
+      setUpdatingReview(null);
     }
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
-      return;
-    }
-
+    setUpdatingReview(reviewId);
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}`, {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -491,13 +574,21 @@ const AdminDashboard = () => {
       if (response.ok) {
         setReviews(prev => prev.filter(review => review.id !== reviewId));
         toast.success('Review deleted successfully!');
+        setIsReviewModalOpen(false);
       } else {
         throw new Error('Failed to delete review');
       }
     } catch (error) {
       console.error('Error deleting review:', error);
       toast.error('Failed to delete review. Please try again.');
+    } finally {
+      setUpdatingReview(null);
     }
+  };
+
+  const openReviewModal = (review: Review) => {
+    setSelectedReview(review);
+    setIsReviewModalOpen(true);
   };
 
   const handleProjectStatusUpdate = async () => {
@@ -592,23 +683,6 @@ const AdminDashboard = () => {
     }
 
     try {
-      // Step 1: Delete project dump
-      // const dumpResponse = await fetch(
-      //   `https://projxchange-backend-v1.vercel.app/projects/${projectId}/dump`,
-      //   {
-      //     method: "DELETE",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   }
-      // );
-
-      // if (!dumpResponse.ok) {
-      //   throw new Error("Failed to delete project dump");
-      // }
-
-      // Step 2: Delete project
       const projectResponse = await fetch(
         `https://projxchange-backend-v1.vercel.app/projects/${projectId}`,
         {
@@ -1090,8 +1164,8 @@ const AdminDashboard = () => {
                                 </td>
                                 <td className="px-6 py-4">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-gray-900">₹{project.pricing.sale_price}</span>
-                                    <span className="text-xs text-gray-500 line-through">₹{project.pricing.original_price}</span>
+                                    <span className="text-sm font-bold text-gray-900">₹{project.pricing?.sale_price}</span>
+                                    <span className="text-xs text-gray-500 line-through">₹{project.pricing?.original_price}</span>
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 text-sm font-bold text-gray-900">
@@ -1241,6 +1315,13 @@ const AdminDashboard = () => {
                               </td>
                             </tr>
                           ))}
+                          {users.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                                 No users found
+                              </td>
+                            </tr>
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -1305,8 +1386,8 @@ const AdminDashboard = () => {
                               </td>
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-bold text-gray-900">₹{project.pricing.sale_price}</span>
-                                  <span className="text-xs text-gray-500 line-through">₹{project.pricing.original_price}</span>
+                                  <span className="text-sm font-bold text-gray-900">₹{project.pricing?.sale_price}</span>
+                                  <span className="text-xs text-gray-500 line-through">₹{project.pricing?.original_price}</span>
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-sm text-gray-600 font-medium">
@@ -1336,6 +1417,13 @@ const AdminDashboard = () => {
                               </td>
                             </tr>
                           ))}
+                          {pendingProjects.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                                 No pending projects found
+                              </td>
+                            </tr>
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -1527,34 +1615,63 @@ const AdminDashboard = () => {
                                 </td>
                                 <td className="px-6 py-4">
                                   <div className="flex space-x-2">
+                                    <button
+                                      onClick={() => openReviewModal(review)}
+                                      className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                      title="View Review Details"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                    </button>
                                     {!review.is_approved ? (
                                       <button
-                                        onClick={() => handleReviewApproval(review.id, true)}
-                                        className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                        onClick={() => handleReviewAction([review.id], true)}
+                                        disabled={updatingReview === review.id}
+                                        className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
                                         title="Approve Review"
                                       >
-                                        <Check className="w-4 h-4" />
+                                        {updatingReview === review.id ? (
+                                          <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                                        ) : (
+                                          <Check className="w-4 h-4" />
+                                        )}
                                       </button>
                                     ) : (
                                       <button
-                                        onClick={() => handleReviewApproval(review.id, false)}
-                                        className="p-2 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                        onClick={() => handleReviewAction([review.id], false)}
+                                        disabled={updatingReview === review.id}
+                                        className="p-2 text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
                                         title="Reject Review"
                                       >
-                                        <X className="w-4 h-4" />
+                                        {updatingReview === review.id ? (
+                                          <div className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
+                                        ) : (
+                                          <X className="w-4 h-4" />
+                                        )}
                                       </button>
                                     )}
                                     <button
                                       onClick={() => handleDeleteReview(review.id)}
-                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                      disabled={updatingReview === review.id}
+                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
                                       title="Delete Review"
                                     >
-                                      <Trash2 className="w-4 h-4" />
+                                      {updatingReview === review.id ? (
+                                        <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
                                     </button>
                                   </div>
                                 </td>
                               </tr>
                             ))}
+                            {reviews.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                                 No reviews found
+                              </td>
+                            </tr>
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -1603,6 +1720,25 @@ const AdminDashboard = () => {
           updatingTransaction={updatingTransaction}
         />
       )}
+
+      {isReviewModalOpen && selectedReview && (
+        <ReviewDetailsModal
+          isOpen={isReviewModalOpen}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            setSelectedReview(null);
+          }}
+          review={selectedReview}
+          isAdmin={true}
+          // ✅ call handleReviewAction with array + true/false
+          onApprove={() => handleReviewAction([selectedReview.id], true)}
+          onReject={() => handleReviewAction([selectedReview.id], false)}
+          onDelete={handleDeleteReview}
+          isUpdating={updatingReview === selectedReview.id}
+          isDeleting={updatingReview === selectedReview.id}
+        />
+      )}
+
 
     </div>
   );

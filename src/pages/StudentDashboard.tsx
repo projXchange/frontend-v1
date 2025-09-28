@@ -8,6 +8,7 @@ import { ProfileForm, SocialLinks } from '../types/ProfileForm';
 import { ProjectCard } from '../components/ProjectCard';
 import { Review, Project } from '../types/Project';
 import { Transaction } from '../types/Transaction';
+import ReviewDetailsModal from '../components/ReviewDetailsModal';
 
 
 const StudentDashboard = () => {
@@ -27,6 +28,10 @@ const StudentDashboard = () => {
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [updatingReview, setUpdatingReview] = useState<string | null>(null);
+  const [reviewFilterStatus, setReviewFilterStatus] = useState('all');
 
   const [profileForm, setProfileForm] = useState<ProfileForm>({
     id: '',
@@ -265,6 +270,50 @@ const StudentDashboard = () => {
     setAvatarFile(null);
     setAvatarPreview('');
   };
+
+  const handleUpdateReview = async (reviewId: string, updatedReview: { review_text: string; rating: number }) => {
+    setUpdatingReview(reviewId);
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedReview),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update review');
+      }
+
+      const data = await response.json();
+      setReviews(prev => prev.map(review =>
+        review.id === reviewId ? { ...review, ...data.review } : review
+      ));
+      alert('Review updated successfully!');
+      setIsReviewModalOpen(false);
+    } catch (error) {
+      console.error('Error updating review:', error);
+      alert('Failed to update review. Please try again.');
+    } finally {
+      setUpdatingReview(null);
+    }
+  };
+
+  const openReviewModal = (review: Review) => {
+    setSelectedReview(review);
+    setIsReviewModalOpen(true);
+  };
+
+  const filteredReviews = reviews.filter(review => {
+    const matchesSearch = review.review_text.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = reviewFilterStatus === 'all' || 
+      (reviewFilterStatus === 'approved' && review.is_approved) ||
+      (reviewFilterStatus === 'pending' && !review.is_approved);
+    return matchesSearch && matchesFilter;
+  });
 
   useEffect(() => {
     // Load profile on mount
@@ -588,12 +637,12 @@ const StudentDashboard = () => {
                           </div>
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-2xl font-bold text-gray-900">₹{item.project.pricing.sale_price}</span>
-                              {item.project.pricing.original_price > item.project.pricing.sale_price && (
+                              <span className="text-2xl font-bold text-gray-900">₹{item.project.pricing?.sale_price || 0}</span>
+                              {item.project.pricing && item.project.pricing.original_price > item.project.pricing.sale_price && (
                                 <span className="text-lg text-gray-500 line-through">₹{item.project.pricing.original_price}</span>
                               )}
                             </div>
-                            {item.project.pricing.original_price > item.project.pricing.sale_price && (
+                            {item.project.pricing && item.project.pricing.original_price > item.project.pricing.sale_price && (
                               <span className="text-sm text-green-600 font-semibold">
                                 Save ₹{item.project.pricing.original_price - item.project.pricing.sale_price}
                               </span>
@@ -625,7 +674,27 @@ const StudentDashboard = () => {
                     <MessageSquare className="w-7 h-7 text-blue-600" />
                     My Reviews
                   </h2>
-
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        placeholder="Search reviews..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      />
+                    </div>
+                    <select
+                      value={reviewFilterStatus}
+                      onChange={(e) => setReviewFilterStatus(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    >
+                      <option value="all">All Reviews</option>
+                      <option value="approved">Approved</option>
+                      <option value="pending">Pending</option>
+                    </select>
+                  </div>
                 </div>
 
                 {loading ? (
@@ -641,7 +710,6 @@ const StudentDashboard = () => {
                           <tr>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Review</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project ID</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Student</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rating</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
@@ -649,7 +717,7 @@ const StudentDashboard = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {reviews.map((review, index) => (
+                          {filteredReviews.map((review, index) => (
                             <tr key={review.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                               <td className="px-6 py-4">
                                 <div className="max-w-xs">
@@ -662,17 +730,6 @@ const StudentDashboard = () => {
                                 {review.project_id}
                               </td>
                               <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
-                                    <span className="text-white font-bold text-sm">{review.user_id}</span>
-                                  </div>
-                                  <div>
-                                    <div className="font-semibold text-gray-900 text-sm">{review.user_id}</div>
-                                    <div className="text-xs text-gray-500">{review.user_id}</div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4">
                                 <div className="flex items-center gap-1">
                                   {[...Array(5)].map((_, i) => (
                                     <Star
@@ -681,6 +738,7 @@ const StudentDashboard = () => {
                                         }`}
                                     />
                                   ))}
+                                  <span className="ml-2 text-sm font-semibold text-gray-700">{review.rating}/5</span>
                                 </div>
                               </td>
                               <td className="px-6 py-4">
@@ -694,11 +752,24 @@ const StudentDashboard = () => {
                               <td className="px-6 py-4 text-sm text-gray-600 font-medium">
                                 {new Date(review.created_at).toLocaleDateString()}
                               </td>
+                              <td className="px-6 py-4">
+                                <div className="flex space-x-2">
+                                  <button
+                                    onClick={() => openReviewModal(review)}
+                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                    title="View/Edit Review"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
                             </tr>
                           ))}
-                          {reviews.length === 0 && (
+                          {filteredReviews.length === 0 && (
                             <tr>
-                              <td colSpan={7} className="px-6 py-8 text-center text-gray-600">No Reviews found.</td>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                                {reviews.length === 0 ? 'No reviews found.' : 'No reviews match your filters.'}
+                              </td>
                             </tr>
                           )}
                         </tbody>
@@ -1126,6 +1197,21 @@ const StudentDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Review Details Modal */}
+      {isReviewModalOpen && (
+        <ReviewDetailsModal
+          isOpen={isReviewModalOpen}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            setSelectedReview(null);
+          }}
+          review={selectedReview}
+          isAdmin={false}
+          onUpdate={handleUpdateReview}
+          isUpdating={updatingReview === selectedReview?.id}
+        />
+      )}
     </div>
   );
 };
