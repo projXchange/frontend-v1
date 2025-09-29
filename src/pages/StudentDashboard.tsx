@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Star, Calendar, Settings, ShoppingBag, Heart, Eye, Award, TrendingUp, Clock, BarChart3, Trophy, Activity, Search, Loader, Save, Edit3, Github, Globe, Linkedin, MapPin, Twitter, X, MessageSquare } from 'lucide-react';
+import { Download, Star, Calendar, Settings, ShoppingBag, Heart, Eye, Award, TrendingUp, Clock, BarChart3, Trophy, Activity, Search, Loader, Save, Edit3, Github, Globe, Linkedin, MapPin, Twitter, X, MessageSquare, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { motion } from 'framer-motion';
@@ -9,6 +9,7 @@ import { ProjectCard } from '../components/ProjectCard';
 import { Review, Project } from '../types/Project';
 import { Transaction } from '../types/Transaction';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
+import toast from 'react-hot-toast';
 
 
 const StudentDashboard = () => {
@@ -302,6 +303,32 @@ const StudentDashboard = () => {
     }
   };
 
+  const handleDeleteReview = async (reviewId: string) => {
+    setUpdatingReview(reviewId);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setReviews(prev => prev.filter(review => review.id !== reviewId));
+        toast.success('Review deleted successfully!');
+        setIsReviewModalOpen(false);
+      } else {
+        throw new Error('Failed to delete review');
+      }
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast.error('Failed to delete review. Please try again.');
+    } finally {
+      setUpdatingReview(null);
+    }
+  };
   const openReviewModal = (review: Review) => {
     setSelectedReview(review);
     setIsReviewModalOpen(true);
@@ -761,6 +788,18 @@ const StudentDashboard = () => {
                                   >
                                     <Eye className="w-4 h-4" />
                                   </button>
+                                  <button
+                                      onClick={() => handleDeleteReview(review.id)}
+                                      disabled={updatingReview === review.id}
+                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
+                                      title="Delete Review"
+                                    >
+                                      {updatingReview === review.id ? (
+                                        <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
+                                    </button>
                                 </div>
                               </td>
                             </tr>
