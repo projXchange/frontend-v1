@@ -89,6 +89,7 @@ export interface Review {
   user_id: string;
   rating: number;
   review_text: string;
+  is_verified_purchase: boolean;
   is_approved: boolean;
   created_at: string;
   updated_at: string;
@@ -96,6 +97,10 @@ export interface Review {
     id: string;
     full_name: string;
     email: string;
+  };
+  project: {
+    "id": "string",
+    "title": "string"
   };
 }
 

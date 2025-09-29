@@ -17,11 +17,12 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('description');
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [approvedReviews, setApprovedReviews] = useState<Review[]>([]);
+  const [pendingReviews, setPendingReviews] = useState<Review[]>([]);
   const [reviewText, setReviewText] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [rating, setRating] = useState(0);
   
 
@@ -62,7 +63,6 @@ const ProjectDetail = () => {
 
 
   const fetchReviews = async () => {
-
     try {
       console.log('Fetching reviews for project ID:', id);
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/reviews`,
@@ -72,20 +72,28 @@ const ProjectDetail = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
         }
-
       );
       if (response.ok) {
         const data = await response.json();
         console.log('Reviews API response:', data);
-        setReviews(data.reviews || []);
-        setRating(data.stats.average_rating)
+        
+        // Separate approved and pending reviews
+        const allReviews = data.reviews || [];
+        const approved = allReviews.filter((review: Review) => review.is_approved);
+        const pending = allReviews.filter((review: Review) => !review.is_approved);
+        
+        setApprovedReviews(approved);
+        setPendingReviews(pending);
+        setRating(data.stats.average_rating);
       } else {
         console.error('Reviews API response not ok:', response.status, response.statusText);
-        setReviews([]); // Set empty reviews array if API fails
+        setApprovedReviews([]);
+        setPendingReviews([]);
       }
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
-      setReviews([]); // Set empty reviews array if API fails
+      setApprovedReviews([]);
+      setPendingReviews([]);
     }
   };
 
@@ -110,22 +118,11 @@ const ProjectDetail = () => {
       });
 
       if (response.ok) {
-        const newReview: Review = {
-          id: Date.now().toString(),
-          project_id: id || '1',
-          user_id: user?.id || 'user1',
-          rating,
-          review_text: reviewText,
-          is_approved: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          user: { id: user?.id || 'user1', full_name: user?.full_name || 'Anonymous', email: user?.email || '' }
-        };
-
-        //setReviews(prev => [newReview, ...prev]);
         setReviewText('');
         setRating(0); // reset stars
         alert('Review submitted successfully!');
+        // Refresh reviews from backend after successful submission
+        await fetchReviews();
       } else {
         alert('Failed to submit review. Please try again.');
       }
@@ -314,7 +311,7 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-2">
                   <Star className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-400 fill-current" />
                   <span className="font-bold text-base sm:text-lg">{hasProjectDump ? (rating || '0.0') : '0.0'}</span>
-                  <span className="font-medium">({hasProjectDump ? (reviews.length || 0) : 0})</span>
+                  <span className="font-medium">({hasProjectDump ? ((approvedReviews.length + pendingReviews.length) || 0) : 0})</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -386,9 +383,9 @@ const ProjectDetail = () => {
                         }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      {tab === 'reviews' && hasProjectDump && reviews.length && project?.rating?.total_ratings && project.rating.total_ratings > 0 && (
+                      {tab === 'reviews' && hasProjectDump && (approvedReviews.length + pendingReviews.length) > 0 && (
                         <span className="ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
-                          {reviews.length}
+                          {approvedReviews.length + pendingReviews.length}
                         </span>
                       )}
                     </button>
@@ -557,7 +554,12 @@ const ProjectDetail = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
                       <h3 className="text-xl sm:text-2xl font-bold animate-slideInUp">Reviews</h3>
                       <div className="text-base sm:text-lg text-gray-600">
-                        <span className="font-semibold">{hasProjectDump ? (reviews.length || 0) : 0}</span> students reviewed this project
+                        <span className="font-semibold">{hasProjectDump ? (approvedReviews.length + pendingReviews.length) : 0}</span> total
+                        {pendingReviews.length > 0 && (
+                          <span className="ml-2 text-sm text-orange-600">
+                            ({pendingReviews.length} pending)
+                          </span>
+                        )}
                         {!hasProjectDump && <span className="text-xs sm:text-sm text-gray-500 block sm:inline sm:ml-2">(Login required for reviews)</span>}
                       </div>
                     </div>
@@ -630,18 +632,19 @@ const ProjectDetail = () => {
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">Reviews not available</h4>
                           <p className="text-gray-500 text-sm sm:text-base">Please log in to access project reviews.</p>
                         </div>
-                      ) : reviews.length === 0 ? (
+                      ) : (approvedReviews.length === 0 && pendingReviews.length === 0) ? (
                         <div className="text-center py-8 sm:py-12">
                           <MessageSquare className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">No reviews yet</h4>
                           <p className="text-gray-500 text-sm sm:text-base">Be the first to review this project!</p>
                         </div>
                       ) : (
-                        reviews.map((review, index) => (
-                          <div key={review.id} className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                        // Single combined list: pending first, then approved
+                        [...pendingReviews, ...approvedReviews].map((review, index) => (
+                          <div key={review.id} className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border ${review.is_approved ? 'border-gray-100' : 'border-orange-100 bg-orange-50'} animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
                             <div className="flex items-start justify-between mb-4 gap-3">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <div className={`w-10 sm:w-12 h-10 sm:h-12 ${review.is_approved ? 'bg-gradient-to-br from-blue-500 to-teal-500' : 'bg-gradient-to-br from-orange-500 to-red-500'} rounded-full flex items-center justify-center flex-shrink-0`}>
                                   <span className="text-white font-bold text-base sm:text-lg">
                                     {review.user.full_name.charAt(0)}
                                   </span>
@@ -651,14 +654,29 @@ const ProjectDetail = () => {
                                   <p className="text-xs sm:text-sm text-gray-500">
                                     {new Date(review.created_at).toLocaleDateString()}
                                   </p>
+                                  {/* Status Badges */}
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {/* Is Purchase tag (always shown) */}
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_verified_purchase ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
+                                      {review.is_verified_purchase ? 'Verified Purchased: ✓ ' : 'Verified Purchased: ✗ '}
+                                    </span>
+                                    {/* Approval/Verified badges */}
+                                    {review.is_verified_purchase && (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                        ✓ Verified Purchase
+                                      </span>
+                                    )}
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_approved ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                                      {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0">
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
-                                    className={`w-3 sm:w-4 h-3 sm:h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                      }`}
+                                    className={`w-3 sm:w-4 h-3 sm:h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
                                   />
                                 ))}
                               </div>

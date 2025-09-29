@@ -445,66 +445,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // const handleReviewApproval = async (reviewId: string) => {
-  //   setUpdatingReview(reviewId);
-  //   const token = localStorage.getItem("token");
-  //   try {
-  //     const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}/approval`, {
-  //       method: 'PATCH',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify({ is_approved: true }),
-  //     });
-
-  //     if (response.ok) {
-  //       setReviews(prev => prev.map(review =>
-  //         review.id === reviewId ? { ...review, is_approved: true } : review
-  //       ));
-  //       toast.success('Review approved successfully!');
-  //       setIsReviewModalOpen(false);
-  //     } else {
-  //       throw new Error('Failed to approve review');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error approving review:', error);
-  //     toast.error('Failed to approve review. Please try again.');
-  //   } finally {
-  //     setUpdatingReview(null);
-  //   }
-  // };
-
-  // const handleReviewRejection = async (reviewId: string) => {
-  //   setUpdatingReview(reviewId);
-  //   const token = localStorage.getItem("token");
-  //   try {
-  //     const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/${reviewId}/approval`, {
-  //       method: 'PATCH',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify({ is_approved: false }),
-  //     });
-
-  //     if (response.ok) {
-  //       setReviews(prev => prev.map(review =>
-  //         review.id === reviewId ? { ...review, is_approved: false } : review
-  //       ));
-  //       toast.success('Review rejected successfully!');
-  //       setIsReviewModalOpen(false);
-  //     } else {
-  //       throw new Error('Failed to reject review');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error rejecting review:', error);
-  //     toast.error('Failed to reject review. Please try again.');
-  //   } finally {
-  //     setUpdatingReview(null);
-  //   }
-  // };
-
   const handleReviewAction = async (reviewIds: string[], isApproved: boolean) => {
     setUpdatingReview(reviewIds[0]); // show loading state for first review (or adapt for batch)
 
@@ -1552,7 +1492,7 @@ const AdminDashboard = () => {
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Review</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project ID</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project Name</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Student</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rating</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
@@ -1578,12 +1518,12 @@ const AdminDashboard = () => {
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                                  {review.project_id}
+                                  {review.project.title}
                                 </td>
                                 <td className="px-6 py-4">
                                   <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
-                                      <span className="text-white font-bold text-sm">{review.user.full_name.charAt(0)}</span>
+                                      <span className="text-white font-bold text-sm">{review.user.full_name}</span>
                                     </div>
                                     <div>
                                       <div className="font-semibold text-gray-900 text-sm">{review.user.full_name}</div>
