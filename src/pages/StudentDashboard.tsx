@@ -329,7 +329,6 @@ const StudentDashboard = () => {
       setUpdatingReview(null);
     }
   };
-
   const openReviewModal = (review: Review) => {
     setSelectedReview(review);
     setIsReviewModalOpen(true);
