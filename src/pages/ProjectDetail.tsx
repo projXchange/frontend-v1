@@ -124,19 +124,6 @@ const ProjectDetail = () => {
       });
 
       if (response.ok) {
-        const newReview: Review = {
-          id: Date.now().toString(),
-          project_id: id || '1',
-          user_id: user?.id || 'user1',
-          rating,
-          review_text: reviewText,
-          is_approved: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          user: { id: user?.id || 'user1', full_name: user?.full_name || 'Anonymous', email: user?.email || '' }
-        };
-
-        //setReviews(prev => [newReview, ...prev]);
         setReviewText('');
         setFormRating(0); // reset stars
         toast.success('Review submitted successfully!');
