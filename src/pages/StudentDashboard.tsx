@@ -736,7 +736,7 @@ const StudentDashboard = () => {
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Review</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project Name</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project ID</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rating</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
@@ -754,7 +754,7 @@ const StudentDashboard = () => {
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                                {review.project.title}
+                                {review.project_id}
                               </td>
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-1">
