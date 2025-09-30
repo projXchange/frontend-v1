@@ -82,6 +82,7 @@ const ProjectDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
+
         
         // Separate approved and pending reviews
         const allReviews = data.reviews || [];
@@ -91,6 +92,7 @@ const ProjectDetail = () => {
         setApprovedReviews(approved);
         setPendingReviews(pending);
         setAverageRating(data.stats.average_rating);
+
       } else {
         console.error('Reviews API response not ok:', response.status, response.statusText);
         setApprovedReviews([]);
@@ -127,6 +129,7 @@ const ProjectDetail = () => {
         setReviewText('');
         setFormRating(0); // reset stars
         toast.success('Review submitted successfully!');
+     
         // Refresh reviews from backend after successful submission
         await fetchReviews();
       } else {
@@ -481,6 +484,7 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-2">
                   <Star className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-400 fill-current" />
                   <span className="font-bold text-base sm:text-lg">{hasProjectDump ? (averageRating || '0.0') : '0.0'}</span>
+
                   <span className="font-medium">({hasProjectDump ? ((approvedReviews.length + pendingReviews.length) || 0) : 0})</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -931,13 +935,14 @@ const ProjectDetail = () => {
                           <p className="text-gray-500 text-sm sm:text-base">Please log in to access project reviews.</p>
                         </div>
                       ) : ([...pendingReviews, ...approvedReviews].filter(review => !user || review.user.id !== user.id).length === 0) ? (
+
                         <div className="text-center py-8 sm:py-12">
                           <MessageSquare className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">No reviews yet</h4>
                           <p className="text-gray-500 text-sm sm:text-base">Be the first to review this project!</p>
                         </div>
                       ) : (
-                        // Single combined list: pending first, then approved (excluding current user's review)
+                       // Single combined list: pending first, then approved (excluding current user's review)
                         [...pendingReviews, ...approvedReviews]
                           .filter(review => !user || review.user.id !== user.id) // Filter out current user's review
                           .map((review, index) => (
@@ -960,7 +965,6 @@ const ProjectDetail = () => {
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_verified_purchase ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
                                       {review.is_verified_purchase ? 'Verified Purchased: ✓ ' : 'Verified Purchased: ✗ '}
                                     </span>
-                                    
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_approved ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                                       {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
                                     </span>
