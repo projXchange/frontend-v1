@@ -34,7 +34,7 @@ const ProjectDetail = () => {
   const [editReviewText, setEditReviewText] = useState('');
   const [editReviewRating, setEditReviewRating] = useState(0);
   const [updatingReview, setUpdatingReview] = useState(false);
-  
+ 
 
 
   // Fetch project data on component mount
@@ -82,6 +82,7 @@ const ProjectDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
+
         
         // Separate approved and pending reviews
         const allReviews = data.reviews || [];
@@ -760,8 +761,7 @@ const ProjectDetail = () => {
                             (You have reviewed)
                           </span>
                         )}
-                        {!hasProjectDump && <span className="text-xs sm:text-sm text-gray-500 block sm:inline sm:ml-2">(Login required for reviews)</span>}
-                      </div>
+                     </div>
                     </div>
 
 
@@ -944,7 +944,7 @@ const ProjectDetail = () => {
                           <p className="text-gray-500 text-sm sm:text-base">Please log in to access project reviews.</p>
                         </div>
                       ) : ([...pendingReviews, ...approvedReviews].filter(review => !user || review.user.id !== user.id).length === 0) ? (
-                        <div className="text-center py-8 sm:py-12">
+                       <div className="text-center py-8 sm:py-12">
                           <MessageSquare className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">No reviews yet</h4>
                           <p className="text-gray-500 text-sm sm:text-base">Be the first to review this project!</p>
@@ -973,7 +973,7 @@ const ProjectDetail = () => {
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_verified_purchase ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
                                       {review.is_verified_purchase ? 'Verified Purchased: ✓ ' : 'Verified Purchased: ✗ '}
                                     </span>
-                                    
+
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_approved ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                                       {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
                                     </span>
@@ -1005,6 +1005,25 @@ const ProjectDetail = () => {
                                     />
                                   ))}
                                 </div>
+                                    {/* Approval/Verified badges */}
+                                    {review.is_verified_purchase && (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                        ✓ Verified Purchase
+                                      </span>
+                                    )}
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_approved ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                                      {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-3 sm:w-4 h-3 sm:h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                  />
+                                ))}
                               </div>
                             </div>
                             
