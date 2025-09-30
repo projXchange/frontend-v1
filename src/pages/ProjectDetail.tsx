@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award, Clock, Shield, CheckCircle, MessageSquare, Send, Github, ExternalLink } from 'lucide-react';
+import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award, Clock, Shield, CheckCircle, MessageSquare, Send, Github, ExternalLink, Edit2, Save, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import { useCart } from '../contexts/CartContext';
 import { Project, Review } from '../types/Project';
+import toast from 'react-hot-toast';
 
 interface UserStatus {
   has_purchased: boolean;
@@ -22,8 +25,15 @@ const ProjectDetail = () => {
   const [reviewText, setReviewText] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const [rating, setRating] = useState(0);
+  const { isAuthenticated, user } = useAuth();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart, removeFromCart, isInCart } = useCart();
+  const [averageRating, setAverageRating] = useState(0);
+  const [formRating, setFormRating] = useState(0);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editReviewText, setEditReviewText] = useState('');
+  const [editReviewRating, setEditReviewRating] = useState(0);
+  const [updatingReview, setUpdatingReview] = useState(false);
   
 
 
@@ -39,7 +49,6 @@ const ProjectDetail = () => {
     setLoading(true);
     setError('');
     try {
-      console.log('Fetching project data for ID:', id);
       const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}`, {
         method: 'GET',
       });
@@ -50,7 +59,6 @@ const ProjectDetail = () => {
       }
 
       const data = await res.json();
-      console.log('Project API response:', data);
       setProject(data.project);
       setUserStatus(data.user_status);
     } catch (err) {
@@ -64,7 +72,6 @@ const ProjectDetail = () => {
 
   const fetchReviews = async () => {
     try {
-      console.log('Fetching reviews for project ID:', id);
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/reviews`,
         {
           method: 'GET',
@@ -75,7 +82,7 @@ const ProjectDetail = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log('Reviews API response:', data);
+
         
         // Separate approved and pending reviews
         const allReviews = data.reviews || [];
@@ -84,7 +91,8 @@ const ProjectDetail = () => {
         
         setApprovedReviews(approved);
         setPendingReviews(pending);
-        setRating(data.stats.average_rating);
+        setAverageRating(data.stats.average_rating);
+
       } else {
         console.error('Reviews API response not ok:', response.status, response.statusText);
         setApprovedReviews([]);
@@ -99,7 +107,7 @@ const ProjectDetail = () => {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewText.trim() || !project || rating === 0) return; // must select rating
+    if (!reviewText.trim() || !project || formRating === 0) return; // must select rating
 
     setSubmittingReview(true);
     try {
@@ -112,28 +120,16 @@ const ProjectDetail = () => {
         },
         body: JSON.stringify({
           project_id: id,
-          rating, // <-- now dynamic
+          rating: formRating, // <-- now dynamic
           review_text: reviewText,
         }),
       });
 
       if (response.ok) {
-        const newReview: Review = {
-          id: Date.now().toString(),
-          project_id: id || '1',
-          user_id: user?.id || 'user1',
-          rating,
-          review_text: reviewText,
-          is_approved: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          user: { id: user?.id || 'user1', full_name: user?.full_name || 'Anonymous', email: user?.email || '' }
-        };
-
-        //setReviews(prev => [newReview, ...prev]);
         setReviewText('');
-        setRating(0); // reset stars
-        alert('Review submitted successfully!');
+        setFormRating(0); // reset stars
+        toast.success('Review submitted successfully!');
+     
         // Refresh reviews from backend after successful submission
         await fetchReviews();
       } else {
@@ -144,6 +140,133 @@ const ProjectDetail = () => {
       alert('Failed to submit review. Please try again.');
     } finally {
       setSubmittingReview(false);
+    }
+  };
+
+  // Helper function to check if user can edit a review
+  const canEditReview = (review: Review) => {
+    return isAuthenticated && user && user.id === review.user.id && localStorage.getItem('token');
+  };
+
+  // Helper function to check if current user has already submitted a review
+  const getUserReview = () => {
+    if (!isAuthenticated || !user) return null;
+    const allReviews = [...approvedReviews, ...pendingReviews];
+    return allReviews.find(review => review.user.id === user.id) || null;
+  };
+
+  // Check if user has already reviewed
+  const userReview = getUserReview();
+  const hasUserReviewed = !!userReview;
+
+  const handleEditReview = (review: Review) => {
+    // Double-check permissions before allowing edit
+    if (!canEditReview(review)) {
+      toast.error('You can only edit your own reviews.');
+      return;
+    }
+    
+    setEditingReviewId(review.id);
+    setEditReviewText(review.review_text);
+    setEditReviewRating(review.rating);
+  
+  };
+
+  const handleCancelEdit = () => {
+    setEditingReviewId(null);
+    setEditReviewText('');
+    setEditReviewRating(0);
+  };
+
+  const handleUpdateReview = async () => {
+    if (!editReviewText.trim() || editReviewRating === 0) return;
+
+    // Check if user is authenticated and token is available
+    if (!isAuthenticated || !user) {
+      alert('Please log in to edit your review.');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Authentication token not found. Please log in again.');
+      return;
+    }
+
+    setUpdatingReview(true);
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${editingReviewId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          rating: editReviewRating,
+          review_text: editReviewText,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update review');
+      }
+
+      const data = await response.json();
+      
+      // Update the reviews in state
+      setApprovedReviews(prev => prev.map(review =>
+        review.id === editingReviewId ? { ...review, ...data.review, rating: editReviewRating, review_text: editReviewText } : review
+      ));
+      setPendingReviews(prev => prev.map(review =>
+        review.id === editingReviewId ? { ...review, ...data.review, rating: editReviewRating, review_text: editReviewText } : review
+      ));
+
+      toast.success('Review updated successfully!');
+      handleCancelEdit();
+      // Refresh reviews to update the user review display
+      await fetchReviews();
+    } catch (error) {
+      console.error('Error updating review:', error);
+      alert('Failed to update review. Please try again.');
+    } finally {
+      setUpdatingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!isAuthenticated || !user) {
+      alert('Please log in to delete your review.');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Authentication token not found. Please log in again.');
+      return;
+    }
+
+    const confirmDelete = window.confirm('Are you sure you want to delete your review? This action cannot be undone.');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete review');
+      }
+
+      // Remove the review from state
+      setApprovedReviews(prev => prev.filter(review => review.id !== reviewId));
+      setPendingReviews(prev => prev.filter(review => review.id !== reviewId));
+
+      toast.success('Review deleted successfully!');
+    } catch (error) {
+      alert('Failed to delete review. Please try again.');
     }
   };
 
@@ -265,7 +388,44 @@ const ProjectDetail = () => {
   }
 
   const isPurchased = userStatus?.has_purchased || false;
-  const isInWishlist = userStatus?.in_wishlist || false;
+  const wishlistStatus = project ? (userStatus?.in_wishlist || isInWishlist(project.id)) : false;
+  const cartStatus = project ? (userStatus?.in_cart || isInCart(project.id)) : false;
+
+  const handleToggleWishlist = async () => {
+    if (!isAuthenticated || !project) {
+      alert('Please login to manage wishlist.');
+      return;
+    }
+    try {
+      if (wishlistStatus) {
+        await removeFromWishlist(project.id);
+        setUserStatus(prev => prev ? { ...prev, in_wishlist: false } : prev);
+      } else {
+        await addToWishlist(project);
+        setUserStatus(prev => prev ? { ...prev, in_wishlist: true } : prev);
+      }
+    } catch (e) {
+      console.error('Wishlist toggle failed', e);
+    }
+  };
+
+  const handleToggleCart = async () => {
+    if (!isAuthenticated || !project) {
+      alert('Please login to manage cart.');
+      return;
+    }
+    try {
+      if (cartStatus) {
+        await removeFromCart(project.id);
+        setUserStatus(prev => prev ? { ...prev, in_cart: false } : prev);
+      } else {
+        await addToCart(project);
+        setUserStatus(prev => prev ? { ...prev, in_cart: true } : prev);
+      }
+    } catch (e) {
+      console.error('Cart toggle failed', e);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 py-4 sm:py-6 lg:py-8 animate-fadeIn">
@@ -302,9 +462,9 @@ const ProjectDetail = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-4 justify-start sm:justify-end">
-                  <button className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm" style={{ animationDelay: '200ms' }}>
-                    <Heart className={`w-4 sm:w-5 h-4 sm:h-5 ${isInWishlist ? 'text-red-500 fill-current' : ''}`} />
-                    <span className="font-medium hidden sm:inline">{hasProjectDump ? (project?.stats?.total_likes || 0) : 0}</span>
+                  <button onClick={handleToggleWishlist} className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm" style={{ animationDelay: '200ms' }}>
+                    <Heart className={`w-4 sm:w-5 h-4 sm:h-5 ${wishlistStatus ? 'text-red-500 fill-current' : ''}`} />
+                    <span className="font-medium hidden sm:inline">{wishlistStatus ? 'Wishlisted' : 'Wishlist'}</span>
                   </button>
                   <button className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm" style={{ animationDelay: '300ms' }}>
                     <Share2 className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -323,7 +483,8 @@ const ProjectDetail = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-6 sm:mb-8 animate-slideInUp" style={{ animationDelay: '500ms' }}>
                 <div className="flex items-center gap-2">
                   <Star className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-400 fill-current" />
-                  <span className="font-bold text-base sm:text-lg">{hasProjectDump ? (rating || '0.0') : '0.0'}</span>
+                  <span className="font-bold text-base sm:text-lg">{hasProjectDump ? (averageRating || '0.0') : '0.0'}</span>
+
                   <span className="font-medium">({hasProjectDump ? ((approvedReviews.length + pendingReviews.length) || 0) : 0})</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -341,6 +502,18 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-2">
                   <Download className="w-4 sm:w-5 h-4 sm:h-5" />
                   <span className="font-medium">{hasProjectDump ? (project?.stats?.total_downloads || project.download_count || 0) : (project.download_count || 0)}</span>
+                </div>
+                {/* Status badges */}
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-5 flex flex-wrap gap-2 mt-1">
+                  {isPurchased && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Purchased</span>
+                  )}
+                  {cartStatus && !isPurchased && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">In Cart</span>
+                  )}
+                  {wishlistStatus && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">In Wishlist</span>
+                  )}
                 </div>
               </div>
 
@@ -384,7 +557,7 @@ const ProjectDetail = () => {
               </div>
 
               {/* Tabs */}
-              <div className="border-b border-gray-200 mb-6 sm:mb-8 animate-slideInUp overflow-x-auto" style={{ animationDelay: '700ms' }}>
+              <div className="border-b border-gray-200 mb-6 sm:mb-2 animate-slideInUp overflow-x-auto" style={{ animationDelay: '700ms' }}>
                 <nav className="flex space-x-4 sm:space-x-8 min-w-max">
                   {['description', 'features', 'instructions', 'screenshots', 'reviews'].map((tab) => (
                     <button
@@ -573,59 +746,175 @@ const ProjectDetail = () => {
                             ({pendingReviews.length} pending)
                           </span>
                         )}
+                        {hasUserReviewed && (
+                          <span className="ml-2 text-sm text-blue-600">
+                            (You have reviewed)
+                          </span>
+                        )}
                         {!hasProjectDump && <span className="text-xs sm:text-sm text-gray-500 block sm:inline sm:ml-2">(Login required for reviews)</span>}
                       </div>
                     </div>
 
-                    {/* Review Form */}
+
+                    {/* Review Form - Show different content based on whether user has reviewed */}
                     {isAuthenticated && hasProjectDump && (
                       <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-blue-100 animate-slideInUp">
-                        <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-4">Write a Review</h4>
-                        <form onSubmit={handleSubmitReview} className="space-y-4">
+                        {hasUserReviewed ? (
+                          // User has already reviewed - show edit/delete options
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Your Rating
-                            </label>
-                            <div className="flex gap-2 mb-4">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                  type="button"
-                                  key={star}
-                                  onClick={() => setRating(star)}
-                                  className="focus:outline-none"
-                                >
-                                  <Star
-                                    className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-                                      }`}
-                                  />
-                                </button>
-                              ))}
+                            <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-4">Your Review</h4>
+                            <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-5 h-5 ${i < (userReview?.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                    />
+                                  ))}
+                                  <span className="text-sm text-gray-600">
+                                    {userReview?.is_approved ? 'Approved' : 'Pending Approval'}
+                                  </span>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleEditReview(userReview!)}
+                                    disabled={editingReviewId === userReview?.id || updatingReview}
+                                    className="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                    {editingReviewId === userReview?.id ? 'Editing...' : 'Edit'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteReview(userReview!.id)}
+                                    disabled={editingReviewId === userReview?.id || updatingReview}
+                                    className="flex items-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <X className="w-4 h-4" />
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                              {/* Review Content - either display or edit form */}
+                              {(() => {
+                                return editingReviewId === userReview?.id;
+                              })() ? (
+                                <div className="space-y-4">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      Your Rating
+                                    </label>
+                                    <div className="flex gap-2 mb-4">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                          type="button"
+                                          key={star}
+                                          onClick={() => setEditReviewRating(star)}
+                                          className="focus:outline-none"
+                                        >
+                                          <Star
+                                            className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                              }`}
+                                          />
+                                        </button>
+                                      ))}
+                                    </div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      Your Feedback
+                                    </label>
+                                    <textarea
+                                      value={editReviewText}
+                                      onChange={(e) => setEditReviewText(e.target.value)}
+                                      placeholder="Share your experience with this project..."
+                                      rows={4}
+                                      className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                      required
+                                    />
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={handleUpdateReview}
+                                      disabled={updatingReview || !editReviewText.trim() || editReviewRating === 0}
+                                      className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                    >
+                                      {updatingReview ? (
+                                        <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                      ) : (
+                                        <Save className="w-4 sm:w-5 h-4 sm:h-5" />
+                                      )}
+                                      {updatingReview ? 'Updating...' : 'Save Changes'}
+                                    </button>
+                                    <button
+                                      onClick={handleCancelEdit}
+                                      disabled={updatingReview}
+                                      className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                    >
+                                      <X className="w-4 sm:w-5 h-4 sm:h-5" />
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="text-gray-700 text-sm sm:text-base">{userReview?.review_text}</p>
+                                  <p className="text-xs text-gray-500 mt-2">
+                                    Posted on {userReview ? new Date(userReview.created_at).toLocaleDateString() : ''}
+                                  </p>
+                                </>
+                              )}
                             </div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Your Feedback
-                            </label>
-                            <textarea
-                              value={reviewText}
-                              onChange={(e) => setReviewText(e.target.value)}
-                              placeholder="Share your experience with this project..."
-                              rows={4}
-                              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
-                              required
-                            />
                           </div>
-                          <button
-                            type="submit"
-                            disabled={submittingReview || !reviewText.trim()}
-                            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto justify-center"
-                          >
-                            {submittingReview ? (
-                              <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            ) : (
-                              <Send className="w-4 sm:w-5 h-4 sm:h-5" />
-                            )}
-                            {submittingReview ? 'Submitting...' : 'Submit Review'}
-                          </button>
-                        </form>
+                        ) : (
+                          // User hasn't reviewed yet - show review form
+                          <div>
+                            <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-4">Write a Review</h4>
+                            <form onSubmit={handleSubmitReview} className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Your Rating
+                                </label>
+                                <div className="flex gap-2 mb-4">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                      type="button"
+                                      key={star}
+                                      onClick={() => setFormRating(star)}
+                                      className="focus:outline-none"
+                                    >
+                                      <Star
+                                        className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= formRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                          }`}
+                                      />
+                                    </button>
+                                  ))}
+                                </div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Your Feedback
+                                </label>
+                                <textarea
+                                  value={reviewText}
+                                  onChange={(e) => setReviewText(e.target.value)}
+                                  placeholder="Share your experience with this project..."
+                                  rows={4}
+                                  className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                  required
+                                />
+                              </div>
+                              <button
+                                type="submit"
+                                disabled={submittingReview || !reviewText.trim() || formRating === 0}
+                                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto justify-center"
+                              >
+                                {submittingReview ? (
+                                  <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                  <Send className="w-4 sm:w-5 h-4 sm:h-5" />
+                                )}
+                                {submittingReview ? 'Submitting...' : 'Submit Review'}
+                              </button>
+                            </form>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -645,15 +934,18 @@ const ProjectDetail = () => {
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">Reviews not available</h4>
                           <p className="text-gray-500 text-sm sm:text-base">Please log in to access project reviews.</p>
                         </div>
-                      ) : (approvedReviews.length === 0 && pendingReviews.length === 0) ? (
+                      ) : ([...pendingReviews, ...approvedReviews].filter(review => !user || review.user.id !== user.id).length === 0) ? (
+
                         <div className="text-center py-8 sm:py-12">
                           <MessageSquare className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">No reviews yet</h4>
                           <p className="text-gray-500 text-sm sm:text-base">Be the first to review this project!</p>
                         </div>
                       ) : (
-                        // Single combined list: pending first, then approved
-                        [...pendingReviews, ...approvedReviews].map((review, index) => (
+                       // Single combined list: pending first, then approved (excluding current user's review)
+                        [...pendingReviews, ...approvedReviews]
+                          .filter(review => !user || review.user.id !== user.id) // Filter out current user's review
+                          .map((review, index) => (
                           <div key={review.id} className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border ${review.is_approved ? 'border-gray-100' : 'border-orange-100 bg-orange-50'} animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
                             <div className="flex items-start justify-between mb-4 gap-3">
                               <div className="flex items-center gap-3">
@@ -673,28 +965,102 @@ const ProjectDetail = () => {
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_verified_purchase ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
                                       {review.is_verified_purchase ? 'Verified Purchased: ✓ ' : 'Verified Purchased: ✗ '}
                                     </span>
-                                    {/* Approval/Verified badges */}
-                                    {review.is_verified_purchase && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                                        ✓ Verified Purchase
-                                      </span>
-                                    )}
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_approved ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
                                       {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
                                     </span>
+                                    {canEditReview(review) && (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                        ✏️ Your Review
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 flex-shrink-0">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={`w-3 sm:w-4 h-3 sm:h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                                  />
-                                ))}
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                {/* Edit button - only show for current user's reviews */}
+                                {canEditReview(review) && (
+                                  <button
+                                    onClick={() => handleEditReview(review)}
+                                    disabled={editingReviewId === review.id || updatingReview}
+                                    className="p-2 text-gray-400 hover:text-blue-500 transition-colors duration-200 hover:bg-blue-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="Edit review"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                  </button>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-3 sm:w-4 h-3 sm:h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                    />
+                                  ))}
+                                </div>
                               </div>
                             </div>
-                            <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.review_text}</p>
+                            
+                            {/* Review Content - either display or edit form */}
+                            {editingReviewId === review.id ? (
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Your Rating
+                                  </label>
+                                  <div className="flex gap-2 mb-4">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <button
+                                        type="button"
+                                        key={star}
+                                        onClick={() => setEditReviewRating(star)}
+                                        className="focus:outline-none"
+                                      >
+                                        <Star
+                                          className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                            }`}
+                                        />
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Your Feedback
+                                  </label>
+                                  <textarea
+                                    value={editReviewText}
+                                    onChange={(e) => setEditReviewText(e.target.value)}
+                                    placeholder="Share your experience with this project..."
+                                    rows={4}
+                                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                    required
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={handleUpdateReview}
+                                    disabled={updatingReview || !editReviewText.trim() || editReviewRating === 0}
+                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                  >
+                                    {updatingReview ? (
+                                      <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                      <Save className="w-4 sm:w-5 h-4 sm:h-5" />
+                                    )}
+                                    {updatingReview ? 'Updating...' : 'Save Changes'}
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEdit}
+                                    disabled={updatingReview}
+                                    className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                  >
+                                    <X className="w-4 sm:w-5 h-4 sm:h-5" />
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.review_text}</p>
+                            )}
                           </div>
                         ))
                       )}
@@ -754,9 +1120,13 @@ const ProjectDetail = () => {
                     <ShoppingCart className="w-5 sm:w-6 h-5 sm:h-6" />
                     {isAuthenticated ? (isPurchasing ? 'Processing...' : `Buy Now (₹${project.pricing?.sale_price || 0})`) : 'Login to Buy'}
                   </button>
-                  <button className="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base" style={{ animationDelay: '350ms' }}>
+                  <button onClick={handleToggleWishlist} className="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base" style={{ animationDelay: '350ms' }}>
                     <Heart className="w-4 sm:w-5 h-4 sm:h-5 inline mr-2" />
-                    {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                    {wishlistStatus ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                  </button>
+                  <button onClick={handleToggleCart} disabled={!isAuthenticated} className="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base" style={{ animationDelay: '380ms' }}>
+                    <ShoppingCart className="w-4 sm:w-5 h-4 sm:h-5 inline mr-2" />
+                    {cartStatus ? 'Remove from Cart' : 'Add to Cart'}
                   </button>
                 </div>
               ) : (
