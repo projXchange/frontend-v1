@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Project } from '../types/Project';
 import { Upload, FileText, Video, IndianRupee, Tag, Award, Shield, CheckCircle, Image, X, Plus, AlertCircle, Sparkles, Eye, Send, Users } from 'lucide-react';
 
 const UploadProject = () => {
@@ -8,16 +9,16 @@ const UploadProject = () => {
     category: '',
     price: '',
     originalPrice: '',
-    youtubeUrl: '',
-    githubUrl: '',
-    liveDemo: '',
     difficulty: 'Beginner',
     features: [''],
     techStack: ['']
   });
 
   const [dragActive, setDragActive] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [documentationFiles, setDocumentationFiles] = useState<File[]>([]);
+  const [archiveFiles, setArchiveFiles] = useState<File[]>([]);
+  const [assetFiles, setAssetFiles] = useState<File[]>([]);
   const [previewImage, setPreviewImage] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentStep, setCurrentStep] = useState(1);
@@ -70,20 +71,7 @@ const UploadProject = () => {
           delete newErrors.price;
         }
         break;
-      case 'youtubeUrl':
-        if (value && !value.includes('youtube.com') && !value.includes('youtu.be')) {
-          newErrors.youtubeUrl = 'Please enter a valid YouTube URL';
-        } else {
-          delete newErrors.youtubeUrl;
-        }
-        break;
-      case 'githubUrl':
-        if (value && !value.includes('github.com')) {
-          newErrors.githubUrl = 'Please enter a valid GitHub URL';
-        } else {
-          delete newErrors.githubUrl;
-        }
-        break;
+      // githubUrl, youtubeUrl, liveDemo are admin-only now; no validation here
     }
 
     setErrors(newErrors);
@@ -139,22 +127,62 @@ const UploadProject = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files);
-      setUploadedFiles(prev => [...prev, ...files]);
+      categorizeAndStoreFiles(files);
 
       // If it's an image, set as preview
-      const imageFile = files.find(file => file.type.startsWith('image/'));
-      if (imageFile) {
+      const img = files.find(file => file.type.startsWith('image/'));
+      if (img) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          setPreviewImage(e.target?.result as string);
+        reader.onload = (loadEvent) => {
+          setPreviewImage(loadEvent.target?.result as string);
         };
-        reader.readAsDataURL(imageFile);
+        reader.readAsDataURL(img);
       }
     }
   };
 
+  const getAllFiles = (): File[] => [...imageFiles, ...documentationFiles, ...archiveFiles, ...assetFiles];
+
   const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    const all = getAllFiles();
+    const file = all[index];
+    if (!file) return;
+    if (file.type.startsWith('image/')) {
+      setImageFiles(prev => prev.filter(f => f !== file));
+      return;
+    }
+    if (file.name.endsWith('.pdf') || file.name.endsWith('.md')) {
+      setDocumentationFiles(prev => prev.filter(f => f !== file));
+      return;
+    }
+    if (file.name.endsWith('.zip') || file.name.endsWith('.rar')) {
+      setArchiveFiles(prev => prev.filter(f => f !== file));
+      return;
+    }
+    setAssetFiles(prev => prev.filter(f => f !== file));
+  };
+
+  const categorizeAndStoreFiles = (files: File[]) => {
+    if (!files || files.length === 0) return;
+    const imgs: File[] = [];
+    const docs: File[] = [];
+    const archives: File[] = [];
+    const assets: File[] = [];
+    files.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        imgs.push(file);
+      } else if (file.name.endsWith('.pdf') || file.name.endsWith('.md')) {
+        docs.push(file);
+      } else if (file.name.endsWith('.zip') || file.name.endsWith('.rar')) {
+        archives.push(file);
+      } else {
+        assets.push(file);
+      }
+    });
+    if (imgs.length) setImageFiles(prev => [...prev, ...imgs]);
+    if (docs.length) setDocumentationFiles(prev => [...prev, ...docs]);
+    if (archives.length) setArchiveFiles(prev => [...prev, ...archives]);
+    if (assets.length) setAssetFiles(prev => [...prev, ...assets]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -176,15 +204,16 @@ const UploadProject = () => {
         }
 
         // Single API call with all project data
-        const projectData = {
+        const allFiles = getAllFiles();
+
+        const projectData: Partial<Project> = {
           title: formData.title,
           description: formData.description,
           key_features: formData.features.filter(f => f.trim()).join(', '),
           category: formData.category,
           difficulty_level: formData.difficulty.toLowerCase(),
           tech_stack: formData.techStack.filter(tech => tech.trim()),
-          github_url: formData.githubUrl,
-          demo_url: formData.liveDemo,
+          // github_url, demo_url will be set by admin
           status: "pending_review",
           documentation: formData.description,
           pricing: {
@@ -194,16 +223,16 @@ const UploadProject = () => {
           },
           delivery_time: 1,
           // Consolidated dump fields
-          thumbnail: previewImage || "",
-          images: uploadedFiles.filter(file => file.type.startsWith('image/')).map(file => file.name),
-          demo_video: formData.youtubeUrl,
+          thumbnail: previewImage || (imageFiles.length > 0 ? imageFiles[0].name : ""),
+          images: imageFiles.map(file => file.name),
+          // demo_video will be set by admin
           features: formData.features.filter(f => f.trim()),
           tags: formData.techStack.filter(tech => tech.trim()),
           files: {
-            source_files: uploadedFiles.filter(file => file.name.endsWith('.zip') || file.name.endsWith('.rar')).map(file => file.name),
-            documentation_files: uploadedFiles.filter(file => file.name.endsWith('.pdf') || file.name.endsWith('.md')).map(file => file.name),
-            assets: uploadedFiles.filter(file => !file.name.endsWith('.zip') && !file.name.endsWith('.rar') && !file.name.endsWith('.pdf') && !file.name.endsWith('.md')).map(file => file.name),
-            size_mb: uploadedFiles.reduce((total, file) => total + (file.size / 1024 / 1024), 0)
+            source_files: archiveFiles.map(file => file.name),
+            documentation_files: documentationFiles.map(file => file.name),
+            assets: assetFiles.map(file => file.name),
+            size_mb: allFiles.reduce((total, file) => total + (file.size / 1024 / 1024), 0)
           },
           requirements: {
             system_requirements: ["Windows 10 or higher", "Node.js 16+", "Modern web browser"],
@@ -260,14 +289,14 @@ const UploadProject = () => {
           category: '',
           price: '',
           originalPrice: '',
-          youtubeUrl: '',
-          githubUrl: '',
-          liveDemo: '',
           difficulty: 'Beginner',
           features: [''],
           techStack: ['']
         });
-        setUploadedFiles([]);
+        setImageFiles([]);
+        setDocumentationFiles([]);
+        setArchiveFiles([]);
+        setAssetFiles([]);
         setPreviewImage('');
         setCurrentStep(1);
         
@@ -561,40 +590,7 @@ const UploadProject = () => {
                         </div>
                       </div>
 
-                      {/* URLs */}
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-bold text-gray-700 mb-3">
-                            GitHub Repository URL
-                          </label>
-                          <input
-                            type="url"
-                            name="githubUrl"
-                            value={formData.githubUrl}
-                            onChange={handleInputChange}
-                            placeholder="https://github.com/username/repo"
-                            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.githubUrl ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                              }`}
-                          />
-                          {errors.githubUrl && (
-                            <p className="text-red-600 text-sm mt-2">{errors.githubUrl}</p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-bold text-gray-700 mb-3">
-                            Live Demo URL
-                          </label>
-                          <input
-                            type="url"
-                            name="liveDemo"
-                            value={formData.liveDemo}
-                            onChange={handleInputChange}
-                            placeholder="https://your-demo.vercel.app"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                          />
-                        </div>
-                      </div>
+                      {/* Admin will set URLs; hide from uploader */}
                     </div>
                   </div>
                 )}
@@ -608,23 +604,7 @@ const UploadProject = () => {
                     </h2>
 
                     <div className="space-y-8">
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-3">
-                          YouTube Demo Video URL
-                        </label>
-                        <input
-                          type="url"
-                          name="youtubeUrl"
-                          value={formData.youtubeUrl}
-                          onChange={handleInputChange}
-                          placeholder="https://youtube.com/watch?v=..."
-                          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.youtubeUrl ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                            }`}
-                        />
-                        {errors.youtubeUrl && (
-                          <p className="text-red-600 text-sm mt-2">{errors.youtubeUrl}</p>
-                        )}
-                      </div>
+                      {/* Admin will set video URL; hide from uploader */}
 
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-3">
@@ -659,17 +639,17 @@ const UploadProject = () => {
                             onChange={(e) => {
                               if (e.target.files) {
                                 const files = Array.from(e.target.files);
-                                setUploadedFiles(prev => [...prev, ...files]);
+                                categorizeAndStoreFiles(files);
                               }
                             }}
                           />
                         </div>
 
                         {/* Uploaded Files */}
-                        {uploadedFiles.length > 0 && (
+                        {getAllFiles().length > 0 && (
                           <div className="mt-6 space-y-3">
                             <h4 className="font-semibold text-gray-900">Uploaded Files:</h4>
-                            {uploadedFiles.map((file, index) => (
+                            {getAllFiles().map((file, index) => (
                               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                                 <div className="flex items-center gap-3">
                                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
