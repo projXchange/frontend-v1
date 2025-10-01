@@ -43,6 +43,7 @@ const AdminDashboard = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [updatingReview, setUpdatingReview] = useState<string | null>(null);
+  const [deletingReview, setDeletingReview] = useState<string | null>(null);
 
 
 
@@ -446,8 +447,7 @@ const AdminDashboard = () => {
   };
 
   const handleReviewAction = async (reviewIds: string[], isApproved: boolean) => {
-    setUpdatingReview(reviewIds[0]); // show loading state for first review (or adapt for batch)
-
+    setUpdatingReview(reviewIds[0]); 
     const token = localStorage.getItem("token");
 
     try {
@@ -500,7 +500,7 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    setUpdatingReview(reviewId);
+    setDeletingReview(reviewId);
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
@@ -522,7 +522,7 @@ const AdminDashboard = () => {
       console.error('Error deleting review:', error);
       toast.error('Failed to delete review. Please try again.');
     } finally {
-      setUpdatingReview(null);
+      setDeletingReview(null);
     }
   };
 
@@ -1591,11 +1591,11 @@ const AdminDashboard = () => {
                                     )}
                                     <button
                                       onClick={() => handleDeleteReview(review.id)}
-                                      disabled={updatingReview === review.id}
+                                      disabled={deletingReview === review.id}
                                       className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
                                       title="Delete Review"
                                     >
-                                      {updatingReview === review.id ? (
+                                      {deletingReview === review.id ? (
                                         <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
                                       ) : (
                                         <Trash2 className="w-4 h-4" />
@@ -1675,7 +1675,7 @@ const AdminDashboard = () => {
           onReject={() => handleReviewAction([selectedReview.id], false)}
           onDelete={handleDeleteReview}
           isUpdating={updatingReview === selectedReview.id}
-          isDeleting={updatingReview === selectedReview.id}
+          isDeleting={deletingReview === selectedReview.id}
         />
       )}
 

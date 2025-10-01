@@ -41,9 +41,14 @@ const ProjectDetail = () => {
   useEffect(() => {
     if (id) {
       fetchProjectData();
-      fetchReviews();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (activeTab === 'reviews') {
+      fetchReviews();
+    }
+  }, [activeTab]);
 
   const fetchProjectData = async () => {
     setLoading(true);
@@ -367,8 +372,6 @@ const ProjectDetail = () => {
     );
   }
 
-  // Check if we have project data with dump fields
-  const hasProjectDump = project && (project.thumbnail || project.images || project.features);
 
   if (error || !project) {
     return (
@@ -473,23 +476,15 @@ const ProjectDetail = () => {
                 </div>
               </div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 animate-slideInUp leading-tight" style={{ animationDelay: '400ms' }}>{project.title}</h1>
-              {!hasProjectDump && (
-                <div className="mb-4 sm:mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl animate-slideInUp" style={{ animationDelay: '450ms' }}>
-                  <p className="text-yellow-800 text-sm">
-                    <span className="font-semibold">Note:</span> Some detailed project information may not be available. Please log in to access complete project details.
-                  </p>
-                </div>
-              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-6 sm:mb-8 animate-slideInUp" style={{ animationDelay: '500ms' }}>
                 <div className="flex items-center gap-2">
                   <Star className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-400 fill-current" />
-                  <span className="font-bold text-base sm:text-lg">{hasProjectDump ? (averageRating || '0.0') : '0.0'}</span>
-
-                  <span className="font-medium">({hasProjectDump ? ((approvedReviews.length + pendingReviews.length) || 0) : 0})</span>
+                  <span className="font-bold text-base sm:text-lg">{averageRating || '0.0'}</span>
+                  <span className="font-medium">({(approvedReviews.length + pendingReviews.length) || 0})</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 sm:w-5 h-4 sm:h-5" />
-                  <span className="font-medium">{hasProjectDump ? (project?.stats?.total_views || project.view_count || 0) : (project.view_count || 0)}</span>
+                  <span className="font-medium">{project?.stats?.total_views || project.view_count || 0}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -501,7 +496,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Download className="w-4 sm:w-5 h-4 sm:h-5" />
-                  <span className="font-medium">{hasProjectDump ? (project?.stats?.total_downloads || project.download_count || 0) : (project.download_count || 0)}</span>
+                  <span className="font-medium">{project?.stats?.total_downloads || project.download_count || 0}</span>
                 </div>
                 {/* Status badges */}
                 <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-5 flex flex-wrap gap-2 mt-1">
@@ -518,7 +513,7 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video */}
-              {hasProjectDump && project?.demo_video && (
+              {project?.demo_video && (
                 <div className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300" style={{ animationDelay: '600ms' }}>
                   <iframe
                     src={project.demo_video}
@@ -569,7 +564,7 @@ const ProjectDetail = () => {
                         }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      {tab === 'reviews' && hasProjectDump && (approvedReviews.length + pendingReviews.length) > 0 && (
+                      {tab === 'reviews' && (approvedReviews.length + pendingReviews.length) > 0 && (
                         <span className="ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
                           {approvedReviews.length + pendingReviews.length}
                         </span>
@@ -593,7 +588,7 @@ const ProjectDetail = () => {
                         </span>
                       ))}
                     </div>
-                    {hasProjectDump && project?.tags && project.tags.length > 0 && (
+                    {project?.tags && project.tags.length > 0 && (
                       <>
                         <h4 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 animate-slideInUp" style={{ animationDelay: '400ms' }}>Tags</h4>
                         <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -611,7 +606,7 @@ const ProjectDetail = () => {
                 {activeTab === 'features' && (
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 animate-slideInUp">Key Features</h3>
-                    {hasProjectDump && project?.features && project.features.length > 0 ? (
+                    {project?.features && project.features.length > 0 ? (
                       <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                         {project.features.map((feature, index) => (
                           <div key={index} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp" style={{ animationDelay: `${100 + index * 80}ms` }}>
@@ -622,7 +617,7 @@ const ProjectDetail = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <p className="text-gray-500">Features information not available. {!hasProjectDump && 'Please log in to access complete project details.'}</p>
+                        <p className="text-gray-500">Features information not available.</p>
                       </div>
                     )}
                   </div>
@@ -643,7 +638,7 @@ const ProjectDetail = () => {
                       {isPurchased ? (
                         <div className="space-y-4 sm:space-y-6">
                           {/* System Requirements */}
-                          {hasProjectDump && project?.requirements?.system_requirements && project.requirements.system_requirements.length > 0 && (
+                          {project?.requirements?.system_requirements && project.requirements.system_requirements.length > 0 && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">System Requirements</h4>
                               <ul className="space-y-2">
@@ -658,7 +653,7 @@ const ProjectDetail = () => {
                           )}
 
                           {/* Dependencies */}
-                          {hasProjectDump && project?.requirements?.dependencies && project.requirements.dependencies.length > 0 && (
+                          {project?.requirements?.dependencies && project.requirements.dependencies.length > 0 && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">Dependencies</h4>
                               <ul className="space-y-2">
@@ -673,7 +668,7 @@ const ProjectDetail = () => {
                           )}
 
                           {/* Installation Steps */}
-                          {hasProjectDump && project?.requirements?.installation_steps && project.requirements.installation_steps.length > 0 && (
+                          {project?.requirements?.installation_steps && project.requirements.installation_steps.length > 0 && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">Installation Steps</h4>
                               <ol className="space-y-3">
@@ -715,7 +710,7 @@ const ProjectDetail = () => {
                 {activeTab === 'screenshots' && (
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 animate-slideInUp">Project Screenshots</h3>
-                    {hasProjectDump && project?.images && project.images.length > 0 ? (
+                    {project?.images && project.images.length > 0 ? (
                       <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                         {project.images.map((image, index) => (
                           <div key={index} className="aspect-video bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${100 + index * 100}ms` }}>
@@ -729,7 +724,7 @@ const ProjectDetail = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <p className="text-gray-500 text-sm sm:text-base">Screenshots not available. {!hasProjectDump && 'Please log in to access complete project details.'}</p>
+                        <p className="text-gray-500 text-sm sm:text-base">Screenshots not available.</p>
                       </div>
                     )}
                   </div>
@@ -740,7 +735,7 @@ const ProjectDetail = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
                       <h3 className="text-xl sm:text-2xl font-bold animate-slideInUp">Reviews</h3>
                       <div className="text-base sm:text-lg text-gray-600">
-                        <span className="font-semibold">{hasProjectDump ? (approvedReviews.length + pendingReviews.length) : 0}</span> total
+                        <span className="font-semibold">{approvedReviews.length + pendingReviews.length}</span> total
                         {pendingReviews.length > 0 && (
                           <span className="ml-2 text-sm text-orange-600">
                             ({pendingReviews.length} pending)
@@ -751,36 +746,49 @@ const ProjectDetail = () => {
                             (You have reviewed)
                           </span>
                         )}
-                        {!hasProjectDump && <span className="text-xs sm:text-sm text-gray-500 block sm:inline sm:ml-2">(Login required for reviews)</span>}
                       </div>
                     </div>
 
-
                     {/* Review Form - Show different content based on whether user has reviewed */}
-                    {isAuthenticated && hasProjectDump && (
-                      <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-blue-100 animate-slideInUp">
+                    {isAuthenticated && (
+                      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-teal-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 mb-6 sm:mb-8 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-slideInUp">
                         {hasUserReviewed ? (
                           // User has already reviewed - show edit/delete options
                           <div>
-                            <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-4">Your Review</h4>
-                            <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200">
-                              <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`w-5 h-5 ${i < (userReview?.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                                    />
-                                  ))}
-                                  <span className="text-sm text-gray-600">
-                                    {userReview?.is_approved ? 'Approved' : 'Pending Approval'}
-                                  </span>
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
+                                <MessageSquare className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <h4 className="text-lg sm:text-xl font-bold text-gray-900">Your Review</h4>
+                                <p className="text-sm text-gray-600">Manage your review for this project</p>
+                              </div>
+                            </div>
+                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/50 shadow-lg">
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`w-6 h-6 transition-all duration-200 ${i < (userReview?.rating || 0) ? 'text-yellow-400 fill-current drop-shadow-sm' : 'text-gray-300'}`}
+                                      />
+                                    ))}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${userReview?.is_approved ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                                      {userReview?.is_approved ? '✓ Approved' : '⏳ Approval Pending'}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      {userReview ? new Date(userReview.created_at).toLocaleDateString() : ''}
+                                    </span>
+                                  </div>
                                 </div>
                                 <div className="flex gap-2">
                                   <button
                                     onClick={() => handleEditReview(userReview!)}
                                     disabled={editingReviewId === userReview?.id || updatingReview}
-                                    className="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                                   >
                                     <Edit2 className="w-4 h-4" />
                                     {editingReviewId === userReview?.id ? 'Editing...' : 'Edit'}
@@ -788,7 +796,7 @@ const ProjectDetail = () => {
                                   <button
                                     onClick={() => handleDeleteReview(userReview!.id)}
                                     disabled={editingReviewId === userReview?.id || updatingReview}
-                                    className="flex items-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                                   >
                                     <X className="w-4 h-4" />
                                     Delete
@@ -799,143 +807,173 @@ const ProjectDetail = () => {
                               {(() => {
                                 return editingReviewId === userReview?.id;
                               })() ? (
-                                <div className="space-y-4">
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                      Your Rating
+                                <div className="space-y-6">
+                                  <div className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl p-4 border border-blue-100">
+                                    <label className="block text-sm font-semibold text-gray-800 mb-3">
+                                      ⭐ Your Rating
                                     </label>
-                                    <div className="flex gap-2 mb-4">
+                                    <div className="flex gap-1 mb-4">
                                       {[1, 2, 3, 4, 5].map((star) => (
                                         <button
                                           type="button"
                                           key={star}
                                           onClick={() => setEditReviewRating(star)}
-                                          className="focus:outline-none"
+                                          className="focus:outline-none transform hover:scale-110 transition-all duration-200"
                                         >
                                           <Star
-                                            className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                            className={`w-8 h-8 transition-all duration-200 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"
                                               }`}
                                           />
                                         </button>
                                       ))}
                                     </div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                      Your Feedback
+                                    <div className="text-sm text-gray-600">
+                                      {editReviewRating === 0 && "Click a star to rate"}
+                                      {editReviewRating === 1 && "⭐ Poor"}
+                                      {editReviewRating === 2 && "⭐⭐ Fair"}
+                                      {editReviewRating === 3 && "⭐⭐⭐ Good"}
+                                      {editReviewRating === 4 && "⭐⭐⭐⭐ Very Good"}
+                                      {editReviewRating === 5 && "⭐⭐⭐⭐⭐ Excellent"}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-semibold text-gray-800 mb-3">
+                                      💬 Your Feedback
                                     </label>
                                     <textarea
                                       value={editReviewText}
                                       onChange={(e) => setEditReviewText(e.target.value)}
-                                      placeholder="Share your experience with this project..."
-                                      rows={4}
-                                      className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                      placeholder="Share your detailed experience with this project..."
+                                      rows={5}
+                                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
                                       required
                                     />
+                                    <div className="text-xs text-gray-500 mt-2">
+                                      {editReviewText.length}/500 characters
+                                    </div>
                                   </div>
-                                  <div className="flex gap-2">
+                                  <div className="flex gap-3">
                                     <button
                                       onClick={handleUpdateReview}
                                       disabled={updatingReview || !editReviewText.trim() || editReviewRating === 0}
-                                      className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
                                     >
                                       {updatingReview ? (
-                                        <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                       ) : (
-                                        <Save className="w-4 sm:w-5 h-4 sm:h-5" />
+                                        <Save className="w-5 h-5" />
                                       )}
                                       {updatingReview ? 'Updating...' : 'Save Changes'}
                                     </button>
                                     <button
                                       onClick={handleCancelEdit}
                                       disabled={updatingReview}
-                                      className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                      className="flex items-center gap-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-gray-500 hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
                                     >
-                                      <X className="w-4 sm:w-5 h-4 sm:h-5" />
+                                      <X className="w-5 h-5" />
                                       Cancel
                                     </button>
                                   </div>
                                 </div>
                               ) : (
-                                <>
-                                  <p className="text-gray-700 text-sm sm:text-base">{userReview?.review_text}</p>
-                                  <p className="text-xs text-gray-500 mt-2">
-                                    Posted on {userReview ? new Date(userReview.created_at).toLocaleDateString() : ''}
-                                  </p>
-                                </>
+                                <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 border border-gray-100">
+                                  <p className="text-gray-700 text-sm sm:text-base leading-relaxed">{userReview?.review_text}</p>
+                                </div>
                               )}
                             </div>
                           </div>
                         ) : (
                           // User hasn't reviewed yet - show review form
                           <div>
-                            <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-4">Write a Review</h4>
-                            <form onSubmit={handleSubmitReview} className="space-y-4">
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                                <Star className="w-5 h-5 text-white" />
+                              </div>
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Your Rating
+                                <h4 className="text-lg sm:text-xl font-bold text-gray-900">Write a Review</h4>
+                                <p className="text-sm text-gray-600">Share your experience with this project</p>
+                              </div>
+                            </div>
+                            <form onSubmit={handleSubmitReview} className="space-y-6">
+                              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
+                                <label className="block text-sm font-semibold text-gray-800 mb-4">
+                                  ⭐ Rate this Project
                                 </label>
-                                <div className="flex gap-2 mb-4">
+                                <div className="flex gap-1 mb-4">
                                   {[1, 2, 3, 4, 5].map((star) => (
                                     <button
                                       type="button"
                                       key={star}
                                       onClick={() => setFormRating(star)}
-                                      className="focus:outline-none"
+                                      className="focus:outline-none transform hover:scale-110 transition-all duration-200"
                                     >
                                       <Star
-                                        className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= formRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                        className={`w-10 h-10 transition-all duration-200 ${star <= formRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"
                                           }`}
                                       />
                                     </button>
                                   ))}
                                 </div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Your Feedback
+                                <div className="text-sm text-gray-600 font-medium">
+                                  {formRating === 0 && "Click a star to rate this project"}
+                                  {formRating === 1 && "⭐ Poor - Not recommended"}
+                                  {formRating === 2 && "⭐⭐ Fair - Below expectations"}
+                                  {formRating === 3 && "⭐⭐⭐ Good - Meets expectations"}
+                                  {formRating === 4 && "⭐⭐⭐⭐ Very Good - Exceeds expectations"}
+                                  {formRating === 5 && "⭐⭐⭐⭐⭐ Excellent - Outstanding quality"}
+                                </div>
+                              </div>
+                              
+                              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                                <label className="block text-sm font-semibold text-gray-800 mb-4">
+                                  💬 Share Your Experience
                                 </label>
                                 <textarea
                                   value={reviewText}
                                   onChange={(e) => setReviewText(e.target.value)}
-                                  placeholder="Share your experience with this project..."
-                                  rows={4}
-                                  className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                  placeholder="Tell others about your experience with this project. What did you like? What could be improved? Your detailed feedback helps other users make informed decisions..."
+                                  rows={6}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
                                   required
                                 />
+                                <div className="flex justify-between items-center mt-2">
+                                  <div className="text-xs text-gray-500">
+                                    {reviewText.length}/500 characters
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {reviewText.length > 50 ? "✓ Detailed review" : "Add more details"}
+                                  </div>
+                                </div>
                               </div>
-                              <button
-                                type="submit"
-                                disabled={submittingReview || !reviewText.trim() || formRating === 0}
-                                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto justify-center"
-                              >
-                                {submittingReview ? (
-                                  <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                  <Send className="w-4 sm:w-5 h-4 sm:h-5" />
-                                )}
-                                {submittingReview ? 'Submitting...' : 'Submit Review'}
-                              </button>
+
+                              <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                  type="submit"
+                                  disabled={submittingReview || !reviewText.trim() || formRating === 0}
+                                  className="flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
+                                >
+                                  {submittingReview ? (
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  ) : (
+                                    <Send className="w-5 h-5" />
+                                  )}
+                                  {submittingReview ? 'Submitting Review...' : 'Submit Review'}
+                                </button>
+                                <div className="text-xs text-gray-500 flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                  Your review will be moderated before being published
+                                </div>
+                              </div>
                             </form>
                           </div>
                         )}
                       </div>
                     )}
 
-                    {isAuthenticated && !hasProjectDump && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 animate-slideInUp">
-                        <p className="text-yellow-800 text-center text-sm sm:text-base">
-                          <span className="font-semibold">Note:</span> Review functionality requires full project access. Please ensure you're logged in and have access to this project.
-                        </p>
-                      </div>
-                    )}
 
                     {/* Reviews List */}
                     <div className="space-y-4 sm:space-y-6">
-                      {!hasProjectDump ? (
-                        <div className="text-center py-8 sm:py-12">
-                          <MessageSquare className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
-                          <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">Reviews not available</h4>
-                          <p className="text-gray-500 text-sm sm:text-base">Please log in to access project reviews.</p>
-                        </div>
-                      ) : ([...pendingReviews, ...approvedReviews].filter(review => !user || review.user.id !== user.id).length === 0) ? (
-
+                      {([...pendingReviews, ...approvedReviews].filter(review => !user || review.user.id !== user.id).length === 0) ? (
                         <div className="text-center py-8 sm:py-12">
                           <MessageSquare className="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 mx-auto mb-4" />
                           <h4 className="text-base sm:text-lg font-semibold text-gray-600 mb-2">No reviews yet</h4>
@@ -946,76 +984,78 @@ const ProjectDetail = () => {
                         [...pendingReviews, ...approvedReviews]
                           .filter(review => !user || review.user.id !== user.id) // Filter out current user's review
                           .map((review, index) => (
-                          <div key={review.id} className={`bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border ${review.is_approved ? 'border-gray-100' : 'border-orange-100 bg-orange-50'} animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
-                            <div className="flex items-start justify-between mb-4 gap-3">
-                              <div className="flex items-center gap-3">
-                                <div className={`w-10 sm:w-12 h-10 sm:h-12 ${review.is_approved ? 'bg-gradient-to-br from-blue-500 to-teal-500' : 'bg-gradient-to-br from-orange-500 to-red-500'} rounded-full flex items-center justify-center flex-shrink-0`}>
-                                  <span className="text-white font-bold text-base sm:text-lg">
+                          <div key={review.id} className={`bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl border transition-all duration-300 ${review.is_approved ? 'border-gray-200 hover:border-blue-200' : 'border-orange-200 bg-orange-50/50 hover:border-orange-300'} animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
+                            <div className="flex items-start justify-between mb-6 gap-4">
+                              <div className="flex items-center gap-4">
+                                <div className={`w-12 sm:w-14 h-12 sm:h-14 ${review.is_approved ? 'bg-gradient-to-br from-blue-500 to-teal-500' : 'bg-gradient-to-br from-orange-500 to-red-500'} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                                  <span className="text-white font-bold text-lg sm:text-xl">
                                     {review.user.full_name.charAt(0)}
                                   </span>
                                 </div>
                                 <div className="min-w-0">
-                                  <h5 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{review.user.full_name}</h5>
-                                  <p className="text-xs sm:text-sm text-gray-500">
+                                  <h5 className="font-bold text-gray-900 text-base sm:text-lg truncate">{review.user.full_name}</h5>
+                                  <p className="text-sm text-gray-500 mb-2">
                                     {new Date(review.created_at).toLocaleDateString()}
                                   </p>
                                   {/* Status Badges */}
-                                  <div className="flex flex-wrap gap-1 mt-1">
+                                  <div className="flex flex-wrap gap-2">
                                     {/* Is Purchase tag (always shown) */}
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_verified_purchase ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
-                                      {review.is_verified_purchase ? 'Verified Purchased: ✓ ' : 'Verified Purchased: ✗ '}
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+                                      {review.is_verified_purchase ? '✓ Verified Purchase' : '✗ Not Verified'}
                                     </span>
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${review.is_approved ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+                                    
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-orange-100 text-orange-700 border border-orange-200'}`}>
                                       {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
                                     </span>
                                     {canEditReview(review) && (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
                                         ✏️ Your Review
                                       </span>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
+                              <div className="flex items-center gap-3 flex-shrink-0">
                                 {/* Edit button - only show for current user's reviews */}
                                 {canEditReview(review) && (
                                   <button
                                     onClick={() => handleEditReview(review)}
                                     disabled={editingReviewId === review.id || updatingReview}
-                                    className="p-2 text-gray-400 hover:text-blue-500 transition-colors duration-200 hover:bg-blue-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="p-2 text-gray-400 hover:text-blue-500 transition-all duration-200 hover:bg-blue-50 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110"
                                     title="Edit review"
                                   >
-                                    <Edit2 className="w-4 h-4" />
+                                    <Edit2 className="w-5 h-5" />
                                   </button>
                                 )}
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200">
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
-                                      className={`w-3 sm:w-4 h-3 sm:h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                      className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current drop-shadow-sm' : 'text-gray-300'}`}
                                     />
                                   ))}
+                                  <span className="ml-2 text-sm font-semibold text-gray-700">{review.rating}/5</span>
                                 </div>
                               </div>
                             </div>
                             
                             {/* Review Content - either display or edit form */}
                             {editingReviewId === review.id ? (
-                              <div className="space-y-4">
+                              <div className="space-y-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Your Rating
+                                  <label className="block text-sm font-semibold text-gray-800 mb-3">
+                                    ⭐ Update Your Rating
                                   </label>
-                                  <div className="flex gap-2 mb-4">
+                                  <div className="flex gap-1 mb-4">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <button
                                         type="button"
                                         key={star}
                                         onClick={() => setEditReviewRating(star)}
-                                        className="focus:outline-none"
+                                        className="focus:outline-none transform hover:scale-110 transition-all duration-200"
                                       >
                                         <Star
-                                          className={`w-6 sm:w-7 h-6 sm:h-7 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                                          className={`w-8 h-8 transition-all duration-200 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"
                                             }`}
                                         />
                                       </button>
@@ -1023,43 +1063,45 @@ const ProjectDetail = () => {
                                   </div>
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Your Feedback
+                                  <label className="block text-sm font-semibold text-gray-800 mb-3">
+                                    💬 Update Your Feedback
                                   </label>
                                   <textarea
                                     value={editReviewText}
                                     onChange={(e) => setEditReviewText(e.target.value)}
-                                    placeholder="Share your experience with this project..."
-                                    rows={4}
-                                    className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                    placeholder="Share your detailed experience with this project..."
+                                    rows={5}
+                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
                                     required
                                   />
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-3">
                                   <button
                                     onClick={handleUpdateReview}
                                     disabled={updatingReview || !editReviewText.trim() || editReviewRating === 0}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
                                   >
                                     {updatingReview ? (
-                                      <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
-                                      <Save className="w-4 sm:w-5 h-4 sm:h-5" />
+                                      <Save className="w-5 h-5" />
                                     )}
                                     {updatingReview ? 'Updating...' : 'Save Changes'}
                                   </button>
                                   <button
                                     onClick={handleCancelEdit}
                                     disabled={updatingReview}
-                                    className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                                    className="flex items-center gap-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-gray-500 hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
                                   >
-                                    <X className="w-4 sm:w-5 h-4 sm:h-5" />
+                                    <X className="w-5 h-5" />
                                     Cancel
                                   </button>
                                 </div>
                               </div>
                             ) : (
-                              <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.review_text}</p>
+                              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-100">
+                                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.review_text}</p>
+                              </div>
                             )}
                           </div>
                         ))
@@ -1098,7 +1140,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Files Size</span>
-                  <span className="font-semibold text-gray-900">{hasProjectDump ? `${project?.files?.size_mb || 0} MB` : 'N/A'}</span>
+                  <span className="font-semibold text-gray-900">{project?.files?.size_mb || 0} MB</span>
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Total Sales</span>
@@ -1106,7 +1148,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-semibold text-green-600">{hasProjectDump ? `${project?.stats?.completion_rate || 0}%` : 'N/A'}</span>
+                  <span className="font-semibold text-green-600">{project?.stats?.completion_rate || 0}%</span>
                 </div>
               </div>
 
