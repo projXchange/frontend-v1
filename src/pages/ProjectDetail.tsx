@@ -510,6 +510,18 @@ const ProjectDetail = () => {
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">In Wishlist</span>
                   )}
                 </div>
+                {/* Status badges */}
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-5 flex flex-wrap gap-2 mt-1">
+                  {isPurchased && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Purchased</span>
+                  )}
+                  {cartStatus && !isPurchased && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">In Cart</span>
+                  )}
+                  {wishlistStatus && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">In Wishlist</span>
+                  )}
+                </div>
               </div>
 
               {/* Demo Video */}
@@ -1003,7 +1015,6 @@ const ProjectDetail = () => {
                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
                                       {review.is_verified_purchase ? '✓ Verified Purchase' : '✗ Not Verified'}
                                     </span>
-                                    
                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-orange-100 text-orange-700 border border-orange-200'}`}>
                                       {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
                                     </span>
@@ -1015,6 +1026,7 @@ const ProjectDetail = () => {
                                   </div>
                                 </div>
                               </div>
+
                               <div className="flex items-center gap-3 flex-shrink-0">
                                 {/* Edit button - only show for current user's reviews */}
                                 {canEditReview(review) && (
@@ -1055,8 +1067,7 @@ const ProjectDetail = () => {
                                         className="focus:outline-none transform hover:scale-110 transition-all duration-200"
                                       >
                                         <Star
-                                          className={`w-8 h-8 transition-all duration-200 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"
-                                            }`}
+                                          className={`w-8 h-8 transition-all duration-200 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"}`}
                                         />
                                       </button>
                                     ))}
