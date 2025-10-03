@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
 import { Project, Review } from '../types/Project';
+import type {Transaction } from '../types/Transaction';
 import toast from 'react-hot-toast';
 
 interface UserStatus {
@@ -43,6 +44,10 @@ const ProjectDetail = () => {
       fetchProjectData();
     }
   }, [id]);
+
+  useEffect(() => {
+    checkIsPurchased();
+  }, [project, user]);
 
   useEffect(() => {
     if (activeTab === 'reviews') {
@@ -151,6 +156,17 @@ const ProjectDetail = () => {
   // Helper function to check if user can edit a review
   const canEditReview = (review: Review) => {
     return isAuthenticated && user && user.id === review.user.id && localStorage.getItem('token');
+  };
+
+  const checkIsPurchased = () => {
+    const currentUserId = user?.id || '';
+    if (!project || !currentUserId) return;
+    const hasBought = Array.isArray((project as any)?.buyers) && (project as any).buyers.includes(currentUserId);
+    if (hasBought) {
+      setUserStatus(prev => ({ ...(prev || { has_purchased: false, in_wishlist: false, in_cart: false }), has_purchased: true }));
+      console.log('User has purchased the project');
+    }
+
   };
 
   // Helper function to check if current user has already submitted a review
@@ -300,16 +316,34 @@ const ProjectDetail = () => {
         throw new Error(errText || 'Purchase failed');
       }
 
-      // Step 2: Record transaction
-      const transactionBody = {
+      // Step 2: Record transaction (DB-aligned schema)
+      const currentUserId = user?.id;
+      if (!currentUserId) {
+        alert('Please log in to continue.');
+        return;
+      }
+      const nowIso = new Date().toISOString();
+      const amountStr = String(project.pricing?.sale_price ?? '0');
+      const commission = '0';
+      const authorAmount = amountStr; // adjust if commission applies
+
+      const transactionBody: Partial<Transaction> = {
         transaction_id: (crypto && 'randomUUID' in crypto) ? crypto.randomUUID() : `${Date.now()}`,
+        user_id: currentUserId,
         project_id: project.id,
-        seller_id: project.author_id,
-        amount: project.pricing?.sale_price || 0,
+        author_id: project.author_id,
+        type: 'purchase',
+        status: 'success',
+        amount: amountStr,
         currency: project.pricing?.currency || 'INR',
         payment_method: 'manual',
         payment_gateway_response: 'N/A',
-        metadata: JSON.stringify({ projectTitle: project.title })
+        commission_amount: commission,
+        author_amount: authorAmount,
+        metadata: JSON.stringify({ projectTitle: project.title }),
+        processed_at: nowIso,
+        created_at: nowIso,
+        updated_at: nowIso,
       };
 
       const txnRes = await fetch('https://projxchange-backend-v1.vercel.app/transactions', {
@@ -390,7 +424,10 @@ const ProjectDetail = () => {
     );
   }
 
-  const isPurchased = userStatus?.has_purchased || false;
+  const isPurchased = Boolean(
+    userStatus?.has_purchased ||
+    (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false)
+  );
   const wishlistStatus = project ? (userStatus?.in_wishlist || isInWishlist(project.id)) : false;
   const cartStatus = project ? (userStatus?.in_cart || isInCart(project.id)) : false;
 

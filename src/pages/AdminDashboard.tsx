@@ -1406,7 +1406,7 @@ const AdminDashboard = () => {
                           <tr key={tx.id} className="border-t">
                             <td className="px-6 py-4 font-mono">{tx.transaction_id}</td>
                             <td className="px-6 py-4 flex items-center gap-3">
-                              <img src={tx.project.thumbnail} alt={tx.project.title} className="w-8 h-8 rounded" />
+                              <img src={tx.thumbnail} alt={tx.project.title} className="w-8 h-8 rounded" />
                               {tx.project.title}
                             </td>
                             <td className="px-6 py-4">

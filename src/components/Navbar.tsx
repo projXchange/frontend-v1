@@ -112,7 +112,7 @@ const Navbar = () => {
                     >
                       <img
                         src={user?.avatar}
-                        alt={user?.name}
+                        alt={user?.full_name}
                         className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-100"
                       />
                       <span className="text-sm font-medium text-gray-700">{user?.full_name}</span>
@@ -124,7 +124,7 @@ const Navbar = () => {
                           <div className="flex items-center space-x-3">
                             <img
                               src={user?.avatar}
-                              alt={user?.name}
+                              alt={user?.full_name}
                               className="w-10 h-10 rounded-full object-cover"
                             />
                             <div>
