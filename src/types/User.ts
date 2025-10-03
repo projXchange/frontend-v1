@@ -7,14 +7,13 @@ export interface User {
     created_at: string;
     updated_at: string;
     email_verified: boolean;
+    avatar: string;
 }
 
 export interface UsersApiResponse {
   users: User[];
   total: number;
 }
-
-
 
 export interface AuthResult {
     success: boolean;

@@ -168,14 +168,24 @@ const StudentDashboard = () => {
       if (!res.ok) throw new Error('Failed to fetch profile');
       const data = await res.json();
       if (data.profile) {
+        const profile = data.profile;
+        const normalizedSocialLinks = Object.fromEntries(
+          Object.entries(profile.social_links || {}).map(([k, v]) => [k, v ?? ''])
+        );
         setProfileForm({
-          ...data.profile,
-          social_links: {
-            github: data.profile.social_links?.github || '',
-            linkedin: data.profile.social_links?.linkedin || '',
-            twitter: data.profile.social_links?.twitter || '',
-          },
-          skills: data.profile.skills || [],
+          id: profile.id || '',
+          rating: profile.rating ?? 0,
+          total_sales: profile.total_sales ?? 0,
+          total_purchases: profile.total_purchases ?? 0,
+          experience_level: profile.experience_level || 'beginner',
+          avatar: profile.avatar || '',
+          bio: profile.bio ?? '',
+          location: profile.location ?? '',
+          website: profile.website ?? '',
+          social_links: normalizedSocialLinks as any,
+          skills: profile.skills || [],
+          status: profile.status || 'active',
+          created_at: profile.created_at || '',
         });
       }
     } catch (err: any) {
@@ -190,18 +200,18 @@ const StudentDashboard = () => {
     setError('');
     try {
       const method = 'PATCH';
-      const url = `https://projxchange-backend-v1.vercel.app/users/profile/${user?.id}`;
+      const url = `https://projxchange-backend-v1.vercel.app/users/profile/${profileForm.id || user?.id}`;
       const payload = {
         rating: profileForm.rating,
         total_sales: profileForm.total_sales,
         total_purchases: profileForm.total_purchases,
         experience_level: profileForm.experience_level,
-        avatar: avatarFile && avatarPreview ? avatarPreview : profileForm.avatar,
-        bio: profileForm.bio,
-        location: profileForm.location,
-        website: profileForm.website,
-        social_links: profileForm.social_links,
-        skills: profileForm.skills,
+        avatar: avatarFile && avatarPreview ? avatarPreview : (profileForm.avatar || ''),
+        bio: profileForm.bio ?? '',
+        location: profileForm.location ?? '',
+        website: profileForm.website ?? '',
+        social_links: Object.fromEntries(Object.entries(profileForm.social_links || {}).map(([k, v]) => [k, v ?? ''])),
+        skills: profileForm.skills || [],
       };
       const res = await fetch(url, {
         method,
@@ -342,10 +352,10 @@ const StudentDashboard = () => {
     return matchesSearch && matchesFilter;
   });
 
-  useEffect(() => {
-    // Load profile on mount
-    fetchUserProfile();
-  }, []);
+  // useEffect(() => {
+  //   // Load profile on mount
+  //   fetchUserProfile();
+  // }, []);
 
   useEffect(() => {
     // Fetch data when switching tabs
@@ -380,7 +390,7 @@ const StudentDashboard = () => {
             <div className="flex items-center gap-6 animate-slideInLeft">
               <div className="relative">
                 <img
-                  src={profileForm.avatar}
+                  src={user?.avatar}
                   alt={user.full_name}
                   className="w-20 h-20 rounded-full object-cover ring-4 ring-white/30"
                 />
@@ -394,7 +404,7 @@ const StudentDashboard = () => {
                 <div className="flex items-center gap-4 mt-2">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span className="text-sm">Member since {new Date(profileForm.created_at).toLocaleDateString()}</span>
+                    <span className="text-sm">Member since {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Recently'}</span>
                   </div>
                 </div>
               </div>
