@@ -45,7 +45,6 @@ const ProjectDetail = () => {
     }
   }, [id]);
 
-  // Re-evaluate purchase state whenever project or user changes
   useEffect(() => {
     checkIsPurchased();
   }, [project, user]);
