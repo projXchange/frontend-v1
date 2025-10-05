@@ -204,9 +204,11 @@ const Navbar = () => {
               {isAuthenticated && (
                 <>
                   <Link to="/upload" className="block px-4 py-2 text-gray-700" onClick={() => setIsMenuOpen(false)}>Sell Project</Link>
+                  {!isAdmin && (
                   <Link to="/dashboard" className="block px-4 py-2 text-gray-700" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+                 )}
                   {isAdmin && (
-                    <Link to="/admin" className="block px-4 py-2 text-gray-700" onClick={() => setIsMenuOpen(false)}>Admin</Link>
+                    <Link to="/admin" className="block px-4 py-2 text-gray-700" onClick={() => setIsMenuOpen(false)}>Admin Panel</Link>
                   )}
                   <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-700">Logout</button>
                 </>

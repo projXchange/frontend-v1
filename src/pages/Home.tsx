@@ -18,7 +18,7 @@ const Home = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=published');
+        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=approved');
         const data: ProjectResponse = await response.json();
         setProjects(data.data || []);
         console.log(data.data);
@@ -51,7 +51,6 @@ const Home = () => {
           'AWS': Globe,
           'Docker': Globe
         };
-
         const generatedCategories = Object.entries(categoryCounts).map(([name, count]) => ({
           name,
           icon: categoryIcons[name as keyof typeof categoryIcons] || Code,

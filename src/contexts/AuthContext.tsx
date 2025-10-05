@@ -58,7 +58,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         created_at: data.user.created_at,
         updated_at: data.user.updated_at,
         email_verified: data.user.email_verified,
-        avatar: data.user.avatar,
+        //if avatar is blank or null, use default avatar
+        //default avatar is https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80
+        avatar: data.user.avatar === '' || data.user.avatar === null
+          ? 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'
+          : data.user.avatar,
       };
 
       setUser(loggedInUser);
@@ -107,9 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         created_at: data.user.created_at,
         updated_at: data.user.updated_at,
         email_verified: data.user.email_verified,
-       
-        avatar: data.user.avatar || 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80',
-     };
+        avatar: data.user.avatar === '' || data.user.avatar === null
+          ? 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'
+          : data.user.avatar,
+      };
 
       setUser(newUser);
       localStorage.setItem('studystack_user', JSON.stringify(newUser));
