@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Project } from '../types/Project';
 import { Upload, FileText, Video, IndianRupee, Tag, Award, Shield, CheckCircle, Image, X, Plus, AlertCircle, Sparkles, Eye, Send, Users } from 'lucide-react';
 
 const UploadProject = () => {
@@ -9,16 +8,29 @@ const UploadProject = () => {
     category: '',
     price: '',
     originalPrice: '',
+    youtubeUrl: '',
+    githubUrl: '',
+    liveDemo: '',
     difficulty: 'Beginner',
     features: [''],
-    techStack: ['']
+    techStack: [''],
+    currency: 'INR',
+    deliveryTime: '',
+    thumbnailUrl: '',
+    systemRequirements: [''],
+    dependenciesArr: [''],
+    installationSteps: [''],
+    averageRating: '',
+    totalRatings: '',
+    rating5: '',
+    rating4: '',
+    rating3: '',
+    rating2: '',
+    rating1: ''
   });
 
   const [dragActive, setDragActive] = useState(false);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [documentationFiles, setDocumentationFiles] = useState<File[]>([]);
-  const [archiveFiles, setArchiveFiles] = useState<File[]>([]);
-  const [assetFiles, setAssetFiles] = useState<File[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [previewImage, setPreviewImage] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentStep, setCurrentStep] = useState(1);
@@ -71,7 +83,20 @@ const UploadProject = () => {
           delete newErrors.price;
         }
         break;
-      // githubUrl, youtubeUrl, liveDemo are admin-only now; no validation here
+      case 'youtubeUrl':
+        if (value && !value.includes('youtube.com') && !value.includes('youtu.be')) {
+          newErrors.youtubeUrl = 'Please enter a valid YouTube URL';
+        } else {
+          delete newErrors.youtubeUrl;
+        }
+        break;
+      case 'githubUrl':
+        if (value && !value.includes('github.com')) {
+          newErrors.githubUrl = 'Please enter a valid GitHub URL';
+        } else {
+          delete newErrors.githubUrl;
+        }
+        break;
     }
 
     setErrors(newErrors);
@@ -86,7 +111,11 @@ const UploadProject = () => {
     validateField(name, value);
   };
 
-  const handleArrayChange = (index: number, value: string, field: 'features' | 'techStack') => {
+  const handleArrayChange = (
+    index: number,
+    value: string,
+    field: 'features' | 'techStack' | 'systemRequirements' | 'dependenciesArr' | 'installationSteps'
+  ) => {
     const newArray = [...formData[field]];
     newArray[index] = value;
     setFormData(prev => ({
@@ -95,14 +124,19 @@ const UploadProject = () => {
     }));
   };
 
-  const addArrayItem = (field: 'features' | 'techStack') => {
+  const addArrayItem = (
+    field: 'features' | 'techStack' | 'systemRequirements' | 'dependenciesArr' | 'installationSteps'
+  ) => {
     setFormData(prev => ({
       ...prev,
       [field]: [...prev[field], '']
     }));
   };
 
-  const removeArrayItem = (index: number, field: 'features' | 'techStack') => {
+  const removeArrayItem = (
+    index: number,
+    field: 'features' | 'techStack' | 'systemRequirements' | 'dependenciesArr' | 'installationSteps'
+  ) => {
     const newArray = formData[field].filter((_, i) => i !== index);
     setFormData(prev => ({
       ...prev,
@@ -127,62 +161,22 @@ const UploadProject = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files);
-      categorizeAndStoreFiles(files);
+      setUploadedFiles(prev => [...prev, ...files]);
 
       // If it's an image, set as preview
-      const img = files.find(file => file.type.startsWith('image/'));
-      if (img) {
+      const imageFile = files.find(file => file.type.startsWith('image/'));
+      if (imageFile) {
         const reader = new FileReader();
-        reader.onload = (loadEvent) => {
-          setPreviewImage(loadEvent.target?.result as string);
+        reader.onload = (e) => {
+          setPreviewImage(e.target?.result as string);
         };
-        reader.readAsDataURL(img);
+        reader.readAsDataURL(imageFile);
       }
     }
   };
-
-  const getAllFiles = (): File[] => [...imageFiles, ...documentationFiles, ...archiveFiles, ...assetFiles];
 
   const removeFile = (index: number) => {
-    const all = getAllFiles();
-    const file = all[index];
-    if (!file) return;
-    if (file.type.startsWith('image/')) {
-      setImageFiles(prev => prev.filter(f => f !== file));
-      return;
-    }
-    if (file.name.endsWith('.pdf') || file.name.endsWith('.md')) {
-      setDocumentationFiles(prev => prev.filter(f => f !== file));
-      return;
-    }
-    if (file.name.endsWith('.zip') || file.name.endsWith('.rar')) {
-      setArchiveFiles(prev => prev.filter(f => f !== file));
-      return;
-    }
-    setAssetFiles(prev => prev.filter(f => f !== file));
-  };
-
-  const categorizeAndStoreFiles = (files: File[]) => {
-    if (!files || files.length === 0) return;
-    const imgs: File[] = [];
-    const docs: File[] = [];
-    const archives: File[] = [];
-    const assets: File[] = [];
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        imgs.push(file);
-      } else if (file.name.endsWith('.pdf') || file.name.endsWith('.md')) {
-        docs.push(file);
-      } else if (file.name.endsWith('.zip') || file.name.endsWith('.rar')) {
-        archives.push(file);
-      } else {
-        assets.push(file);
-      }
-    });
-    if (imgs.length) setImageFiles(prev => [...prev, ...imgs]);
-    if (docs.length) setDocumentationFiles(prev => [...prev, ...docs]);
-    if (archives.length) setArchiveFiles(prev => [...prev, ...archives]);
-    if (assets.length) setAssetFiles(prev => [...prev, ...assets]);
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -197,90 +191,75 @@ const UploadProject = () => {
 
     if (Object.keys(errors).length === 0) {
       try {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          throw new Error('Authentication token not found. Please login again.');
-        }
-
-        // Single API call with all project data
-        const allFiles = getAllFiles();
-
-        const projectData: Partial<Project> = {
+        // Build payload according to API schema (single POST)
+        const projectData = {
           title: formData.title,
           description: formData.description,
           key_features: formData.features.filter(f => f.trim()).join(', '),
           category: formData.category,
           difficulty_level: formData.difficulty.toLowerCase(),
           tech_stack: formData.techStack.filter(tech => tech.trim()),
-          // github_url, demo_url will be set by admin
-          status: "pending_review",
-          documentation: formData.description,
+          github_url: formData.githubUrl,
+          demo_url: formData.liveDemo,
           pricing: {
             sale_price: parseFloat(formData.price),
             original_price: formData.originalPrice ? parseFloat(formData.originalPrice) : parseFloat(formData.price),
-            currency: "INR"
+            currency: formData.currency || 'INR'
           },
-          delivery_time: 1,
-          // Consolidated dump fields
-          thumbnail: previewImage || (imageFiles.length > 0 ? imageFiles[0].name : ""),
-          images: imageFiles.map(file => file.name),
-          // demo_video will be set by admin
-          features: formData.features.filter(f => f.trim()),
-          tags: formData.techStack.filter(tech => tech.trim()),
+          delivery_time: formData.deliveryTime ? parseInt(formData.deliveryTime, 10) : 0,
+          thumbnail: (formData.thumbnailUrl && formData.thumbnailUrl.trim()) ? formData.thumbnailUrl.trim() : (previewImage || ""),
+          images: uploadedFiles.filter(file => file.type.startsWith('image/')).map(file => file.name),
           files: {
-            source_files: archiveFiles.map(file => file.name),
-            documentation_files: documentationFiles.map(file => file.name),
-            assets: assetFiles.map(file => file.name),
-            size_mb: allFiles.reduce((total, file) => total + (file.size / 1024 / 1024), 0)
+            source_files: uploadedFiles.filter(file => file.name.endsWith('.zip') || file.name.endsWith('.rar')).map(file => file.name),
+            documentation_files: uploadedFiles.filter(file => file.name.endsWith('.pdf') || file.name.endsWith('.md')).map(file => file.name)
           },
           requirements: {
-            system_requirements: ["Windows 10 or higher", "Node.js 16+", "Modern web browser"],
-            dependencies: formData.techStack.filter(tech => tech.trim()),
-            installation_steps: ["Clone the repository", "Install dependencies", "Run the application"]
-          },
-          stats: {
-            total_downloads: 0,
-            total_views: 0,
-            total_likes: 0,
-            completion_rate: 0
+            system_requirements: formData.systemRequirements.filter(s => s.trim()),
+            dependencies: formData.dependenciesArr.filter(d => d.trim()),
+            installation_steps: formData.installationSteps.filter(s => s.trim())
           },
           rating: {
-            average_rating: 0,
-            total_ratings: 0,
+            average_rating: formData.averageRating ? parseFloat(formData.averageRating) : 0,
+            total_ratings: formData.totalRatings ? parseInt(formData.totalRatings, 10) : 0,
             rating_distribution: {
-              "5": 0,
-              "4": 0,
-              "3": 0,
-              "2": 0,
-              "1": 0
+              "5": formData.rating5 ? parseInt(formData.rating5, 10) : 0,
+              "4": formData.rating4 ? parseInt(formData.rating4, 10) : 0,
+              "3": formData.rating3 ? parseInt(formData.rating3, 10) : 0,
+              "2": formData.rating2 ? parseInt(formData.rating2, 10) : 0,
+              "1": formData.rating1 ? parseInt(formData.rating1, 10) : 0
             }
           }
         };
 
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication token not found. Please login again.');
+        }
         console.log('Sending project data:', projectData);
         
-        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
+        const projectResponse = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'accept': 'application/json',
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify(projectData)
         });
 
-        console.log('Project response status:', response.status);
+        console.log('Project response status:', projectResponse.status);
         
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!projectResponse.ok) {
+          const errorData = await projectResponse.json();
           console.error('Project creation error:', errorData);
-          throw new Error(`Failed to create project: ${errorData.error || response.statusText}`);
+          throw new Error(`Failed to create project: ${errorData.error || projectResponse.statusText}`);
         }
 
-        const result = await response.json();
-        console.log('Project creation response:', result);
+        const projectResult = await projectResponse.json();
+        console.log('Project creation response:', projectResult);
 
-        alert('Project submitted successfully! You will receive notification once it\'s approved.');
+        alert('Project submitted successfully! You will receive a notification once it\'s approved.');
         
         // Reset form
         setFormData({
@@ -289,14 +268,27 @@ const UploadProject = () => {
           category: '',
           price: '',
           originalPrice: '',
+          youtubeUrl: '',
+          githubUrl: '',
+          liveDemo: '',
           difficulty: 'Beginner',
           features: [''],
-          techStack: ['']
+          techStack: [''],
+          currency: 'INR',
+          deliveryTime: '',
+          thumbnailUrl: '',
+          systemRequirements: [''],
+          dependenciesArr: [''],
+          installationSteps: [''],
+          averageRating: '',
+          totalRatings: '',
+          rating5: '',
+          rating4: '',
+          rating3: '',
+          rating2: '',
+          rating1: ''
         });
-        setImageFiles([]);
-        setDocumentationFiles([]);
-        setArchiveFiles([]);
-        setAssetFiles([]);
+        setUploadedFiles([]);
         setPreviewImage('');
         setCurrentStep(1);
         
@@ -479,6 +471,117 @@ const UploadProject = () => {
                         </div>
                       </div>
 
+                      {/* Requirements: System Requirements */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-4">
+                          System Requirements
+                        </label>
+                        <div className="space-y-3">
+                          {formData.systemRequirements.map((req, index) => (
+                            <div key={index} className="flex gap-3 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                              <input
+                                type="text"
+                                value={req}
+                                onChange={(e) => handleArrayChange(index, e.target.value, 'systemRequirements')}
+                                placeholder="e.g., Windows 10, 8GB RAM"
+                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                              />
+                              {formData.systemRequirements.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeArrayItem(index, 'systemRequirements')}
+                                  className="px-4 py-3 text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-colors font-semibold"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => addArrayItem('systemRequirements')}
+                            className="flex items-center gap-2 px-4 py-3 text-blue-600 border border-blue-300 rounded-xl hover:bg-blue-50 transition-colors font-semibold"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add Requirement
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Requirements: Dependencies */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-4">
+                          Dependencies
+                        </label>
+                        <div className="space-y-3">
+                          {formData.dependenciesArr.map((dep, index) => (
+                            <div key={index} className="flex gap-3 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                              <input
+                                type="text"
+                                value={dep}
+                                onChange={(e) => handleArrayChange(index, e.target.value, 'dependenciesArr')}
+                                placeholder="e.g., Node 18, MongoDB, Redis"
+                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                              />
+                              {formData.dependenciesArr.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeArrayItem(index, 'dependenciesArr')}
+                                  className="px-4 py-3 text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-colors font-semibold"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => addArrayItem('dependenciesArr')}
+                            className="flex items-center gap-2 px-4 py-3 text-blue-600 border border-blue-300 rounded-xl hover:bg-blue-50 transition-colors font-semibold"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add Dependency
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Requirements: Installation Steps */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-4">
+                          Installation Steps
+                        </label>
+                        <div className="space-y-3">
+                          {formData.installationSteps.map((step, index) => (
+                            <div key={index} className="flex gap-3 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                              <input
+                                type="text"
+                                value={step}
+                                onChange={(e) => handleArrayChange(index, e.target.value, 'installationSteps')}
+                                placeholder="e.g., Clone repo, Install deps, Run app"
+                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                              />
+                              {formData.installationSteps.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeArrayItem(index, 'installationSteps')}
+                                  className="px-4 py-3 text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-colors font-semibold"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => addArrayItem('installationSteps')}
+                            className="flex items-center gap-2 px-4 py-3 text-blue-600 border border-blue-300 rounded-xl hover:bg-blue-50 transition-colors font-semibold"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add Step
+                          </button>
+                        </div>
+                      </div>
+
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-3">
                           Project Description *
@@ -590,7 +693,40 @@ const UploadProject = () => {
                         </div>
                       </div>
 
-                      {/* Admin will set URLs; hide from uploader */}
+                      {/* URLs */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-3">
+                            GitHub Repository URL
+                          </label>
+                          <input
+                            type="url"
+                            name="githubUrl"
+                            value={formData.githubUrl}
+                            onChange={handleInputChange}
+                            placeholder="https://github.com/username/repo"
+                            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.githubUrl ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                              }`}
+                          />
+                          {errors.githubUrl && (
+                            <p className="text-red-600 text-sm mt-2">{errors.githubUrl}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-3">
+                            Live Demo URL
+                          </label>
+                          <input
+                            type="url"
+                            name="liveDemo"
+                            value={formData.liveDemo}
+                            onChange={handleInputChange}
+                            placeholder="https://your-demo.vercel.app"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -604,7 +740,36 @@ const UploadProject = () => {
                     </h2>
 
                     <div className="space-y-8">
-                      {/* Admin will set video URL; hide from uploader */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">
+                          Thumbnail URL
+                        </label>
+                        <input
+                          type="url"
+                          name="thumbnailUrl"
+                          value={formData.thumbnailUrl}
+                          onChange={handleInputChange}
+                          placeholder="https://.../image.png"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">
+                          YouTube Demo Video URL
+                        </label>
+                        <input
+                          type="url"
+                          name="youtubeUrl"
+                          value={formData.youtubeUrl}
+                          onChange={handleInputChange}
+                          placeholder="https://youtube.com/watch?v=..."
+                          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.youtubeUrl ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                            }`}
+                        />
+                        {errors.youtubeUrl && (
+                          <p className="text-red-600 text-sm mt-2">{errors.youtubeUrl}</p>
+                        )}
+                      </div>
 
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-3">
@@ -639,17 +804,17 @@ const UploadProject = () => {
                             onChange={(e) => {
                               if (e.target.files) {
                                 const files = Array.from(e.target.files);
-                                categorizeAndStoreFiles(files);
+                                setUploadedFiles(prev => [...prev, ...files]);
                               }
                             }}
                           />
                         </div>
 
                         {/* Uploaded Files */}
-                        {getAllFiles().length > 0 && (
+                        {uploadedFiles.length > 0 && (
                           <div className="mt-6 space-y-3">
                             <h4 className="font-semibold text-gray-900">Uploaded Files:</h4>
-                            {getAllFiles().map((file, index) => (
+                            {uploadedFiles.map((file, index) => (
                               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                                 <div className="flex items-center gap-3">
                                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -731,6 +896,39 @@ const UploadProject = () => {
                         </div>
                       </div>
 
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-3">
+                            Currency
+                          </label>
+                          <select
+                            name="currency"
+                            value={formData.currency}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                          >
+                            <option value="INR">INR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-3">
+                            Delivery Time (days)
+                          </label>
+                          <input
+                            type="number"
+                            name="deliveryTime"
+                            value={formData.deliveryTime}
+                            onChange={handleInputChange}
+                            min="0"
+                            max="365"
+                            placeholder="1"
+                            className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                          />
+                        </div>
+                      </div>
+
                       {formData.price &&
                         formData.originalPrice &&
                         parseFloat(formData.originalPrice) > parseFloat(formData.price) && (
@@ -771,6 +969,61 @@ const UploadProject = () => {
                           <li>• Higher original prices can make your discount more attractive</li>
                           <li>• Start with lower prices to build reviews and reputation</li>
                         </ul>
+                      </div>
+
+                      {/* Optional Rating Inputs */}
+                      <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                        <h4 className="font-bold text-gray-900 mb-3">Rating (optional)</h4>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Average Rating</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              min="0"
+                              max="5"
+                              name="averageRating"
+                              value={formData.averageRating}
+                              onChange={handleInputChange}
+                              placeholder="0"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Total Ratings</label>
+                            <input
+                              type="number"
+                              min="0"
+                              name="totalRatings"
+                              value={formData.totalRatings}
+                              onChange={handleInputChange}
+                              placeholder="0"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-5 gap-4 mt-4">
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">5★</label>
+                            <input type="number" min="0" name="rating5" value={formData.rating5} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">4★</label>
+                            <input type="number" min="0" name="rating4" value={formData.rating4} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">3★</label>
+                            <input type="number" min="0" name="rating3" value={formData.rating3} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">2★</label>
+                            <input type="number" min="0" name="rating2" value={formData.rating2} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">1★</label>
+                            <input type="number" min="0" name="rating1" value={formData.rating1} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

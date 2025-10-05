@@ -64,7 +64,7 @@ const AdminDashboard = () => {
         fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         }),
-        fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending_review', {
+        fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending', {
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         }),
       ]);
@@ -180,7 +180,7 @@ const AdminDashboard = () => {
     setError('');
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending_review', {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ const AdminDashboard = () => {
         )
       );
 
-      alert(`Project ${status === 'approved' ? 'approved' : status === 'suspended' ? 'suspended' : 'updated'} successfully!`);
+      toast.success(`Project ${status === 'approved' ? 'approved' : status === 'suspended' ? 'suspended' : 'updated'} successfully!`);
     } catch (error) {
       console.error('Error updating project status:', error);
       alert('Failed to update project status. Please try again.');
@@ -269,7 +269,7 @@ const AdminDashboard = () => {
             : user
         )
       );
-      alert(`User status updated successfully!`);
+      toast.success(`User status updated successfully!`);
       setIsUserModalOpen(false);
     } catch (error) {
       console.error('Error updating user status:', error);
@@ -302,7 +302,7 @@ const AdminDashboard = () => {
       // Remove the user from the local state
       setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
 
-      alert('User deleted successfully!');
+      toast.success('User deleted successfully!');
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('Failed to delete user. Please try again.');
@@ -587,7 +587,7 @@ const AdminDashboard = () => {
         )
       );
 
-      alert('Project status updated successfully!');
+      toast.success('Project status updated successfully!');
       setIsProjectModalOpen(false);
       setSelectedProject(null);
 
@@ -1043,8 +1043,7 @@ const AdminDashboard = () => {
                     >
                       <option value="all">All Status</option>
                       <option value="approved">Approved</option>
-                      <option value="pending_review">Pending Review</option>
-                      <option value="published">Published</option>
+                      <option value="pending">Pending Review</option>
                       <option value="suspended">Suspended</option>
                       <option value="archived">Archived</option>
                     </select>
@@ -1113,8 +1112,7 @@ const AdminDashboard = () => {
                                 </td>
                                 <td className="px-6 py-4">
                                   <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                    project.status === 'pending_review' ? 'bg-yellow-100 text-yellow-800' :
-                                      project.status === 'published' ? 'bg-blue-100 text-blue-800' :
+                                    project.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                         project.status === 'suspended' ? 'bg-red-100 text-red-800' :
                                           project.status === 'archived' ? 'bg-gray-100 text-gray-800' :
                                             'bg-gray-100 text-gray-800'
@@ -1643,6 +1641,7 @@ const AdminDashboard = () => {
             setSelectedProject(null);
           }}
           project={selectedProject}
+          canEditAll={false}
           projectUpdateData={projectUpdateData}
           onUpdateDataChange={setProjectUpdateData}
           onUpdate={handleProjectStatusUpdate}
