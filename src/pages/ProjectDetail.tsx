@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
 import { Project, Review } from '../types/Project';
-import type {Transaction } from '../types/Transaction';
+import type { Transaction } from '../types/Transaction';
 import toast from 'react-hot-toast';
 
 interface UserStatus {
@@ -35,7 +35,7 @@ const ProjectDetail = () => {
   const [editReviewText, setEditReviewText] = useState('');
   const [editReviewRating, setEditReviewRating] = useState(0);
   const [updatingReview, setUpdatingReview] = useState(false);
-  
+
 
 
   // Fetch project data on component mount
@@ -93,12 +93,12 @@ const ProjectDetail = () => {
       if (response.ok) {
         const data = await response.json();
 
-        
+
         // Separate approved and pending reviews
         const allReviews = data.reviews || [];
         const approved = allReviews.filter((review: Review) => review.is_approved);
         const pending = allReviews.filter((review: Review) => !review.is_approved);
-        
+
         setApprovedReviews(approved);
         setPendingReviews(pending);
         setAverageRating(data.stats.average_rating);
@@ -139,7 +139,7 @@ const ProjectDetail = () => {
         setReviewText('');
         setFormRating(0); // reset stars
         toast.success('Review submitted successfully!');
-     
+
         // Refresh reviews from backend after successful submission
         await fetchReviews();
       } else {
@@ -186,11 +186,11 @@ const ProjectDetail = () => {
       toast.error('You can only edit your own reviews.');
       return;
     }
-    
+
     setEditingReviewId(review.id);
     setEditReviewText(review.review_text);
     setEditReviewRating(review.rating);
-  
+
   };
 
   const handleCancelEdit = () => {
@@ -233,7 +233,7 @@ const ProjectDetail = () => {
       }
 
       const data = await response.json();
-      
+
       // Update the reviews in state
       setApprovedReviews(prev => prev.map(review =>
         review.id === editingReviewId ? { ...review, ...data.review, rating: editReviewRating, review_text: editReviewText } : review
@@ -480,7 +480,7 @@ const ProjectDetail = () => {
             <span className="text-gray-900 font-medium truncate">{project.title}</span>
           </nav>
         </div>
-        
+
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 order-1 lg:order-1">
@@ -562,10 +562,19 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video */}
-              {project?.demo_video && (
-                <div className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300" style={{ animationDelay: '600ms' }}>
+              {project?.demo_url && (
+                <div
+                  className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300"
+                  style={{ animationDelay: '600ms' }}
+                >
                   <iframe
-                    src={project.demo_video}
+                    src={
+                      project.demo_url.includes("watch?v=")
+                        ? project.demo_url.replace("watch?v=", "embed/")
+                        : project.demo_url.includes("youtu.be")
+                          ? project.demo_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
+                          : project.demo_url
+                    }
                     title="Project Demo"
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -972,7 +981,7 @@ const ProjectDetail = () => {
                                   {formRating === 5 && "⭐⭐⭐⭐⭐ Excellent - Outstanding quality"}
                                 </div>
                               </div>
-                              
+
                               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
                                 <label className="block text-sm font-semibold text-gray-800 mb-4">
                                   💬 Share Your Experience
@@ -1029,130 +1038,130 @@ const ProjectDetail = () => {
                           <p className="text-gray-500 text-sm sm:text-base">Be the first to review this project!</p>
                         </div>
                       ) : (
-                       // Single combined list: pending first, then approved (excluding current user's review)
+                        // Single combined list: pending first, then approved (excluding current user's review)
                         [...pendingReviews, ...approvedReviews]
                           .filter(review => !user || review.user.id !== user.id) // Filter out current user's review
                           .map((review, index) => (
-                          <div key={review.id} className={`bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl border transition-all duration-300 ${review.is_approved ? 'border-gray-200 hover:border-blue-200' : 'border-orange-200 bg-orange-50/50 hover:border-orange-300'} animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
-                            <div className="flex items-start justify-between mb-6 gap-4">
-                              <div className="flex items-center gap-4">
-                                <div className={`w-12 sm:w-14 h-12 sm:h-14 ${review.is_approved ? 'bg-gradient-to-br from-blue-500 to-teal-500' : 'bg-gradient-to-br from-orange-500 to-red-500'} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                                  <span className="text-white font-bold text-lg sm:text-xl">
-                                    {review.user.full_name.charAt(0)}
-                                  </span>
-                                </div>
-                                <div className="min-w-0">
-                                  <h5 className="font-bold text-gray-900 text-base sm:text-lg truncate">{review.user.full_name}</h5>
-                                  <p className="text-sm text-gray-500 mb-2">
-                                    {new Date(review.created_at).toLocaleDateString()}
-                                  </p>
-                                  {/* Status Badges */}
-                                  <div className="flex flex-wrap gap-2">
-                                    {/* Is Purchase tag (always shown) */}
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
-                                      {review.is_verified_purchase ? '✓ Verified Purchase' : '✗ Not Verified'}
+                            <div key={review.id} className={`bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl border transition-all duration-300 ${review.is_approved ? 'border-gray-200 hover:border-blue-200' : 'border-orange-200 bg-orange-50/50 hover:border-orange-300'} animate-slideInUp`} style={{ animationDelay: `${index * 100}ms` }}>
+                              <div className="flex items-start justify-between mb-6 gap-4">
+                                <div className="flex items-center gap-4">
+                                  <div className={`w-12 sm:w-14 h-12 sm:h-14 ${review.is_approved ? 'bg-gradient-to-br from-blue-500 to-teal-500' : 'bg-gradient-to-br from-orange-500 to-red-500'} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                                    <span className="text-white font-bold text-lg sm:text-xl">
+                                      {review.user.full_name.charAt(0)}
                                     </span>
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-orange-100 text-orange-700 border border-orange-200'}`}>
-                                      {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
-                                    </span>
-                                    {canEditReview(review) && (
-                                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
-                                        ✏️ Your Review
+                                  </div>
+                                  <div className="min-w-0">
+                                    <h5 className="font-bold text-gray-900 text-base sm:text-lg truncate">{review.user.full_name}</h5>
+                                    <p className="text-sm text-gray-500 mb-2">
+                                      {new Date(review.created_at).toLocaleDateString()}
+                                    </p>
+                                    {/* Status Badges */}
+                                    <div className="flex flex-wrap gap-2">
+                                      {/* Is Purchase tag (always shown) */}
+                                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+                                        {review.is_verified_purchase ? '✓ Verified Purchase' : '✗ Not Verified'}
                                       </span>
-                                    )}
+                                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-orange-100 text-orange-700 border border-orange-200'}`}>
+                                        {review.is_approved ? '✓ Approved' : '⏳ Pending Approval'}
+                                      </span>
+                                      {canEditReview(review) && (
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                                          ✏️ Your Review
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 flex-shrink-0">
+                                  {/* Edit button - only show for current user's reviews */}
+                                  {canEditReview(review) && (
+                                    <button
+                                      onClick={() => handleEditReview(review)}
+                                      disabled={editingReviewId === review.id || updatingReview}
+                                      className="p-2 text-gray-400 hover:text-blue-500 transition-all duration-200 hover:bg-blue-50 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110"
+                                      title="Edit review"
+                                    >
+                                      <Edit2 className="w-5 h-5" />
+                                    </button>
+                                  )}
+                                  <div className="flex items-center gap-1 bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current drop-shadow-sm' : 'text-gray-300'}`}
+                                      />
+                                    ))}
+                                    <span className="ml-2 text-sm font-semibold text-gray-700">{review.rating}/5</span>
                                   </div>
                                 </div>
                               </div>
 
-                              <div className="flex items-center gap-3 flex-shrink-0">
-                                {/* Edit button - only show for current user's reviews */}
-                                {canEditReview(review) && (
-                                  <button
-                                    onClick={() => handleEditReview(review)}
-                                    disabled={editingReviewId === review.id || updatingReview}
-                                    className="p-2 text-gray-400 hover:text-blue-500 transition-all duration-200 hover:bg-blue-50 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110"
-                                    title="Edit review"
-                                  >
-                                    <Edit2 className="w-5 h-5" />
-                                  </button>
-                                )}
-                                <div className="flex items-center gap-1 bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current drop-shadow-sm' : 'text-gray-300'}`}
+                              {/* Review Content - either display or edit form */}
+                              {editingReviewId === review.id ? (
+                                <div className="space-y-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                                  <div>
+                                    <label className="block text-sm font-semibold text-gray-800 mb-3">
+                                      ⭐ Update Your Rating
+                                    </label>
+                                    <div className="flex gap-1 mb-4">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                          type="button"
+                                          key={star}
+                                          onClick={() => setEditReviewRating(star)}
+                                          className="focus:outline-none transform hover:scale-110 transition-all duration-200"
+                                        >
+                                          <Star
+                                            className={`w-8 h-8 transition-all duration-200 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"}`}
+                                          />
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-semibold text-gray-800 mb-3">
+                                      💬 Update Your Feedback
+                                    </label>
+                                    <textarea
+                                      value={editReviewText}
+                                      onChange={(e) => setEditReviewText(e.target.value)}
+                                      placeholder="Share your detailed experience with this project..."
+                                      rows={5}
+                                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                                      required
                                     />
-                                  ))}
-                                  <span className="ml-2 text-sm font-semibold text-gray-700">{review.rating}/5</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Review Content - either display or edit form */}
-                            {editingReviewId === review.id ? (
-                              <div className="space-y-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                                <div>
-                                  <label className="block text-sm font-semibold text-gray-800 mb-3">
-                                    ⭐ Update Your Rating
-                                  </label>
-                                  <div className="flex gap-1 mb-4">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                      <button
-                                        type="button"
-                                        key={star}
-                                        onClick={() => setEditReviewRating(star)}
-                                        className="focus:outline-none transform hover:scale-110 transition-all duration-200"
-                                      >
-                                        <Star
-                                          className={`w-8 h-8 transition-all duration-200 ${star <= editReviewRating ? "text-yellow-400 fill-yellow-400 drop-shadow-md" : "text-gray-300 hover:text-yellow-300"}`}
-                                        />
-                                      </button>
-                                    ))}
+                                  </div>
+                                  <div className="flex gap-3">
+                                    <button
+                                      onClick={handleUpdateReview}
+                                      disabled={updatingReview || !editReviewText.trim() || editReviewRating === 0}
+                                      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
+                                    >
+                                      {updatingReview ? (
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                      ) : (
+                                        <Save className="w-5 h-5" />
+                                      )}
+                                      {updatingReview ? 'Updating...' : 'Save Changes'}
+                                    </button>
+                                    <button
+                                      onClick={handleCancelEdit}
+                                      disabled={updatingReview}
+                                      className="flex items-center gap-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-gray-500 hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
+                                    >
+                                      <X className="w-5 h-5" />
+                                      Cancel
+                                    </button>
                                   </div>
                                 </div>
-                                <div>
-                                  <label className="block text-sm font-semibold text-gray-800 mb-3">
-                                    💬 Update Your Feedback
-                                  </label>
-                                  <textarea
-                                    value={editReviewText}
-                                    onChange={(e) => setEditReviewText(e.target.value)}
-                                    placeholder="Share your detailed experience with this project..."
-                                    rows={5}
-                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                                    required
-                                  />
+                              ) : (
+                                <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-100">
+                                  <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.review_text}</p>
                                 </div>
-                                <div className="flex gap-3">
-                                  <button
-                                    onClick={handleUpdateReview}
-                                    disabled={updatingReview || !editReviewText.trim() || editReviewRating === 0}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
-                                  >
-                                    {updatingReview ? (
-                                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    ) : (
-                                      <Save className="w-5 h-5" />
-                                    )}
-                                    {updatingReview ? 'Updating...' : 'Save Changes'}
-                                  </button>
-                                  <button
-                                    onClick={handleCancelEdit}
-                                    disabled={updatingReview}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-gray-500 hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
-                                  >
-                                    <X className="w-5 h-5" />
-                                    Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-100">
-                                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{review.review_text}</p>
-                              </div>
-                            )}
-                          </div>
-                        ))
+                              )}
+                            </div>
+                          ))
                       )}
                     </div>
                   </div>
