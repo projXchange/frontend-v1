@@ -35,6 +35,17 @@ const UploadProject = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploadedSourceFiles, setUploadedSourceFiles] = useState<string[]>([]);
+  const [uploadedDocFiles, setUploadedDocFiles] = useState<string[]>([]);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [imagesUploading, setImagesUploading] = useState(false);
+  const [sourceFilesUploading, setSourceFilesUploading] = useState(false);
+  const [docFilesUploading, setDocFilesUploading] = useState(false);
+
+  // Cloudinary configuration
+  const CLOUDINARY_CLOUD_NAME = 'dmfh4f4yg'; // Replace with your cloud name
+  const CLOUDINARY_UPLOAD_PRESET = 'projectXchange'; //
 
   const categories = [
     { label: 'Web Development', value: 'web_development' },
@@ -51,6 +62,156 @@ const UploadProject = () => {
     { label: 'Other', value: 'other' }
   ];
   const difficulties = ['Beginner', 'Intermediate', 'Advanced'];
+
+
+  // Generic upload function for Cloudinary
+  const uploadToCloudinary = async (file: File, folder: string, resourceType: 'image' | 'raw' = 'image'): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('folder', folder);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw error;
+    }
+  };
+
+  // 1. Thumbnail Upload (Single Image)
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    setThumbnailUploading(true);
+    try {
+      // Store temporarily, will upload with project ID later
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Store file for later upload
+      setFormData(prev => ({ ...prev, thumbnailUrl: 'TEMP_FILE' }));
+
+      // You can also store the file in state if needed
+      alert('Thumbnail selected! It will be uploaded when you submit the project.');
+    } catch (error) {
+      alert('Failed to process thumbnail.');
+    } finally {
+      setThumbnailUploading(false);
+    }
+  };
+
+  // 2. Multiple Images Upload
+  const handleMultipleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+  
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      alert('Please upload image files only');
+      return;
+    }
+  
+    const alreadyUploadedImages = uploadedFiles.filter(f => f.type.startsWith('image/')).length;
+    const remainingSlots = 3 - alreadyUploadedImages;
+  
+    if (imageFiles.length > remainingSlots) {
+      alert(`You can upload a maximum of 3 images. You already uploaded ${alreadyUploadedImages}, so you can select up to ${remainingSlots} more.`);
+      return;
+    }
+  
+    setImagesUploading(true);
+    setUploadedFiles(prev => [...prev, ...imageFiles]);
+    alert(`${imageFiles.length} image(s) selected! They will be uploaded when you submit the project.`);
+    setImagesUploading(false);
+  };
+  
+
+  // 3. Source Files Upload (ZIP, RAR, etc.)
+  const handleSourceFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+  
+    const maxSize = 10 * 1024 * 1024; // 10 MB
+    const sourceFiles = Array.from(files).filter(file =>
+      (file.name.endsWith('.zip') ||
+        file.name.endsWith('.rar') ||
+        file.name.endsWith('.7z') ||
+        file.name.endsWith('.tar') ||
+        file.name.endsWith('.gz')) &&
+      file.size <= maxSize
+    );
+  
+    if (sourceFiles.length === 0) {
+      alert('Please upload valid source files (.zip, .rar, .7z, .tar, .gz) with a maximum size of 10 MB.');
+      return;
+    }
+  
+    setSourceFilesUploading(true);
+    setUploadedFiles(prev => [...prev, ...sourceFiles]);
+    alert(`${sourceFiles.length} source file(s) selected! They will be uploaded when you submit the project.`);
+    setSourceFilesUploading(false);
+  };
+  
+
+  // 4. Documentation Files Upload (PDF, MD, DOCX, etc.)
+  const handleDocFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const maxSize = 10 * 1024 * 1024; // 10 MB in bytes
+
+    const docFiles = Array.from(files).filter(file =>
+      (file.name.endsWith('.pdf') ||
+        file.name.endsWith('.md') ||
+        file.name.endsWith('.txt') ||
+        file.name.endsWith('.docx') ||
+        file.name.endsWith('.doc')) &&
+      file.size <= maxSize
+    );
+  
+    if (docFiles.length === 0) {
+      alert('Please upload valid documentation files (.pdf, .md, .txt, .docx, .doc) with a maximum size of 10 MB.');
+      return;
+    }
+
+    setDocFilesUploading(true);
+    setUploadedFiles(prev => [...prev, ...docFiles]);
+    alert(`${docFiles.length} documentation file(s) selected! They will be uploaded when you submit the project.`);
+    setDocFilesUploading(false);
+  };
+
+  // Remove uploaded image
+  const removeUploadedImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Remove file from uploadedFiles
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const validateField = (name: string, value: string) => {
     const newErrors = { ...errors };
@@ -245,7 +406,7 @@ const UploadProject = () => {
             'accept': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(projectData)
+          body: JSON.stringify(initialProjectData)
         });
 
         console.log('Project response status:', projectResponse.status);
@@ -291,7 +452,7 @@ const UploadProject = () => {
         setUploadedFiles([]);
         setPreviewImage('');
         setCurrentStep(1);
-        
+
       } catch (error) {
         console.error('Error submitting project:', error);
         alert('Failed to submit project. Please try again.');
@@ -310,12 +471,12 @@ const UploadProject = () => {
           </div>
         )}
         <div className="absolute top-4 left-4 flex gap-2">
-                     <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-             {categories.find(cat => cat.value === formData.category)?.label || 'Category'}
-           </span>
+          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+            {categories.find(cat => cat.value === formData.category)?.label || 'Category'}
+          </span>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${formData.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
-              formData.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
-                'bg-red-100 text-red-700'
+            formData.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
+              'bg-red-100 text-red-700'
             }`}>
             {formData.difficulty}
           </span>
@@ -385,8 +546,8 @@ const UploadProject = () => {
               {steps.map((step, index) => (
                 <React.Fragment key={step.id}>
                   <div className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${currentStep >= step.id
-                      ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg scale-105'
-                      : 'bg-white text-gray-600 shadow-md'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg scale-105'
+                    : 'bg-white text-gray-600 shadow-md'
                     }`}>
                     <step.icon className="w-5 h-5" />
                     <span className="font-semibold text-sm">{step.title}</span>
@@ -448,9 +609,9 @@ const UploadProject = () => {
                             className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                           >
                             <option value="">Select a category</option>
-                                                         {categories.map(category => (
-                               <option key={category.value} value={category.value}>{category.label}</option>
-                             ))}
+                            {categories.map(category => (
+                              <option key={category.value} value={category.value}>{category.label}</option>
+                            ))}
                           </select>
                         </div>
 
@@ -771,9 +932,10 @@ const UploadProject = () => {
                         )}
                       </div>
 
+                      {/* 2. Multiple Images Upload */}
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-3">
-                          Project Files & Images
+                          Project Screenshots (Multiple Images)
                         </label>
                         <div
                           className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 bg-gray-50'
@@ -809,6 +971,7 @@ const UploadProject = () => {
                             }}
                           />
                         </div>
+                      </div>
 
                         {/* Uploaded Files */}
                         {uploadedFiles.length > 0 && (
@@ -825,16 +988,105 @@ const UploadProject = () => {
                                     ({(file.size / 1024 / 1024).toFixed(2)} MB)
                                   </span>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => removeFile(index)}
-                                  className="p-1 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
                               </div>
-                            ))}
+                            )}
+                        </div>
+                      </div>
+
+                      {/* 4. Documentation Files Upload */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">
+                          Documentation Files (PDF, MD, DOCX, etc.)
+                        </label>
+                        <div className="space-y-4">
+                          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-green-400 transition-colors">
+                            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-red-600 mb-4">a maximum size of 10 MB.</p>
+                            <p className="text-gray-600 mb-4">Upload documentation files (.pdf, .md, .txt, .docx, .doc)</p>
+                            <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 cursor-pointer">
+                              {docFilesUploading ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                  Processing...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4" />
+                                  Choose Documentation
+                                </>
+                              )}
+                              <input
+                                type="file"
+                                multiple
+                                accept=".pdf,.md,.txt,.docx,.doc"
+                                onChange={handleDocFilesUpload}
+                                disabled={docFilesUploading}
+                                className="hidden"
+                              />
+                            </label>
                           </div>
+
+                          {/* Display Selected Documentation Files */}
+                          {uploadedFiles.filter(f =>
+                            f.name.endsWith('.pdf') || f.name.endsWith('.md') ||
+                            f.name.endsWith('.txt') || f.name.endsWith('.docx') || f.name.endsWith('.doc')
+                          ).length > 0 && (
+                              <div className="space-y-3">
+                                <h4 className="font-semibold text-gray-900">
+                                  Selected Documentation Files ({uploadedFiles.filter(f =>
+                                    f.name.endsWith('.pdf') || f.name.endsWith('.md') ||
+                                    f.name.endsWith('.txt') || f.name.endsWith('.docx') || f.name.endsWith('.doc')
+                                  ).length}):
+                                </h4>
+                                <div className="space-y-2">
+                                  {uploadedFiles
+                                    .map((file, index) => ({ file, index }))
+                                    .filter(({ file }) =>
+                                      file.name.endsWith('.pdf') || file.name.endsWith('.md') ||
+                                      file.name.endsWith('.txt') || file.name.endsWith('.docx') || file.name.endsWith('.doc')
+                                    )
+                                    .map(({ file, index }) => (
+                                      <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <FileText className="w-4 h-4 text-green-600" />
+                                          </div>
+                                          <span className="text-sm font-medium text-gray-900">{file.name}</span>
+                                          <span className="text-xs text-gray-500">
+                                            ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                          </span>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => removeFile(index)}
+                                          className="p-1 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                        >
+                                          <X className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            )}
+                        </div>
+                      </div>
+
+                      {/* YouTube URL */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">
+                          YouTube Demo Video URL (Optional)
+                        </label>
+                        <input
+                          type="url"
+                          name="youtubeUrl"
+                          value={formData.youtubeUrl}
+                          onChange={handleInputChange}
+                          placeholder="https://youtube.com/watch?v=..."
+                          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.youtubeUrl ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                            }`}
+                        />
+                        {errors.youtubeUrl && (
+                          <p className="text-red-600 text-sm mt-2">{errors.youtubeUrl}</p>
                         )}
                       </div>
                     </div>
