@@ -35,7 +35,7 @@ const UploadProject = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null); // this line added now 
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null); 
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploadedSourceFiles, setUploadedSourceFiles] = useState<string[]>([]);
   const [uploadedDocFiles, setUploadedDocFiles] = useState<string[]>([]);
