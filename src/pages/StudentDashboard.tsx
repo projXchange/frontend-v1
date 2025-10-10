@@ -5,10 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { motion } from 'framer-motion';
 import { ProfileForm, SocialLinks } from '../types/ProfileForm';
+import { ProjectCard } from '../components/ProjectCard';
 import { Review, Project } from '../types/Project';
 import { Transaction } from '../types/Transaction';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
-import ProjectDetailsModal from '../components/ProjectDetailsModal';
 import toast from 'react-hot-toast';
 
 
@@ -33,13 +33,6 @@ const StudentDashboard = () => {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [updatingReview, setUpdatingReview] = useState<string | null>(null);
   const [reviewFilterStatus, setReviewFilterStatus] = useState('all');
-
-  // Project details modal state
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [projectUpdateData, setProjectUpdateData] = useState<{ status: string; is_featured: boolean }>({ status: 'draft', is_featured: false });
-  const [projectEditData, setProjectEditData] = useState<Partial<Project>>({});
-  const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false);
 
   const [profileForm, setProfileForm] = useState<ProfileForm>({
     id: '',
@@ -121,7 +114,7 @@ const StudentDashboard = () => {
   const fetchMyProjects = async () => {
     setProjectsLoading(true);
     try {
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects?author_id=${user?.id}`, {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects/my', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -130,11 +123,7 @@ const StudentDashboard = () => {
       });
       if (!res.ok) throw new Error('Failed to fetch projects');
       const data = await res.json();
-      // Accept { data, pagination }, { projects }, or raw array
-      const projects = Array.isArray(data)
-        ? data
-        : (data.data || data.projects || []);
-      setMyProjects(projects);
+      setMyProjects(data.projects || []);
     } catch (err) {
       console.error(err);
       setMyProjects([]);
@@ -206,84 +195,6 @@ const StudentDashboard = () => {
     }
   };
 
-  const openProjectDetails = (project: Project) => {
-    setSelectedProject(project);
-    setProjectUpdateData({ status: project.status, is_featured: project.is_featured });
-    setProjectEditData({
-      id: project.id,
-      title: project.title,
-      description: project.description,
-      category: project.category,
-      tech_stack: project.tech_stack,
-      key_features: project.key_features,
-      pricing: project.pricing,
-    });
-    setIsProjectModalOpen(true);
-  };
-
-  const handleUpdateProject = async () => {
-    if (!selectedProject) return;
-    setUpdatingProjectStatus(true);
-    try {
-      const payload = {
-        ...projectEditData,
-        status: projectUpdateData.status,
-        is_featured: projectUpdateData.is_featured,
-      };
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${selectedProject.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error('Failed to update project');
-      const data = await res.json();
-      const updated = data.project || data;
-      setMyProjects(prev => prev.map(p => (p.id === updated.id ? { ...p, ...updated } : p)));
-      setIsProjectModalOpen(false);
-      setSelectedProject(null);
-      if (projectUpdateData.status === 'approved') {
-        handleSendForApproval(selectedProject);
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Failed to update project. Please try again.');
-    } finally {
-      setUpdatingProjectStatus(false);
-    }
-  };
-
-  const handleSendForApproval = async (project: Project) => {
-    try {
-      setUpdatingProjectStatus(true);
-      if(project.status == 'approved')
-      {
-        project.status = "pending"
-      }
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ status: 'pending' }),
-      });
-      if (!res.ok) throw new Error('Failed to send for approval');
-      const data = await res.json();
-      const updated = data.project || data;
-      setMyProjects(prev => prev.map(p => (p.id === updated.id ? { ...p, ...updated } : p)));
-      
-      toast.success('Project sent for approval.');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to send for approval.');
-    } finally {
-      setUpdatingProjectStatus(false);
-    }
-  };
-
   const handleSaveProfile = async () => {
     setIsLoading(true);
     setError('');
@@ -324,7 +235,7 @@ const StudentDashboard = () => {
       setAvatarFile(null);
       setAvatarPreview('');
       setIsEditingProfile(false);
-      toast.success('Profile updated successfully!');
+      alert('Profile updated successfully!');
     } catch (err: any) {
       setError(err.message || 'Failed to save profile');
     } finally {
@@ -392,7 +303,7 @@ const StudentDashboard = () => {
       setReviews(prev => prev.map(review =>
         review.id === reviewId ? { ...review, ...data.review } : review
       ));
-      toast.success('Review updated successfully!');
+      alert('Review updated successfully!');
       setIsReviewModalOpen(false);
     } catch (error) {
       console.error('Error updating review:', error);
@@ -686,62 +597,15 @@ const StudentDashboard = () => {
                     <p className="mt-4 text-gray-600">Loading projects...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                          <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Title</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Created</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                          {filteredProjects.map((project, index) => (
-                            <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                              <td className="px-6 py-4">
-                                <div className="font-semibold text-gray-900">{project.title}</div>
-                                <div className="text-sm text-gray-500 line-clamp-1">{project.description}</div>
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-700">{project.category}</td>
-                              <td className="px-6 py-4 text-sm text-gray-700 font-semibold">₹{project.pricing?.sale_price || 0}</td>
-                              <td className="px-6 py-4">
-                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'approved' ? 'bg-green-100 text-green-800' : project.status === 'pending_review' || project.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
-                                  {project.status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-600">{new Date(project.created_at).toLocaleDateString()}</td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => openProjectDetails(project)}
-                                    className="px-3 py-2 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 rounded-lg transition-colors text-sm font-semibold"
-                                  >
-                                    Update
-                                  </button>
-                                
-                                    <button
-                                      onClick={() => handleSendForApproval(project)}
-                                      disabled={updatingProjectStatus || project.status === 'pending' || project.status === 'approved'}
-                                      className="px-3 py-2 text-yellow-700 hover:text-yellow-900 hover:bg-yellow-50 rounded-lg transition-colors text-sm font-semibold disabled:opacity-50"
-                                    >
-                                      {updatingProjectStatus ? 'Sending...' : 'Send for Approval'}
-                                    </button>
-                                 </div>
-                              </td>
-                            </tr>
-                          ))}
-                          {filteredProjects.length === 0 && (
-                            <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">No projects found.</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProjects.map((project, index) => (
+                      <div key={project.id} style={{ animationDelay: `${index * 100}ms` }}>
+                        <ProjectCard project={project} index={0} />
+                      </div>
+                    ))}
+                    {filteredProjects.length === 0 && (
+                      <div className="col-span-full text-center text-gray-600">No projects found.</div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1395,26 +1259,6 @@ const StudentDashboard = () => {
           isAdmin={false}
           onUpdate={handleUpdateReview}
           isUpdating={updatingReview === selectedReview?.id}
-        />
-      )}
-
-      {/* Project Details Modal */}
-      {isProjectModalOpen && (
-        <ProjectDetailsModal
-          isOpen={isProjectModalOpen}
-          onClose={() => {
-            setIsProjectModalOpen(false);
-            setSelectedProject(null);
-          }}
-          project={selectedProject}
-          canEditAll={true}
-          projectEditData={projectEditData}
-          onEditDataChange={setProjectEditData}
-          projectUpdateData={projectUpdateData}
-          onUpdateDataChange={setProjectUpdateData}
-          onUpdate={handleUpdateProject}
-          onSendForApproval={() => selectedProject && handleSendForApproval(selectedProject)}
-          updatingProjectStatus={updatingProjectStatus}
         />
       )}
     </div>

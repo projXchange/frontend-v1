@@ -20,7 +20,7 @@ const ProjectListing = () => {
       setError('');
       try {
         console.log('Fetching projects data...');
-        const res = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=approved', {
+        const res = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
           method: 'GET',
         });
 
