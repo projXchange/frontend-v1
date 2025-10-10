@@ -35,6 +35,7 @@ const UploadProject = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null); // this line added now 
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploadedSourceFiles, setUploadedSourceFiles] = useState<string[]>([]);
   const [uploadedDocFiles, setUploadedDocFiles] = useState<string[]>([]);
@@ -104,17 +105,16 @@ const UploadProject = () => {
 
     setThumbnailUploading(true);
     try {
-      // Store temporarily, will upload with project ID later
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
 
-      // Store file for later upload
+      // Store the actual file for later upload
+      setThumbnailFile(file); // CHANGE THIS
       setFormData(prev => ({ ...prev, thumbnailUrl: 'TEMP_FILE' }));
 
-      // You can also store the file in state if needed
       alert('Thumbnail selected! It will be uploaded when you submit the project.');
     } catch (error) {
       alert('Failed to process thumbnail.');
@@ -127,33 +127,33 @@ const UploadProject = () => {
   const handleMultipleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-  
+
     const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
     if (imageFiles.length === 0) {
       alert('Please upload image files only');
       return;
     }
-  
+
     const alreadyUploadedImages = uploadedFiles.filter(f => f.type.startsWith('image/')).length;
     const remainingSlots = 3 - alreadyUploadedImages;
-  
+
     if (imageFiles.length > remainingSlots) {
       alert(`You can upload a maximum of 3 images. You already uploaded ${alreadyUploadedImages}, so you can select up to ${remainingSlots} more.`);
       return;
     }
-  
+
     setImagesUploading(true);
     setUploadedFiles(prev => [...prev, ...imageFiles]);
     alert(`${imageFiles.length} image(s) selected! They will be uploaded when you submit the project.`);
     setImagesUploading(false);
   };
-  
+
 
   // 3. Source Files Upload (ZIP, RAR, etc.)
   const handleSourceFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-  
+
     const maxSize = 10 * 1024 * 1024; // 10 MB
     const sourceFiles = Array.from(files).filter(file =>
       (file.name.endsWith('.zip') ||
@@ -163,18 +163,18 @@ const UploadProject = () => {
         file.name.endsWith('.gz')) &&
       file.size <= maxSize
     );
-  
+
     if (sourceFiles.length === 0) {
       alert('Please upload valid source files (.zip, .rar, .7z, .tar, .gz) with a maximum size of 10 MB.');
       return;
     }
-  
+
     setSourceFilesUploading(true);
     setUploadedFiles(prev => [...prev, ...sourceFiles]);
     alert(`${sourceFiles.length} source file(s) selected! They will be uploaded when you submit the project.`);
     setSourceFilesUploading(false);
   };
-  
+
 
   // 4. Documentation Files Upload (PDF, MD, DOCX, etc.)
   const handleDocFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +191,7 @@ const UploadProject = () => {
         file.name.endsWith('.doc')) &&
       file.size <= maxSize
     );
-  
+
     if (docFiles.length === 0) {
       alert('Please upload valid documentation files (.pdf, .md, .txt, .docx, .doc) with a maximum size of 10 MB.');
       return;
@@ -408,7 +408,7 @@ const UploadProject = () => {
         console.log('Project creation response:', projectResult);
 
         // Get the project ID from backend response
-        const backendProjectId =projectResult.project?.id || projectResult.id || projectResult._id || projectResult.project_id || projectResult.data?.id;
+        const backendProjectId = projectResult.project?.id || projectResult.id || projectResult._id || projectResult.project_id || projectResult.data?.id;
         if (!backendProjectId) {
           throw new Error('Project ID not found in response');
         }
@@ -424,8 +424,7 @@ const UploadProject = () => {
         let finalDocFileUrls: string[] = [];
 
         // 2.1 Upload Thumbnail
-        const thumbnailFile = uploadedFiles.find(file => file.type.startsWith('image/') && previewImage);
-        if (thumbnailFile || (formData.thumbnailUrl && formData.thumbnailUrl !== 'TEMP_FILE')) {
+          if (thumbnailFile || (formData.thumbnailUrl && formData.thumbnailUrl !== 'TEMP_FILE')) {
           try {
             console.log('Uploading thumbnail...');
             if (thumbnailFile) {
@@ -440,9 +439,7 @@ const UploadProject = () => {
         }
 
         // 2.2 Upload Multiple Images
-        const imageFiles = uploadedFiles.filter(file =>
-          file.type.startsWith('image/') && file !== thumbnailFile
-        );
+        const imageFiles = uploadedFiles.filter(file => file.type.startsWith('image/'));
 
         if (imageFiles.length > 0) {
           try {
@@ -567,6 +564,7 @@ const UploadProject = () => {
           rating1: ''
         });
         setUploadedFiles([]);
+        setThumbnailFile(null); 
         setUploadedImages([]);
         setUploadedSourceFiles([]);
         setUploadedDocFiles([]);
@@ -1038,9 +1036,8 @@ const UploadProject = () => {
                                 type="button"
                                 onClick={() => {
                                   setPreviewImage('');
+                                  setThumbnailFile(null); // CHANGE THIS
                                   setFormData(prev => ({ ...prev, thumbnailUrl: '' }));
-                                  // Remove thumbnail from uploadedFiles
-                                  setUploadedFiles(prev => prev.filter(f => !f.type.startsWith('image/') || f !== prev[0]));
                                 }}
                                 className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                               >
