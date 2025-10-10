@@ -336,9 +336,6 @@ const UploadProject = () => {
     }
   };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -352,8 +349,14 @@ const UploadProject = () => {
 
     if (Object.keys(errors).length === 0) {
       try {
-        // Build payload according to API schema (single POST)
-        const projectData = {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('Authentication token not found. Please login again.');
+        }
+
+        // Step 1: Create project first to get project ID
+        const initialProjectData = {
           title: formData.title,
           description: formData.description,
           key_features: formData.features.filter(f => f.trim()).join(', '),
@@ -368,37 +371,21 @@ const UploadProject = () => {
             currency: formData.currency || 'INR'
           },
           delivery_time: formData.deliveryTime ? parseInt(formData.deliveryTime, 10) : 0,
-          thumbnail: (formData.thumbnailUrl && formData.thumbnailUrl.trim()) ? formData.thumbnailUrl.trim() : (previewImage || ""),
-          images: uploadedFiles.filter(file => file.type.startsWith('image/')).map(file => file.name),
+          thumbnail: "", // Will update after upload
+          images: [], // Will update after upload
           files: {
-            source_files: uploadedFiles.filter(file => file.name.endsWith('.zip') || file.name.endsWith('.rar')).map(file => file.name),
-            documentation_files: uploadedFiles.filter(file => file.name.endsWith('.pdf') || file.name.endsWith('.md')).map(file => file.name)
+            source_files: [],
+            documentation_files: []
           },
           requirements: {
             system_requirements: formData.systemRequirements.filter(s => s.trim()),
             dependencies: formData.dependenciesArr.filter(d => d.trim()),
             installation_steps: formData.installationSteps.filter(s => s.trim())
           },
-          rating: {
-            average_rating: formData.averageRating ? parseFloat(formData.averageRating) : 0,
-            total_ratings: formData.totalRatings ? parseInt(formData.totalRatings, 10) : 0,
-            rating_distribution: {
-              "5": formData.rating5 ? parseInt(formData.rating5, 10) : 0,
-              "4": formData.rating4 ? parseInt(formData.rating4, 10) : 0,
-              "3": formData.rating3 ? parseInt(formData.rating3, 10) : 0,
-              "2": formData.rating2 ? parseInt(formData.rating2, 10) : 0,
-              "1": formData.rating1 ? parseInt(formData.rating1, 10) : 0
-            }
-          }
         };
 
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          throw new Error('Authentication token not found. Please login again.');
-        }
-        console.log('Sending project data:', projectData);
-        
+        console.log('Creating project...');
+
         const projectResponse = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
           method: 'POST',
           headers: {
@@ -410,7 +397,7 @@ const UploadProject = () => {
         });
 
         console.log('Project response status:', projectResponse.status);
-        
+
         if (!projectResponse.ok) {
           const errorData = await projectResponse.json();
           console.error('Project creation error:', errorData);
@@ -420,8 +407,138 @@ const UploadProject = () => {
         const projectResult = await projectResponse.json();
         console.log('Project creation response:', projectResult);
 
+        // Get the project ID from backend response
+        const backendProjectId =projectResult.project?.id || projectResult.id || projectResult._id || projectResult.project_id || projectResult.data?.id;
+        if (!backendProjectId) {
+          throw new Error('Project ID not found in response');
+        }
+
+        console.log('Project created with ID:', backendProjectId);
+
+        // Step 2: Upload all files to Cloudinary with project ID as folder
+        const projectFolder = `projects/${backendProjectId}`;
+
+        let finalThumbnailUrl = "";
+        let finalImageUrls: string[] = [];
+        let finalSourceFileUrls: string[] = [];
+        let finalDocFileUrls: string[] = [];
+
+        // 2.1 Upload Thumbnail
+        const thumbnailFile = uploadedFiles.find(file => file.type.startsWith('image/') && previewImage);
+        if (thumbnailFile || (formData.thumbnailUrl && formData.thumbnailUrl !== 'TEMP_FILE')) {
+          try {
+            console.log('Uploading thumbnail...');
+            if (thumbnailFile) {
+              finalThumbnailUrl = await uploadToCloudinary(thumbnailFile, `${projectFolder}/thumbnail`, 'image');
+            } else if (formData.thumbnailUrl && formData.thumbnailUrl !== 'TEMP_FILE') {
+              finalThumbnailUrl = formData.thumbnailUrl;
+            }
+            console.log('Thumbnail uploaded:', finalThumbnailUrl);
+          } catch (error) {
+            console.error('Thumbnail upload failed:', error);
+          }
+        }
+
+        // 2.2 Upload Multiple Images
+        const imageFiles = uploadedFiles.filter(file =>
+          file.type.startsWith('image/') && file !== thumbnailFile
+        );
+
+        if (imageFiles.length > 0) {
+          try {
+            console.log(`Uploading ${imageFiles.length} images...`);
+            const imageUploadPromises = imageFiles.map((file, index) =>
+              uploadToCloudinary(file, `${projectFolder}/images`, 'image')
+            );
+            finalImageUrls = await Promise.all(imageUploadPromises);
+            console.log(`${finalImageUrls.length} images uploaded`);
+          } catch (error) {
+            console.error('Images upload failed:', error);
+          }
+        }
+
+        // 2.3 Upload Source Files
+        const sourceFiles = uploadedFiles.filter(file =>
+          file.name.endsWith('.zip') ||
+          file.name.endsWith('.rar') ||
+          file.name.endsWith('.7z') ||
+          file.name.endsWith('.tar') ||
+          file.name.endsWith('.gz')
+        );
+
+        if (sourceFiles.length > 0) {
+          try {
+            console.log(`Uploading ${sourceFiles.length} source files...`);
+            const sourceUploadPromises = sourceFiles.map(file =>
+              uploadToCloudinary(file, `${projectFolder}/source`, 'raw')
+            );
+            finalSourceFileUrls = await Promise.all(sourceUploadPromises);
+            console.log(`${finalSourceFileUrls.length} source files uploaded`);
+          } catch (error) {
+            console.error('Source files upload failed:', error);
+          }
+        }
+
+        // 2.4 Upload Documentation Files
+        const docFiles = uploadedFiles.filter(file =>
+          file.name.endsWith('.pdf') ||
+          file.name.endsWith('.md') ||
+          file.name.endsWith('.txt') ||
+          file.name.endsWith('.docx') ||
+          file.name.endsWith('.doc')
+        );
+
+        if (docFiles.length > 0) {
+          try {
+            console.log(`Uploading ${docFiles.length} documentation files...`);
+            const docUploadPromises = docFiles.map(file =>
+              uploadToCloudinary(file, `${projectFolder}/docs`, 'raw')
+            );
+            finalDocFileUrls = await Promise.all(docUploadPromises);
+            console.log(`${finalDocFileUrls.length} documentation files uploaded`);
+          } catch (error) {
+            console.error('Documentation files upload failed:', error);
+          }
+        }
+
+        // Step 3: Update project with all Cloudinary URLs
+        console.log('Updating project with file URLs...');
+
+        const updateData = {
+          thumbnail: finalThumbnailUrl,
+          images: finalImageUrls,
+          files: {
+            source_files: finalSourceFileUrls,
+            documentation_files: finalDocFileUrls
+          }
+        };
+
+        try {
+          const updateResponse = await fetch(
+            `https://projxchange-backend-v1.vercel.app/projects/${backendProjectId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(updateData)
+            }
+          );
+
+          if (updateResponse.ok) {
+            console.log('Project updated with all files successfully');
+          } else {
+            const errorData = await updateResponse.json();
+            console.error('Failed to update project with files:', errorData);
+          }
+        } catch (updateError) {
+          console.error('Error updating project with files:', updateError);
+        }
+
         alert('Project submitted successfully! You will receive a notification once it\'s approved.');
-        
+
         // Reset form
         setFormData({
           title: '',
@@ -450,6 +567,9 @@ const UploadProject = () => {
           rating1: ''
         });
         setUploadedFiles([]);
+        setUploadedImages([]);
+        setUploadedSourceFiles([]);
+        setUploadedDocFiles([]);
         setPreviewImage('');
         setCurrentStep(1);
 
@@ -901,35 +1021,59 @@ const UploadProject = () => {
                     </h2>
 
                     <div className="space-y-8">
+                      {/* 1. Thumbnail Upload */}
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-3">
-                          Thumbnail URL
+                          Project Thumbnail * (Single Image)
                         </label>
-                        <input
-                          type="url"
-                          name="thumbnailUrl"
-                          value={formData.thumbnailUrl}
-                          onChange={handleInputChange}
-                          placeholder="https://.../image.png"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-3">
-                          YouTube Demo Video URL
-                        </label>
-                        <input
-                          type="url"
-                          name="youtubeUrl"
-                          value={formData.youtubeUrl}
-                          onChange={handleInputChange}
-                          placeholder="https://youtube.com/watch?v=..."
-                          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.youtubeUrl ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                            }`}
-                        />
-                        {errors.youtubeUrl && (
-                          <p className="text-red-600 text-sm mt-2">{errors.youtubeUrl}</p>
-                        )}
+                        <div className="space-y-4">
+                          {previewImage ? (
+                            <div className="relative">
+                              <img
+                                src={previewImage}
+                                alt="Thumbnail preview"
+                                className="w-full h-48 object-cover rounded-xl border-2 border-gray-200"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPreviewImage('');
+                                  setFormData(prev => ({ ...prev, thumbnailUrl: '' }));
+                                  // Remove thumbnail from uploadedFiles
+                                  setUploadedFiles(prev => prev.filter(f => !f.type.startsWith('image/') || f !== prev[0]));
+                                }}
+                                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
+                              <Image className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                              <p className="text-gray-600 mb-4">Upload a thumbnail for your project</p>
+                              <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 cursor-pointer">
+                                {thumbnailUploading ? (
+                                  <>
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    Processing...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="w-4 h-4" />
+                                    Choose Thumbnail
+                                  </>
+                                )}
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleThumbnailUpload}
+                                  disabled={thumbnailUploading}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* 2. Multiple Images Upload */}
@@ -937,56 +1081,141 @@ const UploadProject = () => {
                         <label className="block text-sm font-bold text-gray-700 mb-3">
                           Project Screenshots (Multiple Images)
                         </label>
-                        <div
-                          className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 bg-gray-50'
-                            }`}
-                          onDragEnter={handleDrag}
-                          onDragLeave={handleDrag}
-                          onDragOver={handleDrag}
-                          onDrop={handleDrop}
-                        >
-                          <Upload className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-                          <p className="text-xl font-bold text-gray-900 mb-3">
-                            Drop your files here, or click to browse
-                          </p>
-                          <p className="text-sm text-gray-600 mb-4">
-                            Upload project files, screenshots, or documentation
-                          </p>
-                          <button
-                            type="button"
-                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200"
-                          >
-                            Choose Files
-                          </button>
-                          <input
-                            type="file"
-                            multiple
-                            accept=".zip,.rar,.jpg,.jpeg,.png,.gif,.pdf"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files) {
-                                const files = Array.from(e.target.files);
-                                setUploadedFiles(prev => [...prev, ...files]);
-                              }
-                            }}
-                          />
+                        <div className="space-y-4">
+                          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
+                            <Image className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600 mb-4">Upload multiple screenshots of your project</p>
+                            <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 cursor-pointer">
+                              {imagesUploading ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                  Processing...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4" />
+                                  Choose Images
+                                </>
+                              )}
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleMultipleImagesUpload}
+                                disabled={imagesUploading}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          {/* Display Selected Images */}
+                          {uploadedFiles.filter(f => f.type.startsWith('image/')).length > 0 && (
+                            <div className="space-y-3">
+                              <h4 className="font-semibold text-gray-900">
+                                Selected Images ({uploadedFiles.filter(f => f.type.startsWith('image/')).length}):
+                              </h4>
+                              <div className="space-y-2">
+                                {uploadedFiles
+                                  .map((file, index) => ({ file, index }))
+                                  .filter(({ file }) => file.type.startsWith('image/'))
+                                  .map(({ file, index }) => (
+                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                          <Image className="w-4 h-4 text-blue-600" />
+                                        </div>
+                                        <span className="text-sm font-medium text-gray-900">{file.name}</span>
+                                        <span className="text-xs text-gray-500">
+                                          ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                        </span>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => removeFile(index)}
+                                        className="p-1 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                        {/* Uploaded Files */}
-                        {uploadedFiles.length > 0 && (
-                          <div className="mt-6 space-y-3">
-                            <h4 className="font-semibold text-gray-900">Uploaded Files:</h4>
-                            {uploadedFiles.map((file, index) => (
-                              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <FileText className="w-4 h-4 text-blue-600" />
-                                  </div>
-                                  <span className="text-sm font-medium text-gray-900">{file.name}</span>
-                                  <span className="text-xs text-gray-500">
-                                    ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                  </span>
+                      {/* 3. Source Files Upload */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">
+                          Source Files (ZIP, RAR, etc.)
+                        </label>
+                        <div className="space-y-4">
+                          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition-colors">
+                            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-red-600 mb-4">a maximum size of 10 MB.</p>
+                            <p className="text-gray-600 mb-4">Upload source code archives (.zip, .rar, .7z, .tar, .gz)</p>
+                            <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 cursor-pointer">
+                              {sourceFilesUploading ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                  Processing...
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4" />
+                                  Choose Source Files
+                                </>
+                              )}
+                              <input
+                                type="file"
+                                multiple
+                                accept=".zip,.rar,.7z,.tar,.gz"
+                                onChange={handleSourceFilesUpload}
+                                disabled={sourceFilesUploading}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          {/* Display Selected Source Files */}
+                          {uploadedFiles.filter(f =>
+                            f.name.endsWith('.zip') || f.name.endsWith('.rar') ||
+                            f.name.endsWith('.7z') || f.name.endsWith('.tar') || f.name.endsWith('.gz')
+                          ).length > 0 && (
+                              <div className="space-y-3">
+                                <h4 className="font-semibold text-gray-900">
+                                  Selected Source Files ({uploadedFiles.filter(f =>
+                                    f.name.endsWith('.zip') || f.name.endsWith('.rar') ||
+                                    f.name.endsWith('.7z') || f.name.endsWith('.tar') || f.name.endsWith('.gz')
+                                  ).length}):
+                                </h4>
+                                <div className="space-y-2">
+                                  {uploadedFiles
+                                    .map((file, index) => ({ file, index }))
+                                    .filter(({ file }) =>
+                                      file.name.endsWith('.zip') || file.name.endsWith('.rar') ||
+                                      file.name.endsWith('.7z') || file.name.endsWith('.tar') || file.name.endsWith('.gz')
+                                    )
+                                    .map(({ file, index }) => (
+                                      <div key={index} className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                            <FileText className="w-4 h-4 text-purple-600" />
+                                          </div>
+                                          <span className="text-sm font-medium text-gray-900">{file.name}</span>
+                                          <span className="text-xs text-gray-500">
+                                            ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                          </span>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => removeFile(index)}
+                                          className="p-1 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                        >
+                                          <X className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    ))}
                                 </div>
                               </div>
                             )}
@@ -1161,7 +1390,6 @@ const UploadProject = () => {
                           >
                             <option value="INR">INR</option>
                             <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
                           </select>
                         </div>
                         <div>
@@ -1221,61 +1449,6 @@ const UploadProject = () => {
                           <li>• Higher original prices can make your discount more attractive</li>
                           <li>• Start with lower prices to build reviews and reputation</li>
                         </ul>
-                      </div>
-
-                      {/* Optional Rating Inputs */}
-                      <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
-                        <h4 className="font-bold text-gray-900 mb-3">Rating (optional)</h4>
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Average Rating</label>
-                            <input
-                              type="number"
-                              step="0.1"
-                              min="0"
-                              max="5"
-                              name="averageRating"
-                              value={formData.averageRating}
-                              onChange={handleInputChange}
-                              placeholder="0"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Total Ratings</label>
-                            <input
-                              type="number"
-                              min="0"
-                              name="totalRatings"
-                              value={formData.totalRatings}
-                              onChange={handleInputChange}
-                              placeholder="0"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid md:grid-cols-5 gap-4 mt-4">
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">5★</label>
-                            <input type="number" min="0" name="rating5" value={formData.rating5} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">4★</label>
-                            <input type="number" min="0" name="rating4" value={formData.rating4} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">3★</label>
-                            <input type="number" min="0" name="rating3" value={formData.rating3} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">2★</label>
-                            <input type="number" min="0" name="rating2" value={formData.rating2} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">1★</label>
-                            <input type="number" min="0" name="rating1" value={formData.rating1} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus-border-transparent bg-white" />
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
