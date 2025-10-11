@@ -30,20 +30,19 @@ const CartPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <ShoppingCart className="w-8 h-8 text-white" />
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center shadow-md">
+              <ShoppingCart className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
               Shopping Cart
             </h1>
           </div>
-          <p className="text-gray-600 text-lg">
-            {cart.length === 0 
+          <p className="text-gray-600 text-sm sm:text-base">
+            {cart.length === 0
               ? "Your cart is empty. Start adding projects!"
-              : `You have ${cart.length} project${cart.length === 1 ? '' : 's'} in your cart`
-            }
+              : `You have ${cart.length} project${cart.length === 1 ? '' : 's'} in your cart.`}
           </p>
         </div>
 
@@ -76,7 +75,7 @@ const CartPage = () => {
                       {/* Image */}
                       <div className="flex-shrink-0">
                         <img
-                          src={`https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=200`}
+                          src={item.project.thumbnail}
                           alt={item.project.title}
                           className="w-32 h-24 object-cover rounded-xl"
                         />
@@ -92,7 +91,7 @@ const CartPage = () => {
                             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                               {item.project.description}
                             </p>
-                            
+
                             <div className="flex flex-wrap gap-2 mb-3">
                               {item.project.tech_stack?.slice(0, 3).map((tech: string, i: number) => (
                                 <span
@@ -116,10 +115,15 @@ const CartPage = () => {
                           {/* Price and Actions */}
                           <div className="flex flex-col items-end gap-3">
                             <div className="text-right">
-                              <div className="text-2xl font-bold text-gray-900">₹{item.project.pricing.sale_price}</div>
-                              {item.project.pricing.original_price > item.project.pricing.sale_price && (
-                                <div className="text-sm text-gray-500 line-through">₹{item.project.pricing.original_price}</div>
-                              )}
+                              <div className="text-2xl font-bold text-gray-900">₹{item.project.pricing?.sale_price}</div>
+                              {item.project?.pricing &&
+                                item.project.pricing.original_price > item.project.pricing.sale_price &&
+                                item.project.pricing.original_price !== 0 && (
+                                  <div className="text-sm text-gray-500 line-through">
+                                    ₹{item.project.pricing.original_price}
+                                  </div>
+                                )}
+
                             </div>
 
                             <div className="flex gap-2">
@@ -151,7 +155,7 @@ const CartPage = () => {
             <div className="lg:col-span-1">
               <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-gray-100 sticky top-8">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h3>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Items ({getCartCount()})</span>
@@ -182,7 +186,7 @@ const CartPage = () => {
                     Proceed to Checkout
                     <ArrowRight className="w-5 h-5" />
                   </button>
-                  
+
                   <button
                     onClick={clearCart}
                     className="w-full border border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:scale-105 transition-all duration-200"

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (project: Project) => Promise<void>;
+  addToCart: (project: Project) => Promise<boolean>;
   removeFromCart: (projectId: string) => Promise<void>;
   isInCart: (projectId: string) => boolean;
   clearCart: () => void;
@@ -27,9 +27,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loadCart();
     }
     if (!isAuthenticated) {
-      clearCart();
+      clearLocalStorageCart();
     }
-  }, [isAuthenticated, user]);
+  }, [user]);
 
   const loadCart = async () => {
     if (!user) return;
@@ -66,66 +66,56 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addToCart = async (project: Project) => {
+  const addToCart = async (project: Project): Promise<boolean> => {
     if (!isAuthenticated || !user) {
       toast.error('Please login to add items to cart');
-      return;
+      return false;
     }
 
     if (isInCart(project.id)) {
       toast.error('Project already in cart');
-      return;
+      return false;
     }
 
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const cartItem: Omit<CartItem, 'id'> = {
-        project_id: project.id,
-        user_id: user.id,
-        added_at: new Date().toISOString(),
-        project: project,
-      };
-
-      // Try to save to backend first
       const response = await fetch('https://projxchange-backend-v1.vercel.app/cart', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(cartItem),
+        body: JSON.stringify({ project_id: project.id, quantity: 1 }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const newItem: CartItem = { ...cartItem, id: data.id };
-        setCart(prev => [...prev, newItem]);
-        toast.success('Added to cart!');
-      } else {
-        // If backend fails, save to localStorage
-        const newItem: CartItem = { ...cartItem, id: Date.now().toString() };
-        setCart(prev => [...prev, newItem]);
-        localStorage.setItem(`cart_${user.id}`, JSON.stringify([...cart, newItem]));
-        toast.success('Added to cart! (saved locally)');
+      if (!response.ok) {
+        const errData = await response.json();
+        toast.error(errData.error || 'Failed to add to cart');
+        return false; // <-- important
       }
-    } catch (error) {
-      console.error('Failed to add to cart:', error);
-      // Fallback to localStorage
+
+      const data = await response.json();
       const newItem: CartItem = {
-        id: Date.now().toString(),
+        id: data.id,
         project_id: project.id,
         user_id: user.id,
         added_at: new Date().toISOString(),
-        project: project,
+        project
       };
       setCart(prev => [...prev, newItem]);
-      localStorage.setItem(`cart_${user.id}`, JSON.stringify([...cart, newItem]));
-      toast.success('Added to cart! (saved locally)');
+      toast.success('Added to cart');
+      return true;
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      toast.error('Something went wrong while adding to cart');
+      return false;
     } finally {
       setLoading(false);
     }
   };
+
+
 
   const removeFromCart = async (projectId: string) => {
     if (!isAuthenticated || !user) return;
@@ -170,15 +160,52 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cart.some(item => item.project_id === projectId);
   };
 
-  const clearCart = () => {
-    setCart([]);
-    if (user) {
-      localStorage.removeItem(`cart_${user.id}`);
+  const clearCart = async () => {
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch('https://projxchange-backend-v1.vercel.app/cart', {
+        method: 'DELETE',
+        headers: {
+          accept: 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to clear cart: ${errorText}`);
+      }
+
+      setCart([]);
+      localStorage.removeItem(`cart_${user?.id}`);
+      toast.success('Cart cleared successfully!');
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+
+      // Fallback: clear local cart anyway
+      setCart([]);
+      localStorage.removeItem(`cart_${user?.id}`);
+      toast.success('Cart cleared locally (server unavailable)');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const clearLocalStorageCart = async () => {
+    setCart([]);
+    localStorage.removeItem(`cart_${user?.id}`);
+  }
+
+
+
   const getCartTotal = (): number => {
-    return cart.reduce((total, item) => total + item.project.pricing.sale_price, 0);
+    return cart.reduce(
+      (total, item) => total + (item.project.pricing?.sale_price ?? 0),
+      0
+    );
   };
 
   const getCartCount = (): number => {

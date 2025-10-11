@@ -36,23 +36,21 @@ const WishlistPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <Heart className="w-8 h-8 text-white fill-current" />
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-red-500 rounded-xl flex items-center justify-center shadow-md">
+              <Heart className="w-6 h-6 text-white fill-current" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">
               My Wishlist
             </h1>
           </div>
-          <p className="text-gray-600 text-lg">
-            {wishlist.length === 0 
+          <p className="text-gray-600 text-sm sm:text-base">
+            {wishlist.length === 0
               ? "Your wishlist is empty. Start adding projects you love!"
-              : `You have ${wishlist.length} project${wishlist.length === 1 ? '' : 's'} in your wishlist`
-            }
+              : `You have ${wishlist.length} project${wishlist.length === 1 ? '' : 's'} in your wishlist.`}
           </p>
         </div>
-
         {wishlist.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -77,7 +75,7 @@ const WishlistPage = () => {
                 {/* Image */}
                 <div className="relative overflow-hidden">
                   <img
-                    src={`https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400`}
+                    src={item.project.thumbnail}
                     alt={item.project.title}
                     className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -123,8 +121,8 @@ const WishlistPage = () => {
                   </h3>
 
                   <p className="text-gray-600 text-sm mb-4">
-                    {item.project.description.length > 100 
-                      ? `${item.project.description.substring(0, 100)}...` 
+                    {item.project.description.length > 100
+                      ? `${item.project.description.substring(0, 100)}...`
                       : item.project.description}
                   </p>
 
@@ -138,24 +136,37 @@ const WishlistPage = () => {
                   </div>
 
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-gray-900">₹{item.project.pricing.sale_price}</span>
-                      {item.project.pricing.original_price > item.project.pricing.sale_price && (
-                        <span className="text-sm text-gray-500 line-through">₹{item.project.pricing.original_price}</span>
-                      )}
+                    {item.project?.pricing ? (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg font-bold text-gray-900">
+                          ₹{item.project.pricing.sale_price}
+                        </span>
+
+                        {item.project.pricing.original_price > item.project.pricing.sale_price &&
+                          item.project.pricing.original_price !== 0 && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{item.project.pricing.original_price}
+                            </span>
+                          )}
+                      </div>
+                    ) : (
+                      <div className="text-gray-500 text-sm">Price not available</div>
+                    )}
+
+                    <div className="text-sm text-gray-600">
+                      {item.project?.purchase_count || 0} sales
                     </div>
-                    <div className="text-sm text-gray-600">{item.project.purchase_count || 0} sales</div>
                   </div>
+
 
                   <div className="flex gap-3">
                     <button
                       onClick={() => handleAddToCart(item.project)}
                       disabled={isInCart(item.project.id)}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                        isInCart(item.project.id)
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white shadow hover:shadow-lg hover:scale-105'
-                      }`}
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all duration-200 ${isInCart(item.project.id)
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white shadow hover:shadow-lg hover:scale-105'
+                        }`}
                     >
                       <ShoppingCart className="w-4 h-4" />
                       {isInCart(item.project.id) ? 'In Cart' : 'Add to Cart'}
