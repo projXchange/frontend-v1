@@ -5,8 +5,6 @@ import { Project, Review } from "../types/Project";
 import { useWishlist } from "../contexts/WishlistContext";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
-import { useEffect, useState } from "react";
-
 
 interface ProjectCardProps {
   project: Project;

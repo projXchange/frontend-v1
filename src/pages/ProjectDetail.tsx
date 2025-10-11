@@ -533,7 +533,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Download className="w-4 sm:w-5 h-4 sm:h-5" />
-                  <span className="font-medium">{project?.stats?.total_downloads || project.download_count || 0}</span>
+                  <span className="font-medium">{project.download_count || 0}</span>
                 </div>
                 {/* Status badges */}
                 <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-5 flex flex-wrap gap-2 mt-1">
@@ -562,18 +562,18 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video */}
-              {project?.demo_url && (
+              {project?.youtube_url && (
                 <div
                   className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300"
                   style={{ animationDelay: '600ms' }}
                 >
                   <iframe
                     src={
-                      project.demo_url.includes("watch?v=")
-                        ? project.demo_url.replace("watch?v=", "embed/")
-                        : project.demo_url.includes("youtu.be")
-                          ? project.demo_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
-                          : project.demo_url
+                      project.youtube_url.includes("watch?v=")
+                        ? project.youtube_url.replace("watch?v=", "embed/")
+                        : project.youtube_url.includes("youtu.be")
+                          ? project.youtube_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
+                          : project.youtube_url
                     }
                     title="Project Demo"
                     className="w-full h-full"
@@ -664,14 +664,23 @@ const ProjectDetail = () => {
                 {activeTab === 'features' && (
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 animate-slideInUp">Key Features</h3>
-                    {project?.features && project.features.length > 0 ? (
+                    {project?.key_features && project.key_features.length > 0 ? (
                       <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                        {project.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp" style={{ animationDelay: `${100 + index * 80}ms` }}>
-                            <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full animate-pulse flex-shrink-0" />
-                            <span className="text-gray-800 font-medium text-sm sm:text-base">{feature}</span>
-                          </div>
-                        ))}
+                        {project.key_features &&
+                          project.key_features
+                            .split(',')
+                            .map((feature: string, index: number) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
+                                style={{ animationDelay: `${100 + index * 80}ms` }}
+                              >
+                                <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full animate-pulse flex-shrink-0" />
+                                <span className="text-gray-800 font-medium text-sm sm:text-base">
+                                  {feature.trim()}
+                                </span>
+                              </div>
+                            ))}
                       </div>
                     ) : (
                       <div className="text-center py-8">
@@ -743,12 +752,12 @@ const ProjectDetail = () => {
                           )}
 
                           {/* Documentation */}
-                          {project.documentation && (
+                          {project.files?.documentation_files && (
                             <div>
                               <h4 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">Documentation</h4>
                               <div className="bg-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 font-mono text-xs sm:text-sm shadow-2xl overflow-x-auto">
                                 <pre className="whitespace-pre-wrap text-green-400">
-                                  {project.documentation}
+                                  {project.files.documentation_files}
                                 </pre>
                               </div>
                             </div>
@@ -1194,10 +1203,6 @@ const ProjectDetail = () => {
                     Delivery Time
                   </span>
                   <span className="font-semibold text-gray-900">{project.delivery_time} days</span>
-                </div>
-                <div className="flex items-center justify-between text-xs sm:text-sm">
-                  <span className="text-gray-600">Files Size</span>
-                  <span className="font-semibold text-gray-900">{project?.files?.size_mb || 0} MB</span>
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Total Sales</span>

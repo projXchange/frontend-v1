@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Code, Database, Globe, Smartphone, Star, ArrowRight, Users, Award, TrendingUp, Clock, BookOpen, Brain, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -11,7 +11,16 @@ const Home = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<any[]>([]);
-  const { openAuthModal } = useAuth();
+  const { openAuthModal,user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleJoinClick = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      openAuthModal(false); // open signup/login modal
+    }
+  };
 
   // Fetch projects from API
   useEffect(() => {
@@ -381,7 +390,8 @@ const Home = () => {
             className="mt-16 sm:mt-20 text-center"
           >
             <button
-              onClick={() => openAuthModal(false)}
+
+              onClick={handleJoinClick}
               className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
             >
               🚀 Join Projxchange Now

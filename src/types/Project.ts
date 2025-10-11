@@ -10,7 +10,7 @@ export interface Project {
   tech_stack: string[];
   github_url?: string;
   demo_url?: string;
-  documentation?: string;
+  youtube_url?: string;
   pricing?: {
     sale_price: number;
     original_price: number;
@@ -19,14 +19,14 @@ export interface Project {
   delivery_time: number;
   status: string;
   is_featured: boolean;
-  view_count: number;
-  purchase_count: number;
-  download_count: number;
   created_at: string;
   updated_at: string;
   discount_percentage?: number;
-  // Consolidated dump fields
   thumbnail?: string;
+  view_count: number;
+  purchase_count: number;
+  download_count: number;
+  documentation?: string;
   images?: string[];
   demo_video?: string;
   features?: string[];
