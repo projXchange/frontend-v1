@@ -7,6 +7,7 @@ import { useCart } from '../contexts/CartContext';
 import { Project, Review } from '../types/Project';
 import type { Transaction } from '../types/Transaction';
 import toast from 'react-hot-toast';
+import { User } from '../types/User';
 
 interface UserStatus {
   has_purchased: boolean;
@@ -35,9 +36,9 @@ const ProjectDetail = () => {
   const [editReviewText, setEditReviewText] = useState('');
   const [editReviewRating, setEditReviewRating] = useState(0);
   const [updatingReview, setUpdatingReview] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-
-
+  const [actionLoading, setActionLoading] = useState<boolean>(false);
+  const [authorDetails, setAuthorDetails] = useState<User | null>(null);
+  const [relatedProjects, setRelatedProjects] = useState<Project[] | null>(null);
 
   // Fetch project data on component mount
   useEffect(() => {
@@ -72,6 +73,8 @@ const ProjectDetail = () => {
       const data = await res.json();
       setProject(data.project);
       setUserStatus(data.user_status);
+      setAuthorDetails(data.author_details || null);
+      setRelatedProjects(Array.isArray(data.related_projects) ? data.related_projects : []);
     } catch (err) {
       console.error('Error fetching project data:', err);
       setError('Could not load project details. Please try again later.');
@@ -376,26 +379,6 @@ const ProjectDetail = () => {
       setIsPurchasing(false);
     }
   };
-
-  const relatedProjects = [
-    {
-      id: 2,
-      title: 'React Task Manager',
-      price: 22,
-      originalPrice: 35,
-      rating: 4.6,
-      thumbnail: 'https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=300'
-    },
-    {
-      id: 3,
-      title: 'Social Media Dashboard',
-      price: 35,
-      originalPrice: 55,
-      rating: 4.7,
-      thumbnail: 'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=300'
-    }
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-4">
@@ -564,17 +547,17 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video */}
-              {project?.youtube_url && (
+              {project?.demo_url && (
                 <div
                   className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300"
                   style={{ animationDelay: '600ms' }}
                 >
                   <iframe
                     src={
-                      project.youtube_url.includes("watch?v=")
-                        ? project.youtube_url.replace("watch?v=", "embed/")
-                        : project.youtube_url.includes("youtu.be")
-                          ? project.youtube_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
+                      project.demo_url.includes("watch?v=")
+                        ? project.demo_url.replace("watch?v=", "embed/")
+                        : project.demo_url.includes("youtu.be")
+                          ? project.demo_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
                           : project.youtube_url
                     }
                     title="Project Demo"
@@ -1184,7 +1167,7 @@ const ProjectDetail = () => {
           {/* Sidebar */}
           <div className="space-y-6 lg:space-y-8 order-2 lg:order-2">
             {/* Purchase Card */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl lg:sticky lg:top-8 border border-white/30 animate-slideInRight">
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl  lg:top-8 border border-white/30 animate-slideInRight">
 
               {/* Pricing */}
               <div className="text-center mb-6 sm:mb-8">
@@ -1283,42 +1266,135 @@ const ProjectDetail = () => {
               </div>
             </div>
 
-
-            {/* Related Projects */}
+            {/* Author Details */}
             <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl border border-white/30 animate-slideInRight" style={{ animationDelay: '400ms' }}>
-              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Related Projects</h3>
-              <div className="space-y-4 sm:space-y-6">
-                {relatedProjects.map((relatedProject, idx) => (
-                  <Link
-                    key={relatedProject.id}
-                    to={`/project/${relatedProject.id}`}
-                    className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl hover:bg-blue-50 hover:scale-105 transition-all duration-300 group animate-slideInUp"
-                    style={{ animationDelay: `${idx * 100}ms` }}
-                  >
+              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">About the Author</h3>
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+                  {authorDetails?.avatar ? (
                     <img
-                      src={relatedProject.thumbnail}
-                      alt={relatedProject.title}
-                      className="w-16 sm:w-20 h-12 sm:h-16 object-cover rounded-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+                      src={authorDetails.avatar}
+                      alt={authorDetails.full_name || "Author"}
+                      className="w-full h-full object-cover"
                     />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-900 text-sm mb-2 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">{relatedProject.title}</h4>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                          <span className="text-xs text-gray-600 font-medium">{relatedProject.rating}</span>
-                        </div>
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <span className="font-bold text-gray-900 text-sm">${relatedProject.price}</span>
-                          <span className="text-xs text-gray-500 line-through">${relatedProject.originalPrice}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                  ) : (
+                    <span className="text-white font-bold text-2xl">
+                      {authorDetails?.full_name?.charAt(0)?.toUpperCase() || 'A'}
+                    </span>
+                  )}
+                </div>
+
+                <h4 className="text-lg font-bold text-gray-900 mb-2">{authorDetails?.full_name || 'Author'}</h4>
+                {authorDetails?.email && (
+                  <p className="text-sm text-gray-600 mb-4">{authorDetails.email}</p>
+                )}
               </div>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
+                  <span className="text-gray-600 flex items-center gap-2">
+                    <Award className="w-4 h-4" />
+                    Projects
+                  </span>
+                  <span className="font-semibold text-gray-900">
+                    {authorDetails?.total_purchases || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
+                  <span className="text-gray-600 flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    Rating
+                  </span>
+                  <span className="font-semibold text-gray-900">
+                    {authorDetails?.rating || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
+                  <span className="text-gray-600 flex items-center gap-2">
+                    <ShoppingCart className="w-4 h-4" />
+                    Total Sales
+                  </span>
+                  <span className="font-semibold text-gray-900">
+                    {authorDetails?.total_sales || 0}
+                  </span>
+                </div>
+              </div>
+
+              <Link
+                to={`/author/${project.author_id}`}
+                className="mt-6 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
+              >
+                View Profile
+              </Link>
             </div>
           </div>
         </div>
+        {/* Related Projects */}
+        <div
+  className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl border border-white/30 animate-slideInRight"
+  style={{ animationDelay: '400ms' }}
+>
+  <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900">
+    Related Projects
+  </h3>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+    {relatedProjects?.map((relatedProject, idx) => (
+      <Link
+        key={relatedProject.id}
+        to={`/project/${relatedProject.id}`}
+        className="group p-4 bg-gradient-to-br from-white to-blue-50 rounded-2xl border border-gray-100 shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-slideInUp flex flex-col"
+        style={{ animationDelay: `${idx * 100}ms` }}
+      >
+        <div className="relative mb-3 overflow-hidden rounded-xl">
+          <img
+            src={relatedProject.thumbnail}
+            alt={relatedProject.title}
+            className="w-full h-36 object-cover rounded-xl group-hover:scale-110 transition-transform duration-500"
+          />
+          <span className="absolute top-2 right-2 bg-white/90 text-blue-600 text-xs font-medium px-2 py-1 rounded-md shadow">
+            {relatedProject.category || 'General'}
+          </span>
+        </div>
+
+        <h4 className="font-semibold text-gray-900 text-sm sm:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+          {relatedProject.title}
+        </h4>
+
+        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+          {relatedProject.description || 'A creative and well-built project to explore.'}
+        </p>
+
+        <div className="flex items-center justify-between text-sm mt-auto">
+          <div className="flex items-center gap-1 text-gray-600">
+            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+            <span>{relatedProject.rating?.average_rating?.toFixed(1) || '0.0'}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-gray-900 text-sm">
+            ₹ {relatedProject.pricing?.sale_price || 0}
+            </span>
+            {relatedProject.pricing?.original_price && (
+              <span className="text-xs text-gray-500 line-through">
+                ₹ {relatedProject.pricing.original_price}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-3 text-center">
+          <span className="text-xs text-blue-600 font-medium group-hover:underline">
+            View Details →
+          </span>
+        </div>
+      </Link>
+    ))}
+  </div>
+</div>
+
       </div>
       {/* Animations */}
       <style>{`

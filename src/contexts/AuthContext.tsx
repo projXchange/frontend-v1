@@ -49,22 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, message: data.error || 'Login failed' };
       }
 
-      const loggedInUser: User = {
-        id: data.user.id,
-        email: data.user.email,
-        full_name: data.user.full_name,
-        user_type: data.user.user_type,
-        verification_status: data.user.verification_status,
-        created_at: data.user.created_at,
-        updated_at: data.user.updated_at,
-        email_verified: data.user.email_verified,
-        //if avatar is blank or null, use default avatar
-        //default avatar is https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80
-        avatar: data.user.avatar === '' || data.user.avatar === null
-          ? 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'
-          : data.user.avatar,
-      };
-
+      const loggedInUser = data.user;
+      console.log(loggedInUser)
       setUser(loggedInUser);
       localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
       localStorage.setItem('token', data.refreshToken);
@@ -102,54 +88,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, message: data.message || data.error || 'Signup failed' };
       }
 
-      const newUser: User = {
-        id: data.user.id,
-        email: data.user.email,
-        full_name: data.user.full_name,
-        user_type: data.user.user_type,
-        verification_status: data.user.verification_status,
-        created_at: data.user.created_at,
-        updated_at: data.user.updated_at,
-        email_verified: data.user.email_verified,
-        avatar: data.user.avatar === '' || data.user.avatar === null
-          ? 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'
-          : data.user.avatar,
-      };
-
+      const newUser = data.user;
       setUser(newUser);
       localStorage.setItem('studystack_user', JSON.stringify(newUser));
       localStorage.setItem('token', data.accessToken);
-
-      // Create default profile entry
-      await fetch('https://projxchange-backend-v1.vercel.app/users/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${data.accessToken}`
-        },
-        body: JSON.stringify({
-          id: data.user.id,
-          rating: 0,
-          total_sales: 0,
-          total_purchases: 0,
-          experience_level: "beginner",
-          avatar: "",
-          bio: "",
-          location: "",
-          website: "",
-          social_links: {
-            additionalProp1: "",
-            additionalProp2: "",
-            additionalProp3: ""
-          },
-          skills: [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          status: "active"
-        })
-      });
-
-
+      console.log("signup user response - ",newUser)
+      // // Create default profile entry
+      // await fetch('https://projxchange-backend-v1.vercel.app/users/profile', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${data.accessToken}`
+      //   },
+      //   body: JSON.stringify({
+      //     id: data.user.id,
+      //     rating: 0,
+      //     total_sales: 0,
+      //     total_purchases: 0,
+      //     experience_level: "beginner",
+      //     avatar: "",
+      //     bio: "",
+      //     location: "",
+      //     website: "",
+      //     social_links: {
+      //       additionalProp1: "",
+      //       additionalProp2: "",
+      //       additionalProp3: ""
+      //     },
+      //     skills: [],
+      //     created_at: new Date().toISOString(),
+      //     updated_at: new Date().toISOString(),
+      //     status: "active"
+      //   })
+      // });
       toast.success('User Created Successfully');
       return { success: true, user: newUser };
     } catch (error) {
