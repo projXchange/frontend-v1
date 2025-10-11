@@ -35,6 +35,7 @@ const ProjectDetail = () => {
   const [editReviewText, setEditReviewText] = useState('');
   const [editReviewRating, setEditReviewRating] = useState(0);
   const [updatingReview, setUpdatingReview] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
 
 
@@ -451,21 +452,36 @@ const ProjectDetail = () => {
 
   const handleToggleCart = async () => {
     if (!isAuthenticated || !project) {
-      alert('Please login to manage cart.');
+      toast.error('Please login to manage your cart');
       return;
     }
+    if (actionLoading) return;
+
+    setActionLoading(true);
     try {
       if (cartStatus) {
         await removeFromCart(project.id);
-        setUserStatus(prev => prev ? { ...prev, in_cart: false } : prev);
+        setUserStatus((prev) =>
+          prev ? { ...prev, in_cart: false } : prev
+        );
+        toast.success('Removed from cart');
       } else {
-        await addToCart(project);
-        setUserStatus(prev => prev ? { ...prev, in_cart: true } : prev);
+        const addedSuccessfully = await addToCart(project); // should return true/false
+        if (addedSuccessfully) {
+          setUserStatus((prev) =>
+            prev ? { ...prev, in_cart: true } : prev
+          );
+          toast.success('Added to cart');
+        }
       }
-    } catch (e) {
-      console.error('Cart toggle failed', e);
+    } catch (error: any) {
+      console.error('Cart toggle failed:', error);
+      toast.error(error?.message || 'Something went wrong while updating cart');
+    } finally {
+      setActionLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 py-4 sm:py-6 lg:py-8 animate-fadeIn">
@@ -534,18 +550,6 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-2">
                   <Download className="w-4 sm:w-5 h-4 sm:h-5" />
                   <span className="font-medium">{project.download_count || 0}</span>
-                </div>
-                {/* Status badges */}
-                <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-5 flex flex-wrap gap-2 mt-1">
-                  {isPurchased && (
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Purchased</span>
-                  )}
-                  {cartStatus && !isPurchased && (
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">In Cart</span>
-                  )}
-                  {wishlistStatus && (
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">In Wishlist</span>
-                  )}
                 </div>
                 {/* Status badges */}
                 <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-5 flex flex-wrap gap-2 mt-1">
@@ -1183,8 +1187,10 @@ const ProjectDetail = () => {
           <div className="space-y-6 lg:space-y-8 order-2 lg:order-2">
             {/* Purchase Card */}
             <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl lg:sticky lg:top-8 border border-white/30 animate-slideInRight">
+
+              {/* Pricing */}
               <div className="text-center mb-6 sm:mb-8">
-                <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 animate-slideInUp">
+                <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4 animate-slideInUp">
                   <div className="text-3xl sm:text-4xl font-bold text-gray-900">₹{project.pricing?.sale_price || 0}</div>
                   {project.pricing?.original_price && project.pricing.original_price > (project.pricing?.sale_price || 0) && (
                     <div className="text-xl sm:text-2xl text-gray-500 line-through">₹{project.pricing.original_price}</div>
@@ -1196,55 +1202,69 @@ const ProjectDetail = () => {
                   </div>
                 )}
               </div>
+
+              {/* Stats */}
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 animate-slideInUp" style={{ animationDelay: '200ms' }}>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
-                  <span className="text-gray-600 flex items-center">
-                    <Clock className="w-3 sm:w-4 h-3 sm:h-4 mr-2" />
-                    Delivery Time
+                  <span className="text-gray-600 flex items-center gap-1 sm:gap-2">
+                    <Clock className="w-3 sm:w-4 h-3 sm:h-4" /> Delivery Time
                   </span>
                   <span className="font-semibold text-gray-900">{project.delivery_time} days</span>
                 </div>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Total Sales</span>
-                  <span className="font-semibold text-gray-900">{project.purchase_count}</span>
+                  <span className="font-semibold text-gray-900">{project.purchase_count || 0}</span>
                 </div>
-                {/* <div className="flex items-center justify-between text-xs sm:text-sm">
-                  <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-semibold text-green-600">{project?.stats?.completion_rate || 0}%</span>
-                </div> */}
               </div>
 
+              {/* Buy / Wishlist / Cart Buttons */}
               {!isPurchased ? (
-                <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                  {/* Buy Now */}
                   <button
                     onClick={handlePurchase}
                     disabled={!isAuthenticated || isPurchasing}
-                    className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 shadow-lg hover:shadow-xl transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed" style={{ animationDelay: '300ms' }}
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ animationDelay: '300ms' }}
                   >
                     <ShoppingCart className="w-5 sm:w-6 h-5 sm:h-6" />
-                    {isAuthenticated ? (isPurchasing ? 'Processing...' : `Buy Now (₹${project.pricing?.sale_price || 0})`) : 'Login to Buy'}
+                    <span>{isAuthenticated ? (isPurchasing ? 'Processing...' : `Buy Now (₹${project.pricing?.sale_price || 0})`) : 'Login to Buy'}</span>
                   </button>
-                  <button onClick={handleToggleWishlist} className="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base" style={{ animationDelay: '350ms' }}>
-                    <Heart className="w-4 sm:w-5 h-4 sm:h-5 inline mr-2" />
-                    {wishlistStatus ? 'Remove from Wishlist' : 'Add to Wishlist'}
+
+                  {/* Wishlist */}
+                  <button
+                    onClick={handleToggleWishlist}
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 text-gray-800 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base"
+                    style={{ animationDelay: '350ms' }}
+                  >
+                    <Heart className="w-4 sm:w-5 h-4 sm:h-5" />
+                    <span>{wishlistStatus ? 'Remove from Wishlist' : 'Add to Wishlist'}</span>
                   </button>
-                  <button onClick={handleToggleCart} disabled={!isAuthenticated} className="w-full bg-gray-100 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base" style={{ animationDelay: '380ms' }}>
-                    <ShoppingCart className="w-4 sm:w-5 h-4 sm:h-5 inline mr-2" />
-                    {cartStatus ? 'Remove from Cart' : 'Add to Cart'}
+
+                  {/* Cart */}
+                  <button
+                    onClick={handleToggleCart}
+                    disabled={!isAuthenticated}
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 text-gray-800 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ animationDelay: '380ms' }}
+                  >
+                    <ShoppingCart className="w-4 sm:w-5 h-4 sm:h-5" />
+                    <span>{cartStatus ? 'Remove from Cart' : 'Add to Cart'}</span>
                   </button>
                 </div>
               ) : (
-                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                   <div className="text-center text-green-600 font-bold text-base sm:text-lg mb-3 sm:mb-4 bg-green-100 py-3 rounded-xl animate-slideInUp">
                     ✅ Project Purchased
                   </div>
-                  <button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl hover:scale-105 animate-slideInUp">
+                  <button className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 animate-slideInUp">
                     <Download className="w-5 sm:w-6 h-5 sm:h-6" />
                     Download Files
                   </button>
                 </div>
               )}
 
+              {/* Features */}
               <div className="space-y-2 sm:space-y-3 text-center text-xs sm:text-sm text-gray-600 animate-slideInUp" style={{ animationDelay: '400ms' }}>
                 <div className="flex items-center justify-center gap-2">
                   <CheckCircle className="w-3 sm:w-4 h-3 sm:h-4 text-green-500" />
@@ -1264,6 +1284,7 @@ const ProjectDetail = () => {
                 </div>
               </div>
             </div>
+
 
             {/* Related Projects */}
             <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl border border-white/30 animate-slideInRight" style={{ animationDelay: '400ms' }}>

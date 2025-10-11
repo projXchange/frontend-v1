@@ -13,11 +13,11 @@ interface ProjectCardProps {
 
 export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, isInCart, removeFromCart } = useCart();
   const { isAuthenticated, openAuthModal } = useAuth();
   // Calculate discount from consolidated project data
-  const discount = project.pricing?.original_price && project.pricing?.sale_price 
-    ? project.pricing.original_price > project.pricing.sale_price 
+  const discount = project.pricing?.original_price && project.pricing?.sale_price
+    ? project.pricing.original_price > project.pricing.sale_price
     : false;
   const discountPercent = discount && project.pricing?.original_price && project.pricing?.sale_price
     ? Math.round((1 - project.pricing.sale_price / project.pricing.original_price) * 100)
@@ -85,8 +85,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className={`absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 transition z-20 shadow ${isInWishlist(project.id)
-                ? 'hover:bg-red-100 text-red-500'
-                : 'hover:bg-pink-100 text-pink-500'
+              ? 'hover:bg-red-100 text-red-500'
+              : 'hover:bg-pink-100 text-pink-500'
               }`}
             title={isInWishlist(project.id) ? "Remove from wishlist" : "Add to wishlist"}
             type="button"
@@ -120,21 +120,25 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
                 ? 'hover:bg-green-100 text-green-500'
                 : 'hover:bg-blue-100 text-blue-500'
               }`}
-            title={isInCart(project.id) ? "Already in cart" : "Add to cart"}
+            title={isInCart(project.id) ? "Remove from cart" : "Add to cart"}
             type="button"
             onClick={(e) => {
               e.preventDefault();
               if (!isAuthenticated) {
-                openAuthModal(true)
+                openAuthModal(true);
                 return;
               }
-              if (!isInCart(project.id)) {
-                addToCart(project);
+
+              if (isInCart(project.id)) {
+                removeFromCart(project.id); 
+              } else {
+                addToCart(project); 
               }
             }}
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className={`w-5 h-5 ${isInCart(project.id) ? 'fill-current' : ''}`} />
           </motion.button>
+
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
