@@ -479,7 +479,7 @@ const StudentDashboard = () => {
             <div className="flex items-center gap-6 animate-slideInLeft">
               <div className="relative">
                 <img
-                  src={user?.avatar}
+                  src={user?.avatar || 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'}
                   alt={user.full_name}
                   className="w-20 h-20 rounded-full object-cover ring-4 ring-white/30"
                 />

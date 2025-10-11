@@ -69,17 +69,6 @@ const Navbar = () => {
                     <Upload className="w-5 h-5" />
                     <span>Sell</span>
                   </Link>
-
-                  <div className="relative group">
-                    <button className="relative p-2 hover:bg-blue-50 rounded-full transition">
-                      <Bell className="w-5 h-5 text-gray-600 group-hover:text-blue-600" />
-                      <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
-                    </button>
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
-                      Notifications
-                    </span>
-                  </div>
-
                   <Link
                     to="/wishlist"
                     className="relative p-2 hover:bg-blue-50 rounded-full transition group"
@@ -111,7 +100,7 @@ const Navbar = () => {
                       className="flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition"
                     >
                       <img
-                        src={user?.avatar}
+                        src={user?.avatar || 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'}
                         alt={user?.full_name}
                         className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-100"
                       />
@@ -123,7 +112,7 @@ const Navbar = () => {
                         <div className="px-6 py-4 border-b border-gray-100">
                           <div className="flex items-center space-x-3">
                             <img
-                              src={user?.avatar}
+                              src={user?.avatar || 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80'}
                               alt={user?.full_name}
                               className="w-10 h-10 rounded-full object-cover"
                             />
