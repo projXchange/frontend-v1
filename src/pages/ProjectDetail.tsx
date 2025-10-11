@@ -521,7 +521,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 sm:w-5 h-4 sm:h-5" />
-                  <span className="font-medium">{project?.stats?.total_views || project.view_count || 0}</span>
+                  <span className="font-medium">{project.view_count || 0}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -646,11 +646,11 @@ const ProjectDetail = () => {
                         </span>
                       ))}
                     </div>
-                    {project?.tags && project.tags.length > 0 && (
+                    {project?.tech_stack && project.tech_stack.length > 0 && (
                       <>
                         <h4 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 mt-6 sm:mt-8 animate-slideInUp" style={{ animationDelay: '400ms' }}>Tags</h4>
                         <div className="flex flex-wrap gap-2 sm:gap-3">
-                          {project.tags.map((tag, index) => (
+                          {project.tech_stack.map((tag, index) => (
                             <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs sm:text-sm animate-slideInUp" style={{ animationDelay: `${500 + index * 50}ms` }}>
                               #{tag}
                             </span>
@@ -1208,10 +1208,10 @@ const ProjectDetail = () => {
                   <span className="text-gray-600">Total Sales</span>
                   <span className="font-semibold text-gray-900">{project.purchase_count}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs sm:text-sm">
+                {/* <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Completion Rate</span>
                   <span className="font-semibold text-green-600">{project?.stats?.completion_rate || 0}%</span>
-                </div>
+                </div> */}
               </div>
 
               {!isPurchased ? (

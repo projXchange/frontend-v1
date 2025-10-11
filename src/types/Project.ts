@@ -23,36 +23,24 @@ export interface Project {
   updated_at: string;
   discount_percentage?: number;
   thumbnail?: string;
-  view_count: number;
-  purchase_count: number;
-  download_count: number;
-  documentation?: string;
   images?: string[];
-  demo_video?: string;
-  features?: string[];
-  tags?: string[];
   files?: {
     source_files?: string[];
     documentation_files?: string[];
-    assets?: string[];
-    size_mb?: number;
   };
   requirements?: {
     system_requirements?: string[];
     dependencies?: string[];
     installation_steps?: string[];
   };
-  stats?: {
-    total_downloads?: number;
-    total_views?: number;
-    total_likes?: number;
-    completion_rate?: number;
-  };
   rating?: {
     average_rating?: number;
     total_ratings?: number;
     rating_distribution?: { [key: string]: number };
   };
+  view_count: number;
+  purchase_count: number;
+  download_count: number;
 }
 
 
