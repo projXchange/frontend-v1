@@ -464,14 +464,12 @@ const ProjectDetail = () => {
         setUserStatus((prev) =>
           prev ? { ...prev, in_cart: false } : prev
         );
-        toast.success('Removed from cart');
       } else {
         const addedSuccessfully = await addToCart(project); // should return true/false
         if (addedSuccessfully) {
           setUserStatus((prev) =>
             prev ? { ...prev, in_cart: true } : prev
           );
-          toast.success('Added to cart');
         }
       }
     } catch (error: any) {
