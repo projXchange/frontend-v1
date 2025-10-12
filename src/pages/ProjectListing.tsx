@@ -7,43 +7,72 @@ const ProjectListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
-  const [priceRange, setPriceRange] = useState([0, 1000]); // Increased max price range
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange); // Debounced price
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProjects, setTotalProjects] = useState(0);
 
-  // Fetch projects from API
+  // Debounce price range input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedPriceRange(priceRange);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(handler);
+  }, [priceRange]);
+
+  // Fetch projects whenever filters change
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
       setError('');
       try {
-        console.log('Fetching projects data...');
-        const res = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=approved', {
-          method: 'GET',
-        });
+        const params = new URLSearchParams();
 
-        if (!res.ok) {
-          console.error('Projects API response not ok:', res.status, res.statusText);
-          throw new Error(`Failed to fetch projects: ${res.status}`);
-        }
+        if (selectedCategory !== 'all') params.append('category', selectedCategory);
+        if (selectedTags.length > 0) params.append('tech_stack', selectedTags.join(','));
+        if (debouncedPriceRange[0] > 0) params.append('min_price', debouncedPriceRange[0].toString());
+        if (debouncedPriceRange[1] < 1000) params.append('max_price', debouncedPriceRange[1].toString());
+        params.append('currency', 'INR');
+        if (searchTerm) params.append('search', searchTerm);
+        params.append('status', 'approved');
 
+        const sortMap: { [key: string]: { sort_by: string; sort_order: string } } = {
+          'newest': { sort_by: 'created_at', sort_order: 'desc' },
+          'oldest': { sort_by: 'created_at', sort_order: 'asc' },
+          'price-low': { sort_by: 'sale_price', sort_order: 'asc' },
+          'price-high': { sort_by: 'sale_price', sort_order: 'desc' },
+          'popular': { sort_by: 'purchase_count', sort_order: 'desc' },
+          'trending': { sort_by: 'is_featured', sort_order: 'desc' }
+        };
+
+        const sortConfig = sortMap[sortBy] || sortMap['newest'];
+        params.append('sort_by', sortConfig.sort_by);
+        params.append('sort_order', sortConfig.sort_order);
+        params.append('page', currentPage.toString());
+        params.append('limit', '12');
+
+        const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects?${params.toString()}`);
+        if (!res.ok) throw new Error(`Failed to fetch projects: ${res.status}`);
         const data = await res.json();
-        console.log('Projects API response:', data);
 
-        // Handle both possible response structures
-        const projectsData = data.data || data;
-
-        if (Array.isArray(projectsData)) {
-          setProjects(projectsData);
-          console.log('Projects loaded:', projectsData.length);
+        if (data.data && Array.isArray(data.data)) {
+          setProjects(prev => currentPage === 1 ? data.data : [...prev, ...data.data]);
+          setTotalPages(data.pagination?.total_pages || 1);
+          setTotalProjects(data.pagination?.total || data.data.length);
+        } else if (Array.isArray(data)) {
+          setProjects(prev => currentPage === 1 ? data : [...prev, ...data]);
+          setTotalProjects(data.length);
         } else {
-          console.error('Unexpected data structure:', data);
           setProjects([]);
         }
       } catch (err) {
-        console.error('Error fetching projects:', err);
+        console.error(err);
         setError('Could not load projects. Please try again later.');
       } finally {
         setLoading(false);
@@ -51,103 +80,57 @@ const ProjectListing = () => {
     };
 
     fetchProjects();
-  }, []);
+  }, [searchTerm, selectedCategory, sortBy, debouncedPriceRange, selectedTags, currentPage]);
 
-  // Updated categories to match backend categories
+  // Categories
   const categories = [
-    'all',
-    'web_development',
-    'mobile_development',
-    'desktop_application',
-    'data_science',
-    'machine_learning',
-    'api_backend',
-    'other'
+    'all','web_development','mobile_development','desktop_application',
+    'data_science','machine_learning','api_backend','other'
   ];
-
-  // Map category display names
   const getCategoryDisplayName = (category: string) => {
-    const categoryMap = {
-      'all': 'All Categories',
-      'web_development': 'Web Development',
-      'mobile_development': 'Mobile Development',
-      'desktop_application': 'Desktop Application',
-      'data_science': 'Data Science',
-      'machine_learning': 'Machine Learning',
-      'api_backend': 'API & Backend',
-      'other': 'Other'
+    const map: { [key: string]: string } = {
+      'all':'All Categories',
+      'web_development':'Web Development',
+      'mobile_development':'Mobile Development',
+      'desktop_application':'Desktop Application',
+      'data_science':'Data Science',
+      'machine_learning':'Machine Learning',
+      'api_backend':'API & Backend',
+      'other':'Other'
     };
-    return categoryMap[category as keyof typeof categoryMap] || category;
+    return map[category] || category;
   };
 
-  const allTags = ['React', 'Node.js', 'MongoDB', 'Stripe', 'Java', 'Spring Boot', 'MySQL', 'Python', 'Django', 'PostgreSQL', 'Chart.js', 'Firebase', 'Material-UI', 'PHP', 'Laravel', 'Bootstrap', 'React Native', 'Swing'];
+  const allTags = ['React','Node.js','MongoDB','Stripe','Java','Spring Boot','MySQL','Python','Django','PostgreSQL','Chart.js','Firebase','Material-UI','PHP','Laravel','Bootstrap','React Native','Swing'];
 
   const filteredProjects = useMemo(() => {
-    console.log('Filtering projects:', projects.length, 'total projects');
-
-    let filtered = projects.filter(project => {
-      // Search filter
+    return projects.filter(project => {
       const matchesSearch = !searchTerm ||
         project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.tech_stack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase())) ||
         project.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Category filter
       const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
-
-      // Price filter - make sure to handle sale_price correctly
-      const matchesPrice = project.pricing?.sale_price ? project.pricing.sale_price >= priceRange[0] && project.pricing.sale_price <= priceRange[1] : true;
-
-      // Tags filter
+      const matchesPrice = project.pricing?.sale_price 
+        ? project.pricing.sale_price >= debouncedPriceRange[0] && project.pricing.sale_price <= debouncedPriceRange[1] 
+        : true;
       const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => project.tech_stack.includes(tag));
 
-      console.log('Project filter check:', {
-        title: project.title,
-        matchesSearch,
-        matchesCategory,
-        matchesPrice,
-        matchesTags,
-        category: project.category,
-        selectedCategory,
-          price: project.pricing?.sale_price || 0,
-        priceRange
-      });
-
       return matchesSearch && matchesCategory && matchesPrice && matchesTags;
-    });
-
-    console.log('Filtered projects:', filtered.length);
-
-    // Sort projects
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case 'oldest':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        case 'price-low':
-          return (a.pricing?.sale_price || 0) - (b.pricing?.sale_price || 0);
-        case 'price-high':
-          return (b.pricing?.sale_price || 0) - (a.pricing?.sale_price || 0);
-        case 'popular':
-          return b.purchase_count - a.purchase_count;
-        case 'trending':
-          return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
-        default:
-          return 0;
+    }).sort((a, b) => {
+      switch(sortBy) {
+        case 'newest': return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest': return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'price-low': return (a.pricing?.sale_price||0) - (b.pricing?.sale_price||0);
+        case 'price-high': return (b.pricing?.sale_price||0) - (a.pricing?.sale_price||0);
+        case 'popular': return b.purchase_count - a.purchase_count;
+        case 'trending': return (b.is_featured?1:0) - (a.is_featured?1:0);
+        default: return 0;
       }
     });
+  }, [projects, searchTerm, selectedCategory, debouncedPriceRange, selectedTags, sortBy]);
 
-    return filtered;
-  }, [projects, searchTerm, selectedCategory, priceRange, selectedTags, sortBy]);
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
-  };
+  const toggleTag = (tag: string) => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t!==tag) : [...prev, tag]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -166,7 +149,6 @@ const ProjectListing = () => {
             </p>
           </div>
 
-          {/* Search Bar */}
           <div className="max-w-2xl mx-auto animate-slideInUp" style={{ animationDelay: '200ms' }}>
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
@@ -179,9 +161,8 @@ const ProjectListing = () => {
               />
             </div>
           </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
+           {/* Quick Stats */}
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
             <div className="text-center">
               <div className="text-3xl font-bold text-white mb-2">{projects.length}+</div>
               <div className="text-blue-200 font-medium">Projects</div>
@@ -203,8 +184,6 @@ const ProjectListing = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-
         {/* Filters */}
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl mb-12 border border-white/30 animate-slideInUp">
           <div className="grid md:grid-cols-4 gap-6">
@@ -249,55 +228,30 @@ const ProjectListing = () => {
 
             {/* Price Range */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
-              </label>
-              <div className="flex items-center space-x-3">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Price Range (INR)</label>
+              <div className="flex items-center gap-3">
                 <input
-                  type="range"
-                  min="0"
-                  max="1000"
+                  type="text"
+                  min={0} max={1000}
                   value={priceRange[0]}
-                  onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  onChange={e => setPriceRange([parseInt(e.target.value)||0, priceRange[1]])}
+                  placeholder="Min ₹"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                <span className="text-gray-500">to</span>
                 <input
-                  type="range"
-                  min="0"
-                  max="1000"
+                  type="text"
+                  min={0} max={1000}
                   value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  onChange={e => setPriceRange([priceRange[0], parseInt(e.target.value)||1000])}
+                  placeholder="Max ₹"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
-            {/* View Mode
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">View</label>
-              <div className="flex bg-gray-100 rounded-xl p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium transition-all duration-300 ${viewMode === 'grid'
-                      ? 'bg-white text-blue-600 shadow-md scale-105'
-                      : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                >
-                  <Grid className="w-4 h-4" />
-                  Grid
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium transition-all duration-300 ${viewMode === 'list'
-                      ? 'bg-white text-blue-600 shadow-md scale-105'
-                      : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                >
-                  <List className="w-4 h-4" />
-                  List
-                </button>
-              </div>
-            </div> */}
+            {/* Placeholder for View Mode */}
+            <div></div>
           </div>
 
           {/* Technology Tags */}
@@ -309,8 +263,8 @@ const ProjectListing = () => {
                   key={tag}
                   onClick={() => toggleTag(tag)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:scale-105 ${selectedTags.includes(tag)
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                     }`}
                 >
                   {tag}
@@ -382,65 +336,25 @@ const ProjectListing = () => {
         ) : (
           <div className="text-center py-16 animate-slideInUp">
             <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-12 h-12 text-blue-600" />
+              <Zap className="w-12 h-12 text-blue-600" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-4">No Projects Found</h3>
-            <p className="text-gray-600 text-lg mb-6">
-              We couldn't find any projects matching your criteria. Try adjusting your filters or search terms.
-            </p>
-            <button
-              onClick={() => {
-                setSelectedTags([]);
-                setSelectedCategory('all');
-                setSearchTerm('');
-                setPriceRange([0, 1000]);
-              }}
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              Clear All Filters
-            </button>
+            <p className="text-gray-600 text-lg">Try changing filters or search keywords to find projects.</p>
           </div>
         )}
 
         {/* Load More Button */}
-        {filteredProjects.length > 0 && filteredProjects.length >= 6 && (
-          <div className="text-center mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
-            <button className="px-8 py-4 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-800 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-3 mx-auto">
-              <Zap className="w-5 h-5" />
+        {currentPage < totalPages && (
+          <div className="mt-12 text-center">
+            <button
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
               Load More Projects
             </button>
           </div>
         )}
       </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes slideInUp {
-          0% { opacity: 0; transform: translateY(40px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slideInUp { animation: slideInUp 0.8s cubic-bezier(.4,0,.2,1) both; }
-        
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #3b82f6, #06b6d4);
-          cursor: pointer;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .slider::-moz-range-thumb {
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #3b82f6, #06b6d4);
-          cursor: pointer;
-          border: none;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-      `}</style>
     </div>
   );
 };
