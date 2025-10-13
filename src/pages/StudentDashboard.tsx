@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Star, Calendar, Settings, ShoppingBag, Heart, Eye, Award, TrendingUp, Clock, BarChart3, Trophy, Activity, Search, Loader, Save, Edit3, Github, Globe, Linkedin, MapPin, Twitter, X, MessageSquare, Trash2 } from 'lucide-react';
+import { Download, Star, Calendar, Settings, ShoppingBag, Heart, Eye, Award, TrendingUp, Clock, BarChart3, Trophy, Activity, Search, Loader, Save, Edit3, Github, Globe, Linkedin, MapPin, Twitter, X, MessageSquare, Trash2, User, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { motion } from 'framer-motion';
@@ -40,6 +40,7 @@ const StudentDashboard = () => {
   const [projectUpdateData, setProjectUpdateData] = useState<{ status: string; is_featured: boolean }>({ status: 'draft', is_featured: false });
   const [projectEditData, setProjectEditData] = useState<Partial<Project>>({});
   const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false);
+  const [updatingProjectId, setUpdatingProjectId] = useState<string | null>(null);
 
   const [profileForm, setProfileForm] = useState<ProfileForm>({
     id: '',
@@ -58,6 +59,9 @@ const StudentDashboard = () => {
   });
 
   const { wishlist } = useWishlist();
+
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   const recentActivity = [
     { id: 1, action: 'Downloaded', project: 'E-commerce Web Application', time: '2 hours ago', type: 'download' },
@@ -164,6 +168,27 @@ const StudentDashboard = () => {
     }
   };
 
+  const fetchDashboardStats = async () => {
+    setStatsLoading(true);
+    try {
+      const res = await fetch('https://projxchange-backend-v1.vercel.app/dashboard/stats', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+      const data = await res.json();
+      setDashboardStats(data.stats || null);
+    } catch (err) {
+      console.error(err);
+      setDashboardStats(null);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
 
 
   const fetchUserProfile = async () => {
@@ -257,11 +282,7 @@ const StudentDashboard = () => {
 
   const handleSendForApproval = async (project: Project) => {
     try {
-      setUpdatingProjectStatus(true);
-      if(project.status == 'approved')
-      {
-        project.status = "pending"
-      }
+      setUpdatingProjectId(project.id);
       const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}`, {
         method: 'PATCH',
         headers: {
@@ -274,13 +295,13 @@ const StudentDashboard = () => {
       const data = await res.json();
       const updated = data.project || data;
       setMyProjects(prev => prev.map(p => (p.id === updated.id ? { ...p, ...updated } : p)));
-      
+
       toast.success('Project sent for approval.');
     } catch (err) {
       console.error(err);
       alert('Failed to send for approval.');
     } finally {
-      setUpdatingProjectStatus(false);
+      setUpdatingProjectId(null);
     }
   };
 
@@ -435,7 +456,7 @@ const StudentDashboard = () => {
 
   const filteredReviews = reviews.filter(review => {
     const matchesSearch = review.review_text.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = reviewFilterStatus === 'all' || 
+    const matchesFilter = reviewFilterStatus === 'all' ||
       (reviewFilterStatus === 'approved' && review.is_approved) ||
       (reviewFilterStatus === 'pending' && !review.is_approved);
     return matchesSearch && matchesFilter;
@@ -447,7 +468,9 @@ const StudentDashboard = () => {
   // }, []);
 
   useEffect(() => {
-    // Fetch data when switching tabs
+    if (activeTab === 'overview' && !dashboardStats && !statsLoading) {
+      fetchDashboardStats();
+    }
     if (activeTab === 'projects' && myProjects.length === 0 && !projectsLoading) {
       fetchMyProjects();
     }
@@ -507,31 +530,29 @@ const StudentDashboard = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 -mt-16 relative z-10">
           <StatCard
             title="Projects Owned"
-            value={profileForm.total_purchases}
-            //subtitle="+2 this month"
+            value={dashboardStats?.user_performance?.projects_owned || 0}
+            subtitle={`${dashboardStats?.monthly_activity?.new_projects_created || 0} new this month`}
             icon={ShoppingBag}
             color="text-blue-600"
-          //trend="+40% growth"
           />
           <StatCard
-            title="Total Purchase"
-            value={`${profileForm.total_sales}`}
-            // subtitle="Saved $67"
+            title="Total Purchases"
+            value={dashboardStats?.user_performance?.total_purchases || 0}
+            subtitle={`${dashboardStats?.monthly_activity?.new_projects_purchased || 0} this month`}
             icon={Award}
             color="text-green-600"
-          //trend="Great savings!"
           />
           <StatCard
             title="Wishlist Items"
-            value={wishlist.length}
+            value={dashboardStats?.user_performance?.wishlist_items || wishlist.length}
             subtitle="Ready to buy"
             icon={Heart}
             color="text-pink-600"
           />
           <StatCard
             title="Avg Rating"
-            value={profileForm.rating}
-            subtitle="Excellent"
+            value={dashboardStats?.user_performance?.average_rating?.toFixed(1) || '0.0'}
+            subtitle="Overall rating"
             icon={Star}
             color="text-yellow-600"
           />
@@ -566,93 +587,124 @@ const StudentDashboard = () => {
 
           <div className="p-8">
             {activeTab === 'overview' && (
-              <div className="animate-slideInUp">
+              <motion.div
+                className="animate-slideInUp"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 <h2 className="text-2xl font-bold text-gray-900 mb-8">Dashboard Overview</h2>
 
-                <div className="grid lg:grid-cols-3 gap-8">
-                  {/* Recent Activity */}
-                  <div className="lg:col-span-2">
+                <div className="grid gap-8 lg:grid-cols-3">
+                  {/* Left section (main overview cards) */}
+                  <div className="lg:col-span-2 space-y-8">
+                    {/* USER PERFORMANCE */}
                     <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-100 shadow-lg">
                       <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                        <Activity className="w-6 h-6 text-blue-600" />
-                        Recent Activity
+                        <User className="w-6 h-6 text-blue-600" />
+                        User Performance
                       </h3>
-                      <div className="space-y-4">
-                        {recentActivity.map((activity, index) => (
-                          <div key={activity.id} className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                            <div className="flex items-center gap-4">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${activity.type === 'download' ? 'bg-green-100 text-green-600' :
-                                activity.type === 'purchase' ? 'bg-blue-100 text-blue-600' :
-                                  activity.type === 'wishlist' ? 'bg-pink-100 text-pink-600' :
-                                    'bg-yellow-100 text-yellow-600'
-                                }`}>
-                                {activity.type === 'download' && <Download className="w-5 h-5" />}
-                                {activity.type === 'purchase' && <ShoppingBag className="w-5 h-5" />}
-                                {activity.type === 'wishlist' && <Heart className="w-5 h-5" />}
-                                {activity.type === 'rating' && <Star className="w-5 h-5" />}
-                              </div>
-                              <div>
-                                <span className="text-gray-900 font-semibold">{activity.action}</span>
-                                <div className="text-sm text-gray-600">{activity.project}</div>
-                              </div>
-                            </div>
-                            <span className="text-sm text-gray-500 font-medium">{activity.time}</span>
-                          </div>
-                        ))}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        <div>
+                          <p className="text-gray-500 text-sm">Projects Owned</p>
+                          <p className="text-2xl font-bold text-gray-900">{dashboardStats?.user_performance?.projects_owned || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500 text-sm">Purchases</p>
+                          <p className="text-2xl font-bold text-gray-900">{dashboardStats?.user_performance?.total_purchases || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500 text-sm">Wishlist</p>
+                          <p className="text-2xl font-bold text-gray-900">{dashboardStats?.user_performance?.wishlist_items || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500 text-sm">Avg. Rating</p>
+                          <p className="text-2xl font-bold text-gray-900">{dashboardStats?.user_performance?.average_rating || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* MONTHLY ACTIVITY */}
+                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-8 border border-blue-100 shadow-lg">
+                      <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
+                        <Activity className="w-6 h-6 text-blue-600" />
+                        Monthly Activity
+                      </h3>
+                      <div className="grid md:grid-cols-3 gap-6 text-center">
+                        <div>
+                          <p className="text-blue-700 text-sm">New Projects</p>
+                          <p className="text-2xl font-bold text-blue-900">{dashboardStats?.monthly_activity?.new_projects_created || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-blue-700 text-sm">Downloads</p>
+                          <p className="text-2xl font-bold text-blue-900">{dashboardStats?.monthly_activity?.downloads_received || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-blue-700 text-sm">Purchases</p>
+                          <p className="text-2xl font-bold text-blue-900">{dashboardStats?.monthly_activity?.new_projects_purchased || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* REVENUE & FINANCIAL */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100 shadow-lg">
+                      <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
+                        <DollarSign className="w-6 h-6 text-green-600" />
+                        Revenue & Financial
+                      </h3>
+                      <div className="grid md:grid-cols-3 gap-6 text-center">
+                        <div>
+                          <p className="text-green-700 text-sm">Total Revenue</p>
+                          <p className="text-2xl font-bold text-green-900">₹{dashboardStats?.revenue_financial?.total_revenue_earned || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-green-700 text-sm">Avg. Sale Price</p>
+                          <p className="text-2xl font-bold text-green-900">₹{dashboardStats?.revenue_financial?.average_sale_price || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-green-700 text-sm">Revenue Trend</p>
+                          <p className="text-sm text-green-900">
+                            {dashboardStats?.revenue_financial?.monthly_revenue_trend?.[0]?.month || "N/A"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Quick Stats */}
+                  {/* Right side (secondary cards) */}
                   <div className="space-y-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-6 border border-blue-100">
-                      <h4 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5" />
-                        This Month
+                    {/* PROJECT PERFORMANCE */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 shadow-lg">
+                      <h4 className="font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-purple-700" />
+                        Project Performance
                       </h4>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-blue-700">New Projects</span>
-                          <span className="text-2xl font-bold text-blue-900">2</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-blue-700">Downloads</span>
-                          <span className="text-2xl font-bold text-blue-900">8</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-blue-700">Points Earned</span>
-                          <span className="text-2xl font-bold text-blue-900">450</span>
-                        </div>
+                      <div className="space-y-3 text-sm">
+                        <p><span className="font-semibold">Best Project:</span> {dashboardStats?.project_performance?.best_performing_project?.title || "N/A"}</p>
+                        <p><span className="font-semibold">Total Sales:</span> {dashboardStats?.project_performance?.best_performing_project?.total_sales || 0}</p>
+                        <p><span className="font-semibold">Downloads:</span> {dashboardStats?.project_performance?.best_performing_project?.total_downloads || 0}</p>
+                        <p><span className="font-semibold">Views:</span> {dashboardStats?.project_performance?.best_performing_project?.total_views || 0}</p>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
-                      <h4 className="font-bold text-purple-900 mb-4">Learning Progress</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-purple-700">React Projects</span>
-                            <span className="font-semibold">75%</span>
-                          </div>
-                          <div className="w-full bg-purple-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{ width: '75%' }} />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-purple-700">Java Projects</span>
-                            <span className="font-semibold">60%</span>
-                          </div>
-                          <div className="w-full bg-purple-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{ width: '60%' }} />
-                          </div>
-                        </div>
+                    {/* ENGAGEMENT METRICS */}
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-100 shadow-lg">
+                      <h4 className="font-bold text-yellow-900 mb-4 flex items-center gap-2">
+                        <Star className="w-5 h-5 text-yellow-600" />
+                        Engagement Metrics
+                      </h4>
+                      <div className="space-y-3 text-sm">
+                        <p><span className="font-semibold">Total Views:</span> {dashboardStats?.engagement_metrics?.total_project_views || 0}</p>
+                        <p><span className="font-semibold">Wishlist → Purchase %:</span> {dashboardStats?.engagement_metrics?.wishlist_to_purchase_conversion || 0}%</p>
+                        <p><span className="font-semibold">Positive Reviews:</span> {dashboardStats?.engagement_metrics?.positive_review_percentage || 0}%</p>
+                        <p><span className="font-semibold">Repeat Customers:</span> {dashboardStats?.engagement_metrics?.repeat_customer_count || 0} ({dashboardStats?.engagement_metrics?.repeat_customer_percentage || 0}%)</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
+
 
             {activeTab === 'projects' && (
               <div className="animate-slideInUp">
@@ -722,15 +774,18 @@ const StudentDashboard = () => {
                                   >
                                     Update
                                   </button>
-                                
-                                    <button
-                                      onClick={() => handleSendForApproval(project)}
-                                      disabled={updatingProjectStatus || project.status === 'pending' || project.status === 'approved'}
-                                      className="px-3 py-2 text-yellow-700 hover:text-yellow-900 hover:bg-yellow-50 rounded-lg transition-colors text-sm font-semibold disabled:opacity-50"
-                                    >
-                                      {updatingProjectStatus ? 'Sending...' : 'Send for Approval'}
-                                    </button>
-                                 </div>
+
+                                  <button
+                                    onClick={() => handleSendForApproval(project)}
+                                    disabled={
+                                      updatingProjectId === project.id || project.status !== 'draft'
+                                    }
+                                    className="px-3 py-2 text-yellow-700 hover:text-yellow-900 hover:bg-yellow-50 rounded-lg transition-colors text-sm font-semibold disabled:opacity-50"
+                                  >
+                                    {updatingProjectId === project.id ? 'Sending...' : 'Send for Approval'}
+                                  </button>
+
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -935,17 +990,17 @@ const StudentDashboard = () => {
                                     <Eye className="w-4 h-4" />
                                   </button>
                                   <button
-                                      onClick={() => handleDeleteReview(review.id)}
-                                      disabled={updatingReview === review.id}
-                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
-                                      title="Delete Review"
-                                    >
-                                      {updatingReview === review.id ? (
-                                        <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                                      ) : (
-                                        <Trash2 className="w-4 h-4" />
-                                      )}
-                                    </button>
+                                    onClick={() => handleDeleteReview(review.id)}
+                                    disabled={updatingReview === review.id}
+                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 disabled:opacity-50"
+                                    title="Delete Review"
+                                  >
+                                    {updatingReview === review.id ? (
+                                      <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                      <Trash2 className="w-4 h-4" />
+                                    )}
+                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -1422,3 +1477,4 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+//latest vala code
