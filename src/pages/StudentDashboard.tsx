@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Star, Calendar, Settings, ShoppingBag, Heart, Eye, Award, TrendingUp, Clock, BarChart3, Trophy, Activity, Search, Loader, Save, Edit3, Github, Globe, Linkedin, MapPin, Twitter, X, MessageSquare, Trash2, User, DollarSign } from 'lucide-react';
+import { Star, Calendar, Settings, ShoppingBag, Heart, Eye, Award, TrendingUp, Clock, BarChart3, Trophy, Activity, Search, Loader, Save, Edit3, Github, Globe, Linkedin, MapPin, Twitter, X, MessageSquare, Trash2, User, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { motion } from 'framer-motion';
@@ -62,13 +62,6 @@ const StudentDashboard = () => {
 
   const [dashboardStats, setDashboardStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(false);
-
-  const recentActivity = [
-    { id: 1, action: 'Downloaded', project: 'E-commerce Web Application', time: '2 hours ago', type: 'download' },
-    { id: 2, action: 'Purchased', project: 'Social Media Dashboard', time: '1 day ago', type: 'purchase' },
-    { id: 3, action: 'Added to wishlist', project: 'Online Learning Platform', time: '2 days ago', type: 'wishlist' },
-    { id: 4, action: 'Rated', project: 'Hospital Management System', time: '3 days ago', type: 'rating' }
-  ];
 
   const filteredProjects = myProjects.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -462,10 +455,10 @@ const StudentDashboard = () => {
     return matchesSearch && matchesFilter;
   });
 
-  // useEffect(() => {
-  //   // Load profile on mount
-  //   fetchUserProfile();
-  // }, []);
+  useEffect(() => {
+    // Load stats on mount
+    fetchDashboardStats()
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'overview' && !dashboardStats && !statsLoading) {
