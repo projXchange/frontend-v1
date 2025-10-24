@@ -1,31 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { X, Eye, EyeOff } from 'lucide-react';
+import { X, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import GirlPoster from '../assets/Girl_Poster.png';
-import { AuthResult, User } from '../types/User';
+import { AuthResult } from '../types/User';
 
-interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-  initialMode?: 'login' | 'signup';
-}
-
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initialMode }) => {
-  const { login, signup, resetPassword } = useAuth(); // Make sure these are implemented in your AuthContext
+const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) => {
+  const { login, signup, resetPassword,confirmResetPassword } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams(); // to get token if exists in URL
 
-  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('signup');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot' | 'reset'>('signup');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const slideAnim = mode === 'signup' ? 'animate-slideInRight' : 'animate-slideInLeft';
+
+  // Detect reset password token in URL (e.g., /reset-password/:token)
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('/reset-password/')) {
+      setMode('reset');
+    }
+  }, [location]);
 
   useEffect(() => {
     if (isOpen) {
@@ -35,8 +39,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
       setName('');
       setPassword('');
       setErrorMsg('');
+      setSuccessMsg('');
       setShowPassword(false);
-      setMode(initialMode || 'signup');
+      if (initialMode) setMode(initialMode);
     }
   }, [isOpen, initialMode]);
 
@@ -51,84 +56,60 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-
-   const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-
-    if (!emailRegex.test(email)) {
-      setErrorMsg("Please enter a valid email address.");
-      return;
-    }
-
-    if (!email || (mode !== 'forgot' && !password)) {
-      setErrorMsg('Please fill in all fields.');
-      return;
-    }
-
-    if (mode === 'signup' && !name) {
-      setErrorMsg('Please enter your full name.');
-      return;
-    }
-
-    if (mode === 'signup' && password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters long.');
-      return;
-    }
+    setSuccessMsg('');
 
     setLoading(true);
-
     try {
       let result: AuthResult = { success: false };
+
       if (mode === 'signup') {
         result = await signup(name, email, password, 'student');
       } else if (mode === 'login') {
         result = await login(email, password);
       } else if (mode === 'forgot') {
         await resetPassword(email);
+        setSuccessMsg('Password reset link sent! Please check your email.');
         setMode('login');
         setLoading(false);
         return;
+      } else if (mode === 'reset') {
+        const token = location.pathname.split('/').pop();
+        await confirmResetPassword(token!, password);
+        setSuccessMsg('Password reset successful! Redirecting to login...');
+        setTimeout(() => {
+          navigate('/');
+          setMode('login');
+        }, 2000);
+        setLoading(false);
+        return;
       }
-
       if (result.success && result.user) {
         onSuccess();
         handleClose();
-        // Role-based redirect
-        if (result.user.user_type === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-      } else {
-        setErrorMsg(result.message || `${mode === 'signup' ? 'Signup' : 'Login'} failed. Please try again.`);
+        if (result.user.user_type === 'admin') navigate('/admin');
+        else navigate('/dashboard');
+      } else if (mode === 'login' || mode === 'signup') {
+        setErrorMsg(result.message || `${mode === 'signup' ? 'Signup' : 'Login'} failed.`);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Something went wrong.');
+      setErrorMsg(err.response?.data?.message || 'Something went wrong.');
     }
-
     setLoading(false);
   };
-  useEffect(() => {
-    if (errorMsg) {
-      const timer = setTimeout(() => {
-        setErrorMsg("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMsg]);
-
 
   if (!isVisible) return null;
 
-
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 sm:px-4 transition-opacity duration-300 ease-out ${isClosing ? 'opacity-0' : 'opacity-100'
-        }`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 sm:px-4 transition-opacity duration-300 ease-out ${
+        isClosing ? 'opacity-0' : 'opacity-100'
+      }`}
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden relative transform transition-all duration-500 ease-in-out ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-          }`}
+        className={`bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden relative transform transition-all duration-500 ease-in-out ${
+          isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left Panel */}
@@ -140,15 +121,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
             className={`absolute inset-0 z-20 flex flex-col justify-center items-center text-white px-8 py-12 text-center space-y-6 ${slideAnim}`}
           >
             <h2 className="text-3xl xl:text-4xl font-bold leading-tight">
-              {mode === 'signup' ? 'Join the Future of' : 'Welcome Back to'}
+              {mode === 'signup'
+                ? 'Join the Future of'
+                : mode === 'reset'
+                ? 'Secure Your Account'
+                : 'Welcome Back to'}
               <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                 Academic Success
               </span>
             </h2>
             <p className="text-lg xl:text-xl text-blue-100 leading-relaxed">
-              {mode === 'signup'
-                ? 'Connect with thousands of students and access premium academic projects'
-                : 'Access your projects, network, and resources in one place'}
+              {mode === 'reset'
+                ? 'Set a new password to regain access to your account.'
+                : 'Access your projects, connect, and grow together.'}
             </p>
           </div>
         </div>
@@ -164,27 +149,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
 
           <div className="max-w-md mx-auto">
             <div key={mode} className={`text-center mb-6 sm:mb-8 ${slideAnim}`}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                {mode === 'signup'
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 capitalize">
+                {mode === 'reset'
+                  ? 'Reset Password'
+                  : mode === 'forgot'
+                  ? 'Forgot Password'
+                  : mode === 'signup'
                   ? 'Create Account'
-                  : mode === 'login'
-                    ? 'Welcome Back'
-                    : 'Reset Password'}
+                  : 'Login'}
               </h2>
-              {mode !== 'forgot' && (
-                <p className="text-gray-600 text-sm sm:text-base">
-                  {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
-                  <button
-                    onClick={() => setMode(mode === 'signup' ? 'login' : 'signup')}
-                    className="text-blue-600 font-semibold hover:text-blue-700 hover:underline transition-colors"
-                  >
-                    {mode === 'signup' ? 'Sign in here' : 'Sign up now'}
-                  </button>
-                </p>
-              )}
             </div>
 
             <form onSubmit={handleAuthSubmit} className={`space-y-6 ${slideAnim}`}>
+              {/* SIGNUP ONLY */}
               {mode === 'signup' && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
@@ -193,32 +170,38 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-4 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-4 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-4 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {mode !== 'forgot' && (
+              {/* EMAIL FIELD */}
+              {(mode !== 'reset') && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="w-full px-4 py-4 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+
+              {/* PASSWORD FIELD */}
+              {(mode !== 'forgot') && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {mode === 'reset' ? 'New Password' : 'Password'}
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="w-full px-4 py-4 pr-12 border rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={mode === 'reset' ? 'Enter new password' : 'Enter your password'}
+                      className="w-full px-4 py-4 pr-12 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
@@ -242,26 +225,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
                 </div>
               )}
 
-              {errorMsg && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl animate-shake text-sm text-red-600 font-medium">
-                  {errorMsg}
+              {/* ERROR / SUCCESS MESSAGE */}
+              {(errorMsg || successMsg) && (
+                <div
+                  className={`p-3 text-sm rounded-xl font-medium ${
+                    successMsg
+                      ? 'bg-green-50 border border-green-200 text-green-700'
+                      : 'bg-red-50 border border-red-200 text-red-600'
+                  }`}
+                >
+                  {errorMsg || successMsg}
                 </div>
               )}
 
+              {/* BUTTON */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:scale-105 disabled:opacity-70"
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 disabled:opacity-70"
               >
                 {loading
                   ? 'Please wait...'
                   : mode === 'signup'
-                    ? 'Create Account'
-                    : mode === 'login'
-                      ? 'Login'
-                      : 'Send Reset Link'}
+                  ? 'Create Account'
+                  : mode === 'login'
+                  ? 'Login'
+                  : mode === 'forgot'
+                  ? 'Send Reset Link'
+                  : 'Reset Password'}
               </button>
 
+              {/* NAVIGATION */}
               {mode === 'forgot' && (
                 <div className="text-sm text-center mt-4">
                   <button
@@ -274,18 +268,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
                 </div>
               )}
             </form>
-
-            <div className="text-xs text-gray-500 text-center mt-8">
-              By continuing, you agree to our{' '}
-              <a href="#" className="text-blue-600 hover:underline">
-                Terms of Service
-              </a>{' '}
-              and{' '}
-              <a href="#" className="text-blue-600 hover:underline">
-                Privacy Policy
-              </a>
-              .
-            </div>
           </div>
         </div>
       </div>
