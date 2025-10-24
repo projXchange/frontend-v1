@@ -9,6 +9,7 @@ interface AuthContextType {
   logout: () => void;
   signup: (name: string, email: string, password: string, role: 'student' | 'admin') => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<boolean>;
+  confirmResetPassword: (token: string, password: string) => Promise<boolean>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStudent: boolean;
@@ -159,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // ✅ 1. Forgot Password API
   const resetPassword = async (email: string): Promise<boolean> => {
     try {
       const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/forgot-password', {
@@ -185,6 +187,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // ✅ 2. Confirm Reset Password API
+  const confirmResetPassword = async (token: string, password: string): Promise<boolean> => {
+    try {
+      const res = await fetch(
+        `https://projxchange-backend-v1.vercel.app/auth/reset-password/${token}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || 'Failed to reset password');
+        return false;
+      }
+
+      toast.success(data.message || 'Password reset successful!');
+      return true;
+    } catch (error) {
+      console.error('Confirm Reset Password Error:', error);
+      toast.error('Something went wrong while resetting password');
+      return false;
+    }
+  };
+
   const openAuthModal = (isLogin: boolean = true) => {
     setIsLoginMode(isLogin);
     setAuthModalOpen(true);
@@ -198,6 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     signup,
     resetPassword,
+    confirmResetPassword,
     isAuthenticated: !!user,
     isAdmin: user?.user_type === 'admin',
     isStudent: user?.user_type === 'student',
