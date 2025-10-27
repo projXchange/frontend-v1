@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { X, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import GirlPoster from '../assets/Girl_Poster.png';
 import { AuthResult } from '../types/User';
 
 type AuthModalProps = {
@@ -137,7 +136,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
         {/* Left Panel */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-teal-600/90 z-10" />
-          <img src={GirlPoster} alt="Join Community" className="w-full h-full object-cover object-top" />
+          <img src="https://res.cloudinary.com/dmfh4f4yg/image/upload/v1761589602/users/0e34d7e5-2380-4c69-a536-5e22a0868004/jugtaeylh0aizw101pts.jpg" alt="Join Community" className="w-full h-full object-cover object-top" />
           <div className="absolute inset-0 z-20 flex flex-col justify-center items-center text-white px-8 py-12 text-center space-y-6">
             <h2 className="text-3xl xl:text-4xl font-bold leading-tight">
               {mode === 'signup'
@@ -285,6 +284,33 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initi
                   </button>
                 </div>
               )}
+              {/* Switch between Login / Signup */}
+<div className="text-sm text-center mt-4">
+  {mode === 'login' ? (
+    <p>
+      Don’t have an account?{' '}
+      <button
+        type="button"
+        onClick={() => setMode('signup')}
+        className="text-blue-600 hover:underline font-semibold"
+      >
+        Register
+      </button>
+    </p>
+  ) : mode === 'signup' ? (
+    <p>
+      Already have an account?{' '}
+      <button
+        type="button"
+        onClick={() => setMode('login')}
+        className="text-blue-600 hover:underline font-semibold"
+      >
+        Login
+      </button>
+    </p>
+  ) : null}
+</div>
+
             </form>
           </div>
         </div>
