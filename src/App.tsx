@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { CartProvider } from './contexts/CartContext';
@@ -15,22 +15,40 @@ import { Toaster } from 'react-hot-toast';
 import WishlistPage from './pages/WishlistPage';
 import CartPage from './pages/CartPage';
 import ResetPassword from './pages/ResetPassword';
+import NotFoundPage from './pages/NotFoundPage';
+
+// Create a Layout component to handle conditional rendering
+function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const isNotFoundPage = !['/', '/projects', '/dashboard', '/admin', '/upload', '/wishlist', '/cart'].some(path => 
+    location.pathname === path || 
+    location.pathname.startsWith('/project/')
+  );
+    location.pathname.startsWith('/auth/reset-password/')
+  
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {!isNotFoundPage && <Navbar />}
+      {children}
+      {!isNotFoundPage && <Footer />}
+    </div>
+  );
+}
 
 function App() {
   return (
-    
     <AuthProvider>
       <WishlistProvider>
         <CartProvider>
           <Toaster position="top-right" reverseOrder={false} />  
           <Router>
-            <div className="min-h-screen bg-gray-50">
-              <Navbar/>
+            <Layout>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/projects" element={<ProjectListing />} />
                 <Route path="/project/:id" element={<ProjectDetail />} />
-                <Route path="/reset-password/:token" element={<ResetPassword />} />
+                <Route path="auth/reset-password/:token" element={<ResetPassword />} />
 
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
@@ -57,9 +75,9 @@ function App() {
                     <CartPage />
                   </ProtectedRoute>
                 } />
-             </Routes>
-              <Footer/>
-            </div>
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Layout>
           </Router>
         </CartProvider>
       </WishlistProvider>

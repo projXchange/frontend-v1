@@ -1,36 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { X, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import GirlPoster from '../assets/Girl_Poster.png';
 import { AuthResult } from '../types/User';
 
-const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) => {
-  const { login, signup, resetPassword,confirmResetPassword } = useAuth();
+type AuthModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+  initialMode?: 'login' | 'signup' | 'forgot' | 'reset';
+};
+
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initialMode }) => {
+  const { login, signup, resetPassword, confirmResetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const params = useParams(); // to get token if exists in URL
+  const params = useParams<{ token: string }>();
 
-  const [mode, setMode] = useState<'login' | 'signup' | 'forgot' | 'reset'>('signup');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot' | 'reset'>(initialMode || 'signup');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const slideAnim = mode === 'signup' ? 'animate-slideInRight' : 'animate-slideInLeft';
 
-  // Detect reset password token in URL (e.g., /reset-password/:token)
+  // Detect reset token in URL or initialMode
   useEffect(() => {
-    const path = location.pathname;
-    if (path.includes('/reset-password/')) {
+    if (initialMode === 'reset' || location.pathname.includes('/reset-password/')) {
       setMode('reset');
     }
-  }, [location]);
+  }, [location, initialMode]);
 
+  // Reset modal state when opened
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -38,9 +44,9 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
       setEmail('');
       setName('');
       setPassword('');
+      setShowPassword(false);
       setErrorMsg('');
       setSuccessMsg('');
-      setShowPassword(false);
       if (initialMode) setMode(initialMode);
     }
   }, [isOpen, initialMode]);
@@ -53,48 +59,64 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
     }, 300);
   };
 
-  const handleAuthSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
+    if (mode === 'reset' && (!password || password.length < 6)) {
+      setErrorMsg('Password must be at least 6 characters long.');
+      return;
+    }
+
     setLoading(true);
     try {
-      let result: AuthResult = { success: false };
-
       if (mode === 'signup') {
-        result = await signup(name, email, password, 'student');
+        const result: AuthResult = await signup(name, email, password, 'student');
+        if (result.success && result.user) {
+          onSuccess?.();
+          handleClose();
+          result.user.user_type === 'admin' ? navigate('/admin') : navigate('/dashboard');
+        } else {
+          setErrorMsg(result.message || 'Signup failed.');
+        }
       } else if (mode === 'login') {
-        result = await login(email, password);
+        const result: AuthResult = await login(email, password);
+        if (result.success && result.user) {
+          onSuccess?.();
+          handleClose();
+          result.user.user_type === 'admin' ? navigate('/admin') : navigate('/dashboard');
+        } else {
+          setErrorMsg(result.message || 'Login failed.');
+        }
       } else if (mode === 'forgot') {
         await resetPassword(email);
         setSuccessMsg('Password reset link sent! Please check your email.');
-        setMode('login');
-        setLoading(false);
-        return;
+        handleClose()
       } else if (mode === 'reset') {
-        const token = location.pathname.split('/').pop();
-        await confirmResetPassword(token!, password);
-        setSuccessMsg('Password reset successful! Redirecting to login...');
-        setTimeout(() => {
-          navigate('/');
-          setMode('login');
-        }, 2000);
-        setLoading(false);
-        return;
-      }
-      if (result.success && result.user) {
-        onSuccess();
-        handleClose();
-        if (result.user.user_type === 'admin') navigate('/admin');
-        else navigate('/dashboard');
-      } else if (mode === 'login' || mode === 'signup') {
-        setErrorMsg(result.message || `${mode === 'signup' ? 'Signup' : 'Login'} failed.`);
+        // Extract token from URL params or location pathname
+        const token = params.token || location.pathname.split('/reset-password/')[1]?.split('/')[0];
+        
+        if (!token) {
+          setErrorMsg('Invalid or missing reset token. Please request a new password reset link.');
+          return;
+        }
+      
+        const success = await confirmResetPassword(token, password);
+        if (success) {
+          setSuccessMsg('✅ Password reset successful! Redirecting to login...');
+          setTimeout(() => {
+            onSuccess?.(); // This will trigger navigation to dashboard
+          }, 2000);
+        } else {
+          setErrorMsg('Failed to reset password. The link may be expired or invalid.');
+        }
       }
     } catch (err: any) {
       setErrorMsg(err.response?.data?.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (!isVisible) return null;
@@ -116,10 +138,7 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-teal-600/90 z-10" />
           <img src={GirlPoster} alt="Join Community" className="w-full h-full object-cover object-top" />
-          <div
-            key={mode}
-            className={`absolute inset-0 z-20 flex flex-col justify-center items-center text-white px-8 py-12 text-center space-y-6 ${slideAnim}`}
-          >
+          <div className="absolute inset-0 z-20 flex flex-col justify-center items-center text-white px-8 py-12 text-center space-y-6">
             <h2 className="text-3xl xl:text-4xl font-bold leading-tight">
               {mode === 'signup'
                 ? 'Join the Future of'
@@ -148,7 +167,7 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
           </button>
 
           <div className="max-w-md mx-auto">
-            <div key={mode} className={`text-center mb-6 sm:mb-8 ${slideAnim}`}>
+            <div className="text-center mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 capitalize">
                 {mode === 'reset'
                   ? 'Reset Password'
@@ -160,8 +179,8 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
               </h2>
             </div>
 
-            <form onSubmit={handleAuthSubmit} className={`space-y-6 ${slideAnim}`}>
-              {/* SIGNUP ONLY */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Signup fields */}
               {mode === 'signup' && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
@@ -175,8 +194,8 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
                 </div>
               )}
 
-              {/* EMAIL FIELD */}
-              {(mode !== 'reset') && (
+              {/* Email */}
+              {mode !== 'reset' && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
                   <input
@@ -189,8 +208,8 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
                 </div>
               )}
 
-              {/* PASSWORD FIELD */}
-              {(mode !== 'forgot') && (
+              {/* Password */}
+              {mode !== 'forgot' && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     {mode === 'reset' ? 'New Password' : 'Password'}
@@ -225,7 +244,7 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
                 </div>
               )}
 
-              {/* ERROR / SUCCESS MESSAGE */}
+              {/* Messages */}
               {(errorMsg || successMsg) && (
                 <div
                   className={`p-3 text-sm rounded-xl font-medium ${
@@ -238,7 +257,6 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
                 </div>
               )}
 
-              {/* BUTTON */}
               <button
                 type="submit"
                 disabled={loading}
@@ -255,8 +273,8 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
                   : 'Reset Password'}
               </button>
 
-              {/* NAVIGATION */}
-              {mode === 'forgot' && (
+              {/* Back to login */}
+              {(mode === 'forgot' || mode === 'reset') && (
                 <div className="text-sm text-center mt-4">
                   <button
                     type="button"

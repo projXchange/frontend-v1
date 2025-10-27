@@ -26,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
+  
 
   useEffect(() => {
     const storedUser = localStorage.getItem('studystack_user');
