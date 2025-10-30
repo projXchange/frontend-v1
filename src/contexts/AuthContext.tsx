@@ -10,6 +10,8 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string, role: 'student' | 'admin') => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<boolean>;
   confirmResetPassword: (token: string, password: string) => Promise<boolean>;
+  verifyEmail: (token: string) => Promise<{ success: boolean; message?: string }>;
+  resendVerificationEmail: (email: string) => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStudent: boolean;
@@ -90,41 +92,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, message: data.message || data.error || 'Signup failed' };
       }
 
-      const newUser = data.user;
-      setUser(newUser);
-      localStorage.setItem('studystack_user', JSON.stringify(newUser));
-      localStorage.setItem('token', data.accessToken);
-      console.log("signup user response - ",newUser)
-      // // Create default profile entry
-      // await fetch('https://projxchange-backend-v1.vercel.app/users/profile', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${data.accessToken}`
-      //   },
-      //   body: JSON.stringify({
-      //     id: data.user.id,
-      //     rating: 0,
-      //     total_sales: 0,
-      //     total_purchases: 0,
-      //     experience_level: "beginner",
-      //     avatar: "",
-      //     bio: "",
-      //     location: "",
-      //     website: "",
-      //     social_links: {
-      //       additionalProp1: "",
-      //       additionalProp2: "",
-      //       additionalProp3: ""
-      //     },
-      //     skills: [],
-      //     created_at: new Date().toISOString(),
-      //     updated_at: new Date().toISOString(),
-      //     status: "active"
-      //   })
-      // });
-      toast.success('User Created Successfully');
-      return { success: true, user: newUser };
+      // const newUser = data.user;
+      // setUser(newUser);
+      // localStorage.setItem('studystack_user', JSON.stringify(newUser));
+      // localStorage.setItem('token', data.accessToken);
+      // console.log("signup user response - ",newUser)
+
+      toast.success('Account created! Please check your email to verify.');
+      return { success: true, message: "Account created! Please check your email to verify." };
     } catch (error) {
       console.error(error);
       return { success: false, message: 'Something went wrong. Please try again.' };
@@ -218,6 +193,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Verify email with token
+  const verifyEmail = async (token: string): Promise<AuthResult> => {
+    try {
+      const res = await fetch(`https://projxchange-backend-v1.vercel.app/auth/verify-email/${token}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        toast.error(data.error || 'Email verification failed');
+        return { success: false, message: data.error || 'Email verification failed' };
+      }
+     
+      toast.success('Email verified successfully');
+      return { success: true, message: "Email verified successfully" };
+  
+    } catch (error) {
+      console.error('Email verification error:', error);
+      toast.error('Something went wrong. Please try again.');
+      return { success: false, message: 'Something went wrong. Please try again.' };
+    }
+  };
+    
+
+// Resend verification email
+const resendVerificationEmail = async (email: string): Promise<void> => {
+  try {
+    await fetch('https://projxchange-backend-v1.vercel.app/auth/resend-verification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+  } catch (error: any) {
+    console.error('Failed to resend verification email:', error);
+    throw error;
+  }
+};
+
   const openAuthModal = (isLogin: boolean = true) => {
     setIsLoginMode(isLogin);
     setAuthModalOpen(true);
@@ -232,6 +249,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     resetPassword,
     confirmResetPassword,
+    verifyEmail,
+    resendVerificationEmail,
     isAuthenticated: !!user,
     isAdmin: user?.user_type === 'admin',
     isStudent: user?.user_type === 'student',

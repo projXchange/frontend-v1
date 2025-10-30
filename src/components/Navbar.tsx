@@ -15,7 +15,12 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAuthenticated, isAdmin, isAuthModalOpen, isLoginMode, openAuthModal, closeAuthModal } = useAuth();
-  const { getCartCount } = useCart();
+  let getCartCount = () => 0;
+  try {
+    const cart = useCart();
+    getCartCount = cart.getCartCount;
+  } catch {}
+  
 
   const isActive = (path: string) => location.pathname === path;
 
