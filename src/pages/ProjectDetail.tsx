@@ -547,17 +547,17 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video */}
-              {project?.demo_url && (
+              {project?.youtube_url && (
                 <div
                   className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300"
                   style={{ animationDelay: '600ms' }}
                 >
                   <iframe
                     src={
-                      project.demo_url.includes("watch?v=")
-                        ? project.demo_url.replace("watch?v=", "embed/")
-                        : project.demo_url.includes("youtu.be")
-                          ? project.demo_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
+                      project.youtube_url.includes("watch?v=")
+                        ? project.youtube_url.replace("watch?v=", "embed/")
+                        : project.youtube_url.includes("youtu.be")
+                          ? project.youtube_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
                           : project.youtube_url
                     }
                     title="Project Demo"
