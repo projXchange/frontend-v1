@@ -232,47 +232,116 @@ const StudentDashboard = () => {
       title: project.title,
       description: project.description,
       category: project.category,
+      difficulty_level: project.difficulty_level,
+      delivery_time: project.delivery_time,
       tech_stack: project.tech_stack,
       key_features: project.key_features,
       pricing: project.pricing,
+      requirements: project.requirements,
+      github_url: project.github_url,
+      demo_url: project.demo_url,
+      youtube_url: project.youtube_url,
+      thumbnail: project.thumbnail,
+      images: project.images,
+      author_id: project.author_id,
+      created_at: project.created_at,
+      updated_at: project.updated_at,
     });
     setIsProjectModalOpen(true);
   };
-
   const handleUpdateProject = async () => {
     if (!selectedProject) return;
     setUpdatingProjectStatus(true);
+  
     try {
-      const payload = {
-        ...projectEditData,
-        status: projectUpdateData.status,
-        is_featured: projectUpdateData.is_featured,
-      };
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${selectedProject.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      // Build payload matching API schema exactly
+      const payload: any = {
+        title: projectEditData?.title || selectedProject.title,
+        description: projectEditData?.description || selectedProject.description,
+        key_features: projectEditData?.key_features || selectedProject.key_features || '',
+        category: projectEditData?.category || selectedProject.category || 'web_development',
+        difficulty_level: projectEditData?.difficulty_level || selectedProject.difficulty_level || 'beginner',
+        tech_stack: projectEditData?.tech_stack || selectedProject.tech_stack || [],
+        delivery_time: projectEditData?.delivery_time ?? selectedProject.delivery_time ?? 0,
+        status: "draft",
+        thumbnail: projectEditData?.thumbnail || selectedProject.thumbnail || '',
+        images: projectEditData?.images || selectedProject.images || [],
+        pricing: {
+          sale_price: projectEditData?.pricing?.sale_price ?? selectedProject.pricing?.sale_price ?? 0,
+          original_price: projectEditData?.pricing?.original_price ?? selectedProject.pricing?.original_price ?? 0,
+          currency: projectEditData?.pricing?.currency || selectedProject.pricing?.currency || 'INR',
         },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error('Failed to update project');
+        requirements: {
+          system_requirements: projectEditData?.requirements?.system_requirements || selectedProject.requirements?.system_requirements || [],
+          dependencies: projectEditData?.requirements?.dependencies || selectedProject.requirements?.dependencies || [],
+          installation_steps: projectEditData?.requirements?.installation_steps || selectedProject.requirements?.installation_steps || [],
+        },
+      };
+
+      // Add optional fields only if they have values
+      if (projectEditData?.github_url || selectedProject.github_url) {
+        payload.github_url = projectEditData?.github_url || selectedProject.github_url;
+      }
+      if (projectEditData?.demo_url || selectedProject.demo_url) {
+        payload.demo_url = projectEditData?.demo_url || selectedProject.demo_url;
+      }
+      if (projectEditData?.youtube_url || selectedProject.youtube_url) {
+        payload.youtube_url = projectEditData?.youtube_url || selectedProject.youtube_url;
+      }
+
+      // Add files if they exist
+      if (selectedProject.files || projectEditData?.files) {
+        payload.files = {
+          source_files: projectEditData?.files?.source_files || selectedProject.files?.source_files || [],
+          documentation_files: projectEditData?.files?.documentation_files || selectedProject.files?.documentation_files || [],
+        };
+      }
+
+      // Add rating if it exists
+      if (selectedProject.rating || projectEditData?.rating) {
+        payload.rating = {
+          average_rating: projectEditData?.rating?.average_rating ?? selectedProject.rating?.average_rating ?? 0,
+          total_ratings: projectEditData?.rating?.total_ratings ?? selectedProject.rating?.total_ratings ?? 0,
+          rating_distribution: projectEditData?.rating?.rating_distribution || selectedProject.rating?.rating_distribution || {},
+        };
+      }
+  
+      const res = await fetch(
+        `https://projxchange-backend-v1.vercel.app/projects/${selectedProject.id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+  
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        const errorText = errorData ? JSON.stringify(errorData) : await res.text();
+        console.error('Backend Error:', errorText, 'Status:', res.status);
+        throw new Error(errorData?.detail || 'Failed to update project');
+      }
+      
       const data = await res.json();
       const updated = data.project || data;
-      setMyProjects(prev => prev.map(p => (p.id === updated.id ? { ...p, ...updated } : p)));
+  
+      setMyProjects((prev) =>
+        prev.map((p) => (p.id === updated.id ? { ...p, ...updated } : p))
+      );
+      toast.success('Project updated successfully!');
       setIsProjectModalOpen(false);
       setSelectedProject(null);
-      if (projectUpdateData.status === 'approved') {
-        handleSendForApproval(selectedProject);
-      }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Failed to update project. Please try again.');
+      toast.error(err.message || 'Failed to update project. Please try again.');
     } finally {
       setUpdatingProjectStatus(false);
     }
   };
-
+  
   const handleSendForApproval = async (project: Project) => {
     try {
       setUpdatingProjectId(project.id);
@@ -749,7 +818,7 @@ const StudentDashboard = () => {
                             <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                               <td className="px-6 py-4">
                                 <div className="font-semibold text-gray-900">{project.title}</div>
-                                <div className="text-sm text-gray-500 line-clamp-1">{project.description}</div>
+                
                               </td>
                               <td className="px-6 py-4 text-sm text-gray-700">{project.category}</td>
                               <td className="px-6 py-4 text-sm text-gray-700 font-semibold">₹{project.pricing?.sale_price || 0}</td>
@@ -1470,4 +1539,3 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
-//latest vala code
