@@ -1,76 +1,95 @@
-import { useEffect, useState } from 'react';
-import { Plus, Trash2, Eye, Check, X, DollarSign, Users, ShoppingBag, TrendingUp, AlertCircle, BarChart3, Star, Activity, Target, Search, Bell, Settings, MessageSquare } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { User, UsersApiResponse } from '../types/User';
-import { Project, ProjectResponse, Review } from '../types/Project';
-import ProjectDetailsModal from '../components/ProjectDetailsModal';
-import UserDetailsModal from '../components/UserDetailsModal';
-import { useNavigate } from 'react-router-dom';
-import { Transaction, TransactionsApiResponse } from '../types/Transaction';
-import toast from 'react-hot-toast';
-import TransactionDetailsModal from '../components/TransactionDetailsModal';
-import ReviewDetailsModal from '../components/ReviewDetailsModal';
+"use client"
+
+import { useEffect, useState } from "react"
+import {
+  Plus,
+  Trash2,
+  Eye,
+  Check,
+  X,
+  DollarSign,
+  Users,
+  ShoppingBag,
+  TrendingUp,
+  AlertCircle,
+  BarChart3,
+  Star,
+  Activity,
+  Target,
+  Search,
+  Bell,
+  Settings,
+  MessageSquare,
+} from "lucide-react"
+import { useAuth } from "../contexts/AuthContext"
+import type { User, UsersApiResponse } from "../types/User"
+import type { Project, ProjectResponse, Review } from "../types/Project"
+import ProjectDetailsModal from "../components/ProjectDetailsModal"
+import UserDetailsModal from "../components/UserDetailsModal"
+import { useNavigate } from "react-router-dom"
+import type { Transaction, TransactionsApiResponse } from "../types/Transaction"
+import toast from "react-hot-toast"
+import TransactionDetailsModal from "../components/TransactionDetailsModal"
+import ReviewDetailsModal from "../components/ReviewDetailsModal"
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const { user } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [updatingProject, setUpdatingProject] = useState<string | null>(null);
-  const [updatingUser, setUpdatingUser] = useState<string | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [fetchingUserDetails, setFetchingUserDetails] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filterStatus, setFilterStatus] = useState("all")
+  const { user } = useAuth()
+  const [users, setUsers] = useState<User[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [updatingProject, setUpdatingProject] = useState<string | null>(null)
+  const [updatingUser, setUpdatingUser] = useState<string | null>(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false)
+  const [fetchingUserDetails, setFetchingUserDetails] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
+  const navigate = useNavigate()
   const [projectUpdateData, setProjectUpdateData] = useState({
-    status: '',
-    is_featured: false
-  });
-  const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [pendingProjects, setPendingProjects] = useState<Project[]>([]); // new state
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewSearchTerm, setReviewSearchTerm] = useState('');
-  const [reviewFilterStatus, setReviewFilterStatus] = useState('all');
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [updatingTransaction, setUpdatingTransaction] = useState<string | null>(null);
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const [updatingReview, setUpdatingReview] = useState<string | null>(null);
-  const [deletingReview, setDeletingReview] = useState<string | null>(null);
-
-
+    status: "",
+    is_featured: false,
+  })
+  const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [pendingProjects, setPendingProjects] = useState<Project[]>([]) // new state
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviewSearchTerm, setReviewSearchTerm] = useState("")
+  const [reviewFilterStatus, setReviewFilterStatus] = useState("all")
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
+  const [updatingTransaction, setUpdatingTransaction] = useState<string | null>(null)
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null)
+  const [updatingReview, setUpdatingReview] = useState<string | null>(null)
+  const [deletingReview, setDeletingReview] = useState<string | null>(null)
 
   const fetchAllStats = async () => {
-    setLoading(true);
-    setError('');
-    const token = localStorage.getItem("token");
+    setLoading(true)
+    setError("")
+    const token = localStorage.getItem("token")
 
     try {
       // Fetch in parallel for efficiency
       const [usersRes, projectsRes, transactionsRes, pendingProjectsRes] = await Promise.all([
-        fetch('https://projxchange-backend-v1.vercel.app/admin/users', {
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        fetch("https://projxchange-backend-v1.vercel.app/admin/users", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch('https://projxchange-backend-v1.vercel.app/projects', {
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        fetch("https://projxchange-backend-v1.vercel.app/projects", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        fetch("https://projxchange-backend-v1.vercel.app/admin/transactions/recent", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending', {
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        fetch("https://projxchange-backend-v1.vercel.app/projects?status=pending", {
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-      ]);
+      ])
 
       if (!usersRes.ok || !projectsRes.ok || !transactionsRes.ok || !pendingProjectsRes.ok) {
-        throw new Error('Failed to fetch one or more resources');
+        throw new Error("Failed to fetch one or more resources")
       }
 
       // Parse JSON in parallel
@@ -79,38 +98,76 @@ const AdminDashboard = () => {
         projectsRes.json(),
         transactionsRes.json(),
         pendingProjectsRes.json(),
-      ]);
+      ])
 
-      setUsers(usersData.users);
-      setProjects(projectsData.data || []);
-      setTransactions(transactionsData.transactions);
-      setPendingProjects(pendingProjectsData.data || []); // ✅ store pending projects
-
+      setUsers(usersData.users)
+      setProjects(projectsData.data || [])
+      setTransactions(transactionsData.transactions)
+      setPendingProjects(pendingProjectsData.data || []) // ✅ store pending projects
     } catch (err) {
-      console.error(err);
-      setError('Could not load dashboard stats. Please try again later.');
+      console.error(err)
+      setError("Could not load dashboard stats. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
+  }
 
   const recentActivity = [
-    { id: 1, action: 'New project submitted', user: 'John Doe', time: '2 hours ago', type: 'project', avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100', status: 'pending' },
-    { id: 2, action: 'Project approved', user: 'Sarah Wilson', time: '5 hours ago', type: 'approval', avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100', status: 'approved' },
-    { id: 3, action: 'New user registered', user: 'Mike Johnson', time: '1 day ago', type: 'user', avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100', status: 'active' },
-    { id: 4, action: 'Payment processed', user: 'Emma Davis', time: '2 days ago', type: 'payment', avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100', status: 'completed' },
-    { id: 5, action: 'Project rejected', user: 'Alex Brown', time: '3 days ago', type: 'rejection', avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100', status: 'rejected' }
-  ];
+    {
+      id: 1,
+      action: "New project submitted",
+      user: "John Doe",
+      time: "2 hours ago",
+      type: "project",
+      avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
+      status: "pending",
+    },
+    {
+      id: 2,
+      action: "Project approved",
+      user: "Sarah Wilson",
+      time: "5 hours ago",
+      type: "approval",
+      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
+      status: "approved",
+    },
+    {
+      id: 3,
+      action: "New user registered",
+      user: "Mike Johnson",
+      time: "1 day ago",
+      type: "user",
+      avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100",
+      status: "active",
+    },
+    {
+      id: 4,
+      action: "Payment processed",
+      user: "Emma Davis",
+      time: "2 days ago",
+      type: "payment",
+      avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100",
+      status: "completed",
+    },
+    {
+      id: 5,
+      action: "Project rejected",
+      user: "Alex Brown",
+      time: "3 days ago",
+      type: "rejection",
+      avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100",
+      status: "rejected",
+    },
+  ]
 
   const salesData = [
-    { month: 'Jan', sales: 1200, projects: 15, users: 45 },
-    { month: 'Feb', sales: 1800, projects: 22, users: 67 },
-    { month: 'Mar', sales: 2200, projects: 28, users: 89 },
-    { month: 'Apr', sales: 1900, projects: 24, users: 102 },
-    { month: 'May', sales: 2540, projects: 32, users: 134 },
-    { month: 'Jun', sales: 2800, projects: 35, users: 156 }
-  ];
+    { month: "Jan", sales: 1200, projects: 15, users: 45 },
+    { month: "Feb", sales: 1800, projects: 22, users: 67 },
+    { month: "Mar", sales: 2200, projects: 28, users: 89 },
+    { month: "Apr", sales: 1900, projects: 24, users: 102 },
+    { month: "May", sales: 2540, projects: 32, users: 134 },
+    { month: "Jun", sales: 2800, projects: 35, users: 156 },
+  ]
 
   const stats = {
     totalProjects: projects.length,
@@ -118,544 +175,518 @@ const AdminDashboard = () => {
     totalSales: transactions.length, // or derive from transactions
     totalUsers: users.length,
     monthlyGrowth: 24, // could be derived later
-    avgRating: 4.8,   // placeholder for now
-    activeUsers: users.filter(u => u.verification_status === 'active').length,
+    avgRating: 4.8, // placeholder for now
+    activeUsers: users.filter((u) => u.verification_status === "active").length,
     revenue: transactions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
-    conversionRate: 3.2
-  };
-
+    conversionRate: 3.2,
+  }
 
   const fetchUsers = async () => {
-    setLoading(true);
-    setError('');
-    const token = localStorage.getItem("token");
+    setLoading(true)
+    setError("")
+    const token = localStorage.getItem("token")
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/users', {
-        method: 'GET',
+      const res = await fetch("https://projxchange-backend-v1.vercel.app/admin/users", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to fetch users');
+      if (!res.ok) throw new Error("Failed to fetch users")
 
-      const data: UsersApiResponse = await res.json();
-      setUsers(data.users);
+      const data: UsersApiResponse = await res.json()
+      setUsers(data.users)
     } catch (err) {
-      console.error(err);
-      setError('Could not load users. Please try again later.');
+      console.error(err)
+      setError("Could not load users. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const fetchProjects = async () => {
-    setLoading(true);
-    setError('');
-    const token = localStorage.getItem("token");
+    setLoading(true)
+    setError("")
+    const token = localStorage.getItem("token")
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects', {
-        method: 'GET',
+      const res = await fetch("https://projxchange-backend-v1.vercel.app/projects", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to fetch projects');
+      if (!res.ok) throw new Error("Failed to fetch projects")
 
-      const data: ProjectResponse = await res.json();
-      setProjects(data.data || []);
+      const data: ProjectResponse = await res.json()
+      setProjects(data.data || [])
     } catch (err) {
-      console.error(err);
-      setError('Could not load projects. Please try again later.');
+      console.error(err)
+      setError("Could not load projects. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const fetchPendingProjects = async () => {
-    setLoading(true);
-    setError('');
-    const token = localStorage.getItem("token");
+    setLoading(true)
+    setError("")
+    const token = localStorage.getItem("token")
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/projects?status=pending', {
-        method: 'GET',
+      const res = await fetch("https://projxchange-backend-v1.vercel.app/projects?status=pending", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to fetch pending projects');
+      if (!res.ok) throw new Error("Failed to fetch pending projects")
 
-      const data: ProjectResponse = await res.json();
-      setPendingProjects(data.data || []);
+      const data: ProjectResponse = await res.json()
+      setPendingProjects(data.data || [])
     } catch (err) {
-      console.error(err);
-      setError('Could not load pending projects. Please try again later.');
+      console.error(err)
+      setError("Could not load pending projects. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // API function to update project status
   const updateProjectStatus = async (projectId: string, status: string, isFeatured: boolean) => {
-    setUpdatingProject(projectId);
-    const token = localStorage.getItem("token");
+    setUpdatingProject(projectId)
+    const token = localStorage.getItem("token")
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/projects/${projectId}/status`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           status: status,
-          is_featured: isFeatured
+          is_featured: isFeatured,
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to update project status');
+        throw new Error("Failed to update project status")
       }
 
       // Update the project in the local state
-      setProjects(prevProjects =>
-        prevProjects.map(project =>
-          project.id === projectId
-            ? { ...project, status, is_featured: isFeatured }
-            : project
-        )
-      );
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId ? { ...project, status, is_featured: isFeatured } : project,
+        ),
+      )
 
-      toast.success(`Project ${status === 'approved' ? 'approved' : status === 'suspended' ? 'suspended' : 'updated'} successfully!`);
+      toast.success(
+        `Project ${status === "approved" ? "approved" : status === "suspended" ? "suspended" : "updated"} successfully!`,
+      )
     } catch (error) {
-      console.error('Error updating project status:', error);
-      alert('Failed to update project status. Please try again.');
+      console.error("Error updating project status:", error)
+      alert("Failed to update project status. Please try again.")
     } finally {
-      setUpdatingProject(null);
+      setUpdatingProject(null)
     }
-  };
+  }
 
   // API function to update user status
   const updateUserStatus = async (userId: string, verificationStatus: string, emailVerified: boolean) => {
-    setUpdatingUser(userId);
-    const token = localStorage.getItem("token");
+    setUpdatingUser(userId)
+    const token = localStorage.getItem("token")
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}/status`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           verification_status: verificationStatus,
-          email_verified: emailVerified
+          email_verified: emailVerified,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to update user status');
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || "Failed to update user status")
       }
 
       // Update the user in the local state
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.id === userId
-            ? { ...user, verification_status: verificationStatus }
-            : user
-        )
-      );
-      toast.success(`User status updated successfully!`);
-      setIsUserModalOpen(false);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === userId ? { ...user, verification_status: verificationStatus } : user)),
+      )
+      toast.success(`User status updated successfully!`)
+      setIsUserModalOpen(false)
     } catch (error) {
-      console.error('Error updating user status:', error);
-      alert(`Failed to update user status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Error updating user status:", error)
+      alert(`Failed to update user status: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
-      setUpdatingUser(null);
+      setUpdatingUser(null)
     }
-  };
+  }
 
   // API function to delete user
   const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      return;
+    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
+      return
     }
 
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to delete user');
+        throw new Error("Failed to delete user")
       }
 
       // Remove the user from the local state
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId))
 
-      toast.success('User deleted successfully!');
+      toast.success("User deleted successfully!")
     } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Failed to delete user. Please try again.');
+      console.error("Error deleting user:", error)
+      alert("Failed to delete user. Please try again.")
     }
-  };
+  }
 
   // API function to fetch user details
   const fetchUserDetails = async (userId: string) => {
-    setFetchingUserDetails(true);
-    const token = localStorage.getItem("token");
+    setFetchingUserDetails(true)
+    const token = localStorage.getItem("token")
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch user details');
+        throw new Error("Failed to fetch user details")
       }
 
-      const data = await response.json();
-      setSelectedUser(data.user);
-      setIsUserModalOpen(true);
+      const data = await response.json()
+      setSelectedUser(data.user)
+      setIsUserModalOpen(true)
     } catch (error) {
-      console.error('Error fetching user details:', error);
-      alert('Failed to fetch user details. Please try again.');
+      console.error("Error fetching user details:", error)
+      alert("Failed to fetch user details. Please try again.")
     } finally {
-      setFetchingUserDetails(false);
+      setFetchingUserDetails(false)
     }
-  };
+  }
 
   const openProjectModal = (project: Project) => {
-    setSelectedProject(project);
+    setSelectedProject(project)
     setProjectUpdateData({
       status: project.status,
-      is_featured: project.is_featured
-    });
-    setIsProjectModalOpen(true);
-  };
+      is_featured: project.is_featured,
+    })
+    setIsProjectModalOpen(true)
+  }
 
   const fetchTransactions = async () => {
-    setLoading(true);
-    setError('');
-    const token = localStorage.getItem("token");
+    setLoading(true)
+    setError("")
+    const token = localStorage.getItem("token")
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/transactions/recent', {
-        method: 'GET',
+      const res = await fetch("https://projxchange-backend-v1.vercel.app/admin/transactions/recent", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to fetch transactions');
+      if (!res.ok) throw new Error("Failed to fetch transactions")
 
-      const data: TransactionsApiResponse = await res.json();
-      setTransactions(data.transactions);
+      const data: TransactionsApiResponse = await res.json()
+      setTransactions(data.transactions)
     } catch (err) {
-      console.error(err);
-      setError('Could not load transactions. Please try again later.');
+      console.error(err)
+      setError("Could not load transactions. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleUpdateTransactionStatus = async (transactionId: string, status: string, paymentGatewayResponse?: string, metadata?: string) => {
-    setUpdatingTransaction(transactionId);
-    const token = localStorage.getItem('token');
+  const handleUpdateTransactionStatus = async (
+    transactionId: string,
+    status: string,
+    paymentGatewayResponse?: string,
+    metadata?: string,
+  ) => {
+    setUpdatingTransaction(transactionId)
+    const token = localStorage.getItem("token")
     try {
-      const requestBody: any = { status };
-      if (paymentGatewayResponse) requestBody.payment_gateway_response = paymentGatewayResponse;
-      if (metadata) requestBody.metadata = metadata;
+      const requestBody: any = { status }
+      if (paymentGatewayResponse) requestBody.payment_gateway_response = paymentGatewayResponse
+      if (metadata) requestBody.metadata = metadata
 
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/transactions/${transactionId}/status`, {
-        method: 'PATCH', // or PATCH depending on your API
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Replace with your auth token
+      const response = await fetch(
+        `https://projxchange-backend-v1.vercel.app/admin/transactions/${transactionId}/status`,
+        {
+          method: "PATCH", // or PATCH depending on your API
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Replace with your auth token
+          },
+          body: JSON.stringify(requestBody),
         },
-        body: JSON.stringify(requestBody),
-      });
+      )
 
       if (!response.ok) {
-        throw new Error('Failed to update transaction status');
+        throw new Error("Failed to update transaction status")
       }
 
-      const updatedTransaction = await response.json();
+      const updatedTransaction = await response.json()
 
       // Update the transaction in your transactions array
-      setTransactions(prev =>
-        prev.map(tx =>
-          tx.id === transactionId
-            ? { ...tx, ...updatedTransaction }
-            : tx
-        )
-      );
+      setTransactions((prev) => prev.map((tx) => (tx.id === transactionId ? { ...tx, ...updatedTransaction } : tx)))
 
       // Update the selected transaction if it's the one being updated
       if (selectedTransaction?.id === transactionId) {
-        setSelectedTransaction(prev => prev ? { ...prev, ...updatedTransaction } : null);
+        setSelectedTransaction((prev) => (prev ? { ...prev, ...updatedTransaction } : null))
       }
 
       // Show success message (optional)
-      console.log('Transaction updated successfully');
-
+      console.log("Transaction updated successfully")
     } catch (error) {
-      console.error('Error updating transaction:', error);
+      console.error("Error updating transaction:", error)
       // Show error message to user (you might want to use a toast notification)
-      alert('Failed to update transaction status');
+      alert("Failed to update transaction status")
     } finally {
-      setUpdatingTransaction(null);
+      setUpdatingTransaction(null)
     }
-  };
+  }
 
   const fetchReviews = async () => {
-    setLoading(true);
-    setError('');
-    const token = localStorage.getItem("token");
+    setLoading(true)
+    setError("")
+    const token = localStorage.getItem("token")
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/admin/reviews', {
-        method: 'GET',
+      const res = await fetch("https://projxchange-backend-v1.vercel.app/admin/reviews", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      if (!res.ok) throw new Error('Failed to fetch reviews');
+      if (!res.ok) throw new Error("Failed to fetch reviews")
 
-      const data = await res.json();
-      setReviews(data.reviews || []);
+      const data = await res.json()
+      setReviews(data.reviews || [])
     } catch (err) {
-      console.error(err);
-      setError('Could not load reviews. Please try again later.');
-
+      console.error(err)
+      setError("Could not load reviews. Please try again later.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleReviewAction = async (reviewIds: string[], isApproved: boolean) => {
-    setUpdatingReview(reviewIds[0]); 
-    const token = localStorage.getItem("token");
+    setUpdatingReview(reviewIds[0])
+    const token = localStorage.getItem("token")
 
     try {
-      const response = await fetch(
-        `https://projxchange-backend-v1.vercel.app/admin/reviews/approve`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            review_ids: reviewIds,
-            is_approved: isApproved,
-          }),
-        }
-      );
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/approve`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          review_ids: reviewIds,
+          is_approved: isApproved,
+        }),
+      })
 
       if (response.ok) {
         setReviews((prev) =>
-          prev.map((review) =>
-            reviewIds.includes(review.id)
-              ? { ...review, is_approved: isApproved }
-              : review
-          )
-        );
+          prev.map((review) => (reviewIds.includes(review.id) ? { ...review, is_approved: isApproved } : review)),
+        )
 
-        toast.success(
-          `Review${reviewIds.length > 1 ? "s" : ""} ${isApproved ? "approved" : "rejected"
-          } successfully!`
-        );
+        toast.success(`Review${reviewIds.length > 1 ? "s" : ""} ${isApproved ? "approved" : "rejected"} successfully!`)
 
-        setIsReviewModalOpen(false);
+        setIsReviewModalOpen(false)
       } else {
-        throw new Error(
-          `Failed to ${isApproved ? "approve" : "reject"} review(s)`
-        );
+        throw new Error(`Failed to ${isApproved ? "approve" : "reject"} review(s)`)
       }
     } catch (error) {
-      console.error(
-        `Error ${isApproved ? "approving" : "rejecting"} reviews:`,
-        error
-      );
-      toast.error(
-        `Failed to ${isApproved ? "approve" : "reject"} review(s). Please try again.`
-      );
+      console.error(`Error ${isApproved ? "approving" : "rejecting"} reviews:`, error)
+      toast.error(`Failed to ${isApproved ? "approve" : "reject"} review(s). Please try again.`)
     } finally {
-      setUpdatingReview(null);
+      setUpdatingReview(null)
     }
-  };
+  }
 
   const handleDeleteReview = async (reviewId: string) => {
-    setDeletingReview(reviewId);
-    const token = localStorage.getItem("token");
+    setDeletingReview(reviewId)
+    const token = localStorage.getItem("token")
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (response.ok) {
-        setReviews(prev => prev.filter(review => review.id !== reviewId));
-        toast.success('Review deleted successfully!');
-        setIsReviewModalOpen(false);
+        setReviews((prev) => prev.filter((review) => review.id !== reviewId))
+        toast.success("Review deleted successfully!")
+        setIsReviewModalOpen(false)
       } else {
-        throw new Error('Failed to delete review');
+        throw new Error("Failed to delete review")
       }
     } catch (error) {
-      console.error('Error deleting review:', error);
-      toast.error('Failed to delete review. Please try again.');
+      console.error("Error deleting review:", error)
+      toast.error("Failed to delete review. Please try again.")
     } finally {
-      setDeletingReview(null);
+      setDeletingReview(null)
     }
-  };
+  }
 
   const openReviewModal = (review: Review) => {
-    setSelectedReview(review);
-    setIsReviewModalOpen(true);
-  };
+    setSelectedReview(review)
+    setIsReviewModalOpen(true)
+  }
 
   const handleProjectStatusUpdate = async () => {
-    if (!selectedProject) return;
+    if (!selectedProject) return
 
-    setUpdatingProjectStatus(true);
-    const token = localStorage.getItem("token");
+    setUpdatingProjectStatus(true)
+    const token = localStorage.getItem("token")
 
     // Check if token exists
     if (!token) {
-      alert('Authentication token not found. Please login again.');
-      setUpdatingProjectStatus(false);
-      return;
+      alert("Authentication token not found. Please login again.")
+      setUpdatingProjectStatus(false)
+      return
     }
     // Check if project ID is valid
-    if (!selectedProject.id || selectedProject.id.trim() === '') {
-      alert('Invalid project ID');
-      setUpdatingProjectStatus(false);
-      return;
+    if (!selectedProject.id || selectedProject.id.trim() === "") {
+      alert("Invalid project ID")
+      setUpdatingProjectStatus(false)
+      return
     }
 
     try {
       const requestBody = {
         status: projectUpdateData.status,
-        is_featured: projectUpdateData.is_featured
-      };
-
-      console.log('Request body:', requestBody);
-      console.log('Request body JSON:', JSON.stringify(requestBody));
-
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/projects/${selectedProject.id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      console.log('Response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`Failed to update project status: ${response.status} ${response.statusText}`);
+        is_featured: projectUpdateData.is_featured,
       }
 
-      const data = await response.json();
+      console.log("Request body:", requestBody)
+      console.log("Request body JSON:", JSON.stringify(requestBody))
 
-      // Update the project in the local state
-      setProjects(prevProjects =>
-        prevProjects.map(project =>
-          project.id === selectedProject.id
-            ? { ...project, status: data.project.status, is_featured: data.project.is_featured }
-            : project
-        )
-      );
-
-      toast.success('Project status updated successfully!');
-      setIsProjectModalOpen(false);
-      setSelectedProject(null);
-
-      // Refresh the projects list
-      if (activeTab === 'approval') {
-        fetchPendingProjects();
-      } else if (activeTab === 'projects') {
-        fetchProjects();
-      }
-    } catch (error) {
-      console.error('Error updating project status:', error);
-      alert('Failed to update project status. Please try again.');
-    } finally {
-      setUpdatingProjectStatus(false);
-    }
-  };
-
-
-
-  const handleReject = (id: string) => {
-    updateProjectStatus(id, 'suspended', false);
-  };
-
-  const handleDelete = async (projectId: string) => {
-    if (!confirm("Are you sure you want to delete this project and its dump? This action cannot be undone.")) {
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("You are not authorized. Please log in again.");
-      return;
-    }
-
-    try {
-      const projectResponse = await fetch(
-        `https://projxchange-backend-v1.vercel.app/projects/${projectId}`,
+      const response = await fetch(
+        `https://projxchange-backend-v1.vercel.app/admin/projects/${selectedProject.id}/status`,
         {
-          method: "DELETE",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
+          body: JSON.stringify(requestBody),
+        },
+      )
+
+      console.log("Response status:", response.status)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("Error response:", errorText)
+        throw new Error(`Failed to update project status: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      // Update the project in the local state
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === selectedProject.id
+            ? { ...project, status: data.project.status, is_featured: data.project.is_featured }
+            : project,
+        ),
+      )
+
+      toast.success("Project status updated successfully!")
+      setIsProjectModalOpen(false)
+      setSelectedProject(null)
+
+      // Refresh the projects list
+      if (activeTab === "approval") {
+        fetchPendingProjects()
+      } else if (activeTab === "projects") {
+        fetchProjects()
+      }
+    } catch (error) {
+      console.error("Error updating project status:", error)
+      alert("Failed to update project status. Please try again.")
+    } finally {
+      setUpdatingProjectStatus(false)
+    }
+  }
+
+  const handleReject = (id: string) => {
+    updateProjectStatus(id, "suspended", false)
+  }
+
+  const handleDelete = async (projectId: string) => {
+    if (!confirm("Are you sure you want to delete this project and its dump? This action cannot be undone.")) {
+      return
+    }
+
+    const token = localStorage.getItem("token")
+    if (!token) {
+      toast.error("You are not authorized. Please log in again.")
+      return
+    }
+
+    try {
+      const projectResponse = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${projectId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!projectResponse.ok) {
-        throw new Error("Failed to delete project");
+        throw new Error("Failed to delete project")
       }
 
       // Update state if needed
-      setProjects?.((prev: Project[]) => prev.filter((p) => p.id !== projectId));
+      setProjects?.((prev: Project[]) => prev.filter((p) => p.id !== projectId))
 
-      toast.success("Project and its dump deleted successfully!");
+      toast.success("Project and its dump deleted successfully!")
     } catch (error) {
-      console.error("Error deleting project:", error);
-      toast.error("Failed to delete project. Please try again.");
+      console.error("Error deleting project:", error)
+      toast.error("Failed to delete project. Please try again.")
     }
-  };
-
+  }
 
   const handleToggleFeatured = (id: string, currentFeatured: boolean) => {
-    const project = projects.find(p => p.id === id);
+    const project = projects.find((p) => p.id === id)
     if (project) {
-      updateProjectStatus(id, project.status, !currentFeatured);
+      updateProjectStatus(id, project.status, !currentFeatured)
     }
-  };
-
+  }
 
   const StatCard = ({ title, value, subtitle, icon: Icon, color, trend, onClick }: any) => (
     <div
@@ -668,7 +699,9 @@ const AdminDashboard = () => {
           <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
           <p className={`text-sm font-semibold ${color}`}>{subtitle}</p>
         </div>
-        <div className={`w-14 h-14 bg-gradient-to-br ${color.replace('text-', 'from-').replace('-600', '-500')} to-${color.split('-')[1]}-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+        <div
+          className={`w-14 h-14 bg-gradient-to-br ${color.replace("text-", "from-").replace("-600", "-500")} to-${color.split("-")[1]}-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+        >
           <Icon className="w-7 h-7 text-white" />
         </div>
       </div>
@@ -679,69 +712,70 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  );
+  )
   // fetchAllStats will load everything once when dashboard mounts
   useEffect(() => {
-    fetchAllStats();
-  }, []);
+    fetchAllStats()
+  }, [])
 
   // tab-specific fetching (only when you want fresh detail view)
   useEffect(() => {
-    if (activeTab === 'users') {
-      fetchUsers();
-    } else if (activeTab === 'projects') {
-      fetchProjects();
-    } else if (activeTab === 'approval') {
-      fetchPendingProjects();
-    } else if (activeTab === 'transactions') {
-      fetchTransactions();
-    } else if (activeTab === 'reviews') {
-      fetchReviews();
+    if (activeTab === "users") {
+      fetchUsers()
+    } else if (activeTab === "projects") {
+      fetchProjects()
+    } else if (activeTab === "approval") {
+      fetchPendingProjects()
+    } else if (activeTab === "transactions") {
+      fetchTransactions()
+    } else if (activeTab === "reviews") {
+      fetchReviews()
     }
-  }, [activeTab]);
-
-
+  }, [activeTab])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-12 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-8 sm:py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="animate-slideInLeft">
-              <h1 className="text-4xl font-bold mb-3">Admin Dashboard</h1>
-              <p className="text-blue-100 text-lg">Welcome back, {user?.full_name}! Manage your platform with ease.</p>
-              <div className="flex items-center gap-6 mt-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-4">
+            <div className="animate-slideInLeft w-full sm:w-auto">
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-3">Admin Dashboard</h1>
+              <p className="text-blue-100 text-sm sm:text-lg mb-4">
+                Welcome back, {user?.full_name}! Manage your platform with ease.
+              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <Activity className="w-5 h-5 text-green-300" />
-                  <span className="text-sm">System Status: Healthy</span>
+                  <span className="text-xs sm:text-sm">System Status: Healthy</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-blue-300" />
-                  <span className="text-sm">{stats.activeUsers} Active Users</span>
+                  <span className="text-xs sm:text-sm">{stats.activeUsers} Active Users</span>
                 </div>
               </div>
             </div>
-            <div className="text-right animate-slideInRight">
-              <div className="text-3xl font-bold">${stats.revenue.toLocaleString()}</div>
-              <div className="text-blue-200 text-sm">Monthly Revenue</div>
-              <div className="text-sm text-green-300 font-semibold mt-1">
-                +{stats.monthlyGrowth}% growth
-              </div>
+            <div className="text-left sm:text-right w-full sm:w-auto animate-slideInRight">
+              <div className="text-2xl sm:text-3xl font-bold">${stats.revenue.toLocaleString()}</div>
+              <div className="text-blue-200 text-xs sm:text-sm">Monthly Revenue</div>
+              <div className="text-xs sm:text-sm text-green-300 font-semibold mt-1">+{stats.monthlyGrowth}% growth</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 -mt-16 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:-mt-16 relative z-10">
           <StatCard
             title="Total Projects"
             value={stats.totalProjects}
@@ -749,7 +783,7 @@ const AdminDashboard = () => {
             icon={ShoppingBag}
             color="text-blue-600"
             trend="+5 new projects"
-            onClick={() => setActiveTab('projects')}
+            onClick={() => setActiveTab("projects")}
           />
           <StatCard
             title="Pending Approval"
@@ -757,7 +791,7 @@ const AdminDashboard = () => {
             subtitle="Needs attention"
             icon={AlertCircle}
             color="text-orange-600"
-            onClick={() => setActiveTab('approval')}
+            onClick={() => setActiveTab("approval")}
           />
           <StatCard
             title="Total Sales"
@@ -766,7 +800,7 @@ const AdminDashboard = () => {
             icon={DollarSign}
             color="text-green-600"
             trend="+450 today"
-            onClick={() => setActiveTab('transactions')}
+            onClick={() => setActiveTab("transactions")}
           />
           <StatCard
             title="Total Users"
@@ -775,59 +809,60 @@ const AdminDashboard = () => {
             icon={Users}
             color="text-purple-600"
             trend="+12 new users"
-            onClick={() => setActiveTab('users')}
+            onClick={() => setActiveTab("users")}
           />
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 mb-8 animate-slideInUp">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
-            <div className="flex items-center gap-4">
+        <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 shadow-xl border border-white/30 mb-8 animate-slideInUp">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Quick Actions</h2>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => navigate("/upload")}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-3 sm:px-4 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
-                Add Project
+                <span>Add Project</span>
               </button>
-              <button className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105">
+              <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 sm:px-4 py-2 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base whitespace-nowrap">
                 <Bell className="w-4 h-4" />
-                Notifications
+                <span>Notifications</span>
               </button>
-              <button className="flex items-center gap-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-4 py-2 rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105">
+              <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-3 sm:px-4 py-2 rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base whitespace-nowrap">
                 <Settings className="w-4 h-4" />
-                Settings
+                <span>Settings</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-8 overflow-x-auto">
+        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-8 min-w-max sm:min-w-0">
               {[
-                { id: 'overview', label: 'Overview', icon: BarChart3 },
-                { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-                { id: 'projects', label: 'Projects', icon: ShoppingBag },
-                { id: 'users', label: 'Users', icon: Users },
-                { id: 'approval', label: 'Pending', icon: AlertCircle },
-                { id: 'transactions', label: 'Transactions', icon: DollarSign },
-                { id: 'reviews', label: 'Reviews', icon: MessageSquare }
+                { id: "overview", label: "Overview", icon: BarChart3 },
+                { id: "analytics", label: "Analytics", icon: TrendingUp },
+                { id: "projects", label: "Projects", icon: ShoppingBag },
+                { id: "users", label: "Users", icon: Users },
+                { id: "approval", label: "Pending", icon: AlertCircle },
+                { id: "transactions", label: "Transactions", icon: DollarSign },
+                { id: "reviews", label: "Reviews", icon: MessageSquare },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 py-6 px-2 border-b-2 font-semibold text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 scale-105'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:scale-105'
-                    }`}
+                  className={`flex items-center gap-2 sm:gap-3 py-4 sm:py-6 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "border-blue-500 text-blue-600 scale-105"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                  }`}
                 >
-                  <tab.icon className="w-5 h-5" />
+                  <tab.icon className="w-4 sm:w-5 h-4 sm:h-5" />
                   {tab.label}
-                  {tab.id === 'approval' && stats.pendingApproval > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                  {tab.id === "approval" && stats.pendingApproval > 0 && (
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse ml-1">
                       {stats.pendingApproval}
                     </span>
                   )}
@@ -836,47 +871,69 @@ const AdminDashboard = () => {
             </nav>
           </div>
 
-          <div className="p-8">
-            {activeTab === 'overview' && (
+          <div className="p-4 sm:p-8">
+            {activeTab === "overview" && (
               <div className="animate-slideInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8">Platform Overview</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8">Platform Overview</h2>
 
-                <div className="grid lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Recent Activity */}
                   <div className="lg:col-span-2">
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-100 shadow-lg">
-                      <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                        <Activity className="w-6 h-6 text-blue-600" />
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-lg">
+                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3">
+                        <Activity className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600" />
                         Recent Activity
                       </h3>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {recentActivity.map((activity, index) => (
-                          <div key={activity.id} className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                            <div className="flex items-center gap-4">
+                          <div
+                            key={activity.id}
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
+                            style={{ animationDelay: `${index * 100}ms` }}
+                          >
+                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                               <img
-                                src={activity.avatar}
+                                src={activity.avatar || "/placeholder.svg"}
                                 alt={activity.user}
-                                className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-100"
+                                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-blue-100 flex-shrink-0"
                               />
-                              <div className={`w-3 h-3 rounded-full ${activity.type === 'project' ? 'bg-blue-500' :
-                                activity.type === 'approval' ? 'bg-green-500' :
-                                  activity.type === 'user' ? 'bg-purple-500' :
-                                    activity.type === 'payment' ? 'bg-yellow-500' :
-                                      'bg-red-500'
-                                }`} />
-                              <div>
-                                <span className="text-gray-900 font-semibold">{activity.action}</span>
-                                <div className="text-sm text-gray-600">by {activity.user}</div>
+                              <div
+                                className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                                  activity.type === "project"
+                                    ? "bg-blue-500"
+                                    : activity.type === "approval"
+                                      ? "bg-green-500"
+                                      : activity.type === "user"
+                                        ? "bg-purple-500"
+                                        : activity.type === "payment"
+                                          ? "bg-yellow-500"
+                                          : "bg-red-500"
+                                }`}
+                              />
+                              <div className="min-w-0 flex-1">
+                                <span className="text-gray-900 font-semibold text-sm sm:text-base truncate block">
+                                  {activity.action}
+                                </span>
+                                <div className="text-xs sm:text-sm text-gray-600 truncate">by {activity.user}</div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <span className="text-sm text-gray-500 font-medium">{activity.time}</span>
-                              <div className={`text-xs px-2 py-1 rounded-full mt-1 ${activity.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                activity.status === 'approved' ? 'bg-green-100 text-green-700' :
-                                  activity.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                                    activity.status === 'active' ? 'bg-purple-100 text-purple-700' :
-                                      'bg-red-100 text-red-700'
-                                }`}>
+                            <div className="text-right flex-shrink-0">
+                              <span className="text-xs sm:text-sm text-gray-500 font-medium block">
+                                {activity.time}
+                              </span>
+                              <div
+                                className={`text-xs px-2 py-1 rounded-full mt-1 ${
+                                  activity.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : activity.status === "approved"
+                                      ? "bg-green-100 text-green-700"
+                                      : activity.status === "completed"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : activity.status === "active"
+                                          ? "bg-purple-100 text-purple-700"
+                                          : "bg-red-100 text-red-700"
+                                }`}
+                              >
                                 {activity.status}
                               </div>
                             </div>
@@ -887,47 +944,53 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="space-y-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-6 border border-blue-100">
-                      <h4 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
-                        <Target className="w-5 h-5" />
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-4 sm:p-6 border border-blue-100">
+                      <h4 className="font-bold text-blue-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                        <Target className="w-4 sm:w-5 h-4 sm:h-5" />
                         Today's Metrics
                       </h4>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-blue-700">New Signups</span>
-                          <span className="text-2xl font-bold text-blue-900">12</span>
+                          <span className="text-blue-700 text-sm sm:text-base">New Signups</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900">12</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-blue-700">Projects Sold</span>
-                          <span className="text-2xl font-bold text-blue-900">8</span>
+                          <span className="text-blue-700 text-sm sm:text-base">Projects Sold</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900">8</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-blue-700">Revenue</span>
-                          <span className="text-2xl font-bold text-blue-900">$450</span>
+                          <span className="text-blue-700 text-sm sm:text-base">Revenue</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900">$450</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
-                      <h4 className="font-bold text-purple-900 mb-4">Platform Health</h4>
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 sm:p-6 border border-purple-100">
+                      <h4 className="font-bold text-purple-900 mb-3 sm:mb-4 text-sm sm:text-base">Platform Health</h4>
                       <div className="space-y-3">
                         <div>
-                          <div className="flex justify-between text-sm mb-1">
+                          <div className="flex justify-between text-xs sm:text-sm mb-1">
                             <span className="text-purple-700">Server Uptime</span>
                             <span className="font-semibold">99.9%</span>
                           </div>
                           <div className="w-full bg-purple-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{ width: '99.9%' }} />
+                            <div
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                              style={{ width: "99.9%" }}
+                            />
                           </div>
                         </div>
                         <div>
-                          <div className="flex justify-between text-sm mb-1">
+                          <div className="flex justify-between text-xs sm:text-sm mb-1">
                             <span className="text-purple-700">User Satisfaction</span>
                             <span className="font-semibold">{stats.avgRating}/5.0</span>
                           </div>
                           <div className="w-full bg-purple-200 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{ width: `${(stats.avgRating / 5) * 100}%` }} />
+                            <div
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                              style={{ width: `${(stats.avgRating / 5) * 100}%` }}
+                            />
                           </div>
                         </div>
                       </div>
@@ -937,31 +1000,31 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {activeTab === 'analytics' && (
+            {activeTab === "analytics" && (
               <div className="animate-slideInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                  <BarChart3 className="w-7 h-7 text-blue-600" />
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-3">
+                  <BarChart3 className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600" />
                   Analytics & Reports
                 </h2>
 
-                <div className="grid lg:grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
                   {/* Sales Chart */}
-                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-100 shadow-lg">
-                    <h3 className="text-xl font-bold mb-6">Monthly Performance</h3>
-                    <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-lg">
+                    <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Monthly Performance</h3>
+                    <div className="space-y-3 sm:space-y-4">
                       {salesData.map((data, index) => (
                         <div key={index} className="animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-gray-700 font-semibold">{data.month}</span>
-                            <div className="flex items-center gap-4 text-sm">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2">
+                            <span className="text-gray-700 font-semibold text-sm sm:text-base">{data.month}</span>
+                            <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm">
                               <span className="text-green-600 font-bold">${data.sales}</span>
                               <span className="text-blue-600">{data.projects} projects</span>
                               <span className="text-purple-600">{data.users} users</span>
                             </div>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
                             <div
-                              className="bg-gradient-to-r from-blue-500 to-teal-500 h-3 rounded-full transition-all duration-1000"
+                              className="bg-gradient-to-r from-blue-500 to-teal-500 h-2 sm:h-3 rounded-full transition-all duration-1000"
                               style={{ width: `${(data.sales / 3000) * 100}%` }}
                             />
                           </div>
@@ -971,23 +1034,29 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Top Categories */}
-                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 border border-gray-100 shadow-lg">
-                    <h3 className="text-xl font-bold mb-6">Popular Categories</h3>
-                    <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-lg">
+                    <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Popular Categories</h3>
+                    <div className="space-y-3 sm:space-y-4">
                       {[
-                        { name: 'React', projects: 15, sales: '$1,250', color: 'from-blue-500 to-blue-600' },
-                        { name: 'Java', projects: 12, sales: '$980', color: 'from-orange-500 to-red-600' },
-                        { name: 'Python', projects: 10, sales: '$850', color: 'from-green-500 to-emerald-600' },
-                        { name: 'PHP', projects: 8, sales: '$640', color: 'from-purple-500 to-indigo-600' }
+                        { name: "React", projects: 15, sales: "$1,250", color: "from-blue-500 to-blue-600" },
+                        { name: "Java", projects: 12, sales: "$980", color: "from-orange-500 to-red-600" },
+                        { name: "Python", projects: 10, sales: "$850", color: "from-green-500 to-emerald-600" },
+                        { name: "PHP", projects: 8, sales: "$640", color: "from-purple-500 to-indigo-600" },
                       ].map((category, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                          <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${category.color}`} />
-                            <span className="font-semibold text-gray-900">{category.name}</span>
+                        <div
+                          key={index}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${category.color} flex-shrink-0`} />
+                            <span className="font-semibold text-gray-900 text-sm sm:text-base">{category.name}</span>
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold text-gray-900">{category.projects} projects</div>
-                            <div className="text-sm text-green-600 font-semibold">{category.sales}</div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="font-bold text-gray-900 text-sm sm:text-base">
+                              {category.projects} projects
+                            </div>
+                            <div className="text-xs sm:text-sm text-green-600 font-semibold">{category.sales}</div>
                           </div>
                         </div>
                       ))}
@@ -996,36 +1065,36 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* KPI Cards */}
-                <div className="grid md:grid-cols-4 gap-6">
-                  <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-3">Conversion Rate</h4>
-                    <div className="text-3xl font-bold text-blue-600 mb-2">{stats.conversionRate}%</div>
-                    <div className="text-sm text-green-600 font-semibold">↑ 0.3% from last month</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Conversion Rate</h4>
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{stats.conversionRate}%</div>
+                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 0.3% from last month</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-3">Avg Order Value</h4>
-                    <div className="text-3xl font-bold text-green-600 mb-2">$34.50</div>
-                    <div className="text-sm text-green-600 font-semibold">↑ $2.10 from last month</div>
+                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Avg Order Value</h4>
+                    <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">$34.50</div>
+                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ $2.10 from last month</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-3">User Retention</h4>
-                    <div className="text-3xl font-bold text-purple-600 mb-2">78%</div>
-                    <div className="text-sm text-green-600 font-semibold">↑ 5% from last month</div>
+                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">User Retention</h4>
+                    <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">78%</div>
+                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 5% from last month</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-3">Active Sellers</h4>
-                    <div className="text-3xl font-bold text-orange-600 mb-2">24</div>
-                    <div className="text-sm text-green-600 font-semibold">↑ 3 new this month</div>
+                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Active Sellers</h4>
+                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">24</div>
+                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 3 new this month</div>
                   </div>
                 </div>
               </div>
             )}
 
-            {activeTab === 'projects' && (
+            {activeTab === "projects" && (
               <div className="animate-slideInUp">
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">Manage Projects</h2>
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Manage Projects</h2>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
@@ -1033,13 +1102,13 @@ const AdminDashboard = () => {
                         placeholder="Search projects..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="w-full sm:w-auto pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                       />
                     </div>
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                     >
                       <option value="all">All Status</option>
                       <option value="approved">Approved</option>
@@ -1047,81 +1116,115 @@ const AdminDashboard = () => {
                       <option value="suspended">Suspended</option>
                       <option value="archived">Archived</option>
                     </select>
-
                   </div>
                 </div>
 
                 {loading ? (
                   <div className="bg-white rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading projects...</p>
+                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading projects...</p>
                   </div>
                 ) : (
                   <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
                     <div className="overflow-x-auto">
-                      <table className="w-full">
+                      <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Author ID</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Sales</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Project
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                              Author ID
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                              Category
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Price
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
+                              Sales
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Actions
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {projects
-                            .filter(p => filterStatus === 'all' || p.status === filterStatus)
-                            .filter(p => searchTerm === '' || p.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                            .filter((p) => filterStatus === "all" || p.status === filterStatus)
+                            .filter(
+                              (p) => searchTerm === "" || p.title.toLowerCase().includes(searchTerm.toLowerCase()),
+                            )
                             .map((project, index) => (
-                              <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
-                                      <span className="text-white font-bold text-lg">{project.title.charAt(0)}</span>
+                              <tr
+                                key={project.id}
+                                className="hover:bg-gray-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                              >
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                  <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                      <span className="text-white font-bold text-sm sm:text-lg">
+                                        {project.title.charAt(0)}
+                                      </span>
                                     </div>
-                                    <div>
-                                      <div className="font-semibold text-gray-900">{project.title}</div>
-                                      <div className="flex items-center gap-2 mt-1">
+                                    <div className="min-w-0 flex-1">
+                                      <div className="font-semibold text-gray-900 truncate">{project.title}</div>
+                                      <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
                                         {project.is_featured && (
-                                          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Featured</span>
+                                          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">
+                                            Featured
+                                          </span>
                                         )}
-                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">{project.difficulty_level}</span>
+                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                                          {project.difficulty_level}
+                                        </span>
                                       </div>
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden sm:table-cell truncate">
                                   {project.author_id}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                                   <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
                                     {project.category}
                                   </span>
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-gray-900">₹{project.pricing?.sale_price}</span>
-                                    <span className="text-xs text-gray-500 line-through">₹{project.pricing?.original_price}</span>
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                    <span className="text-gray-900 font-bold">₹{project.pricing?.sale_price}</span>
+                                    <span className="text-gray-500 line-through text-xs">
+                                      ₹{project.pricing?.original_price}
+                                    </span>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-gray-900 hidden lg:table-cell">
                                   {project.purchase_count}
                                 </td>
-                                <td className="px-6 py-4">
-                                  <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                    project.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                        project.status === 'suspended' ? 'bg-red-100 text-red-800' :
-                                          project.status === 'archived' ? 'bg-gray-100 text-gray-800' :
-                                            'bg-gray-100 text-gray-800'
-                                    }`}>
-                                    {project.status.replace('_', ' ')}
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                  <span
+                                    className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
+                                      project.status === "approved"
+                                        ? "bg-green-100 text-green-800"
+                                        : project.status === "pending"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : project.status === "suspended"
+                                            ? "bg-red-100 text-red-800"
+                                            : project.status === "archived"
+                                              ? "bg-gray-100 text-gray-800"
+                                              : "bg-gray-100 text-gray-800"
+                                    }`}
+                                  >
+                                    {project.status.replace("_", " ")}
                                   </span>
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex space-x-2">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                  <div className="flex space-x-1 sm:space-x-2">
                                     <button
                                       onClick={() => openProjectModal(project)}
                                       className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
@@ -1131,12 +1234,13 @@ const AdminDashboard = () => {
                                     <button
                                       onClick={() => handleToggleFeatured(project.id, project.is_featured)}
                                       disabled={updatingProject === project.id}
-                                      className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${project.is_featured
-                                        ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
-                                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                                        }`}
+                                      className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${
+                                        project.is_featured
+                                          ? "text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50"
+                                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                                      }`}
                                     >
-                                      <Star className={`w-4 h-4 ${project.is_featured ? 'fill-current' : ''}`} />
+                                      <Star className={`w-4 h-4 ${project.is_featured ? "fill-current" : ""}`} />
                                     </button>
                                     <button
                                       onClick={() => handleDelete(project.id)}
@@ -1156,24 +1260,24 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {activeTab === 'users' && (
+            {activeTab === "users" && (
               <div className="animate-slideInUp">
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-                  <div className="flex gap-4">
-                    <select className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">User Management</h2>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <select className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm">
                       <option>All Users</option>
                       <option>Students</option>
                       <option>Admins</option>
                       <option>Active</option>
                       <option>Inactive</option>
                     </select>
-                    <div className="relative">
+                    <div className="relative w-full sm:w-auto">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="text"
                         placeholder="Search users..."
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                       />
                     </div>
                   </div>
@@ -1182,55 +1286,83 @@ const AdminDashboard = () => {
                 {loading ? (
                   <div className="bg-white rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading users...</p>
+                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading users...</p>
                   </div>
                 ) : (
                   <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
                     <div className="overflow-x-auto">
-                      <table className="w-full">
+                      <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">User</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Role</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Joined</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              User
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                              Role
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                              Joined
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Actions
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {users.map((user, index) => (
-                            <tr key={user.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
-                                    <span className="text-white font-bold text-lg">{user.full_name.charAt(0)}</span>
+                            <tr
+                              key={user.id}
+                              className="hover:bg-gray-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                              style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                              <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                <div className="flex items-center gap-2 sm:gap-4">
+                                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white font-bold text-sm sm:text-lg">
+                                      {user.full_name.charAt(0)}
+                                    </span>
                                   </div>
-                                  <div>
-                                    <div className="font-semibold text-gray-900">{user.full_name}</div>
-                                    <div className="text-sm text-gray-600">{user.email}</div>
-                                    <div className="text-xs text-gray-500">Last active: {new Date(user.updated_at).toLocaleDateString()}</div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-gray-900 truncate">{user.full_name}</div>
+                                    <div className="text-xs sm:text-sm text-gray-600 truncate">{user.email}</div>
+                                    <div className="text-xs text-gray-500">
+                                      Last: {new Date(user.updated_at).toLocaleDateString()}
+                                    </div>
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-6 py-4">
-                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${user.user_type === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                                  }`}>
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
+                                <span
+                                  className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
+                                    user.user_type === "admin"
+                                      ? "bg-purple-100 text-purple-800"
+                                      : "bg-blue-100 text-blue-800"
+                                  }`}
+                                >
                                   {user.user_type}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden md:table-cell">
                                 {new Date(user.created_at).toLocaleDateString()}
                               </td>
-                              <td className="px-6 py-4">
-                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
-                                  user.verification_status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                    'bg-yellow-100 text-yellow-800'
-                                  }`}>
+                              <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                <span
+                                  className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
+                                    user.verification_status === "verified"
+                                      ? "bg-green-100 text-green-800"
+                                      : user.verification_status === "rejected"
+                                        ? "bg-red-100 text-red-800"
+                                        : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
                                   {user.verification_status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4">
-                                <div className="flex space-x-2">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                <div className="flex space-x-1 sm:space-x-2">
                                   <button
                                     onClick={() => fetchUserDetails(user.id)}
                                     disabled={fetchingUserDetails}
@@ -1255,8 +1387,8 @@ const AdminDashboard = () => {
                           ))}
                           {users.length === 0 && (
                             <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
-                                 No users found
+                              <td colSpan={5} className="px-6 py-8 text-center text-gray-600">
+                                No users found
                               </td>
                             </tr>
                           )}
@@ -1268,12 +1400,12 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {activeTab === 'approval' && (
+            {activeTab === "approval" && (
               <div className="animate-slideInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                  <AlertCircle className="w-7 h-7 text-orange-600" />
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3 flex-wrap">
+                  <AlertCircle className="w-6 sm:w-7 h-6 sm:h-7 text-orange-600" />
                   Pending Approval
-                  <span className="bg-orange-500 text-white text-sm px-3 py-1 rounded-full animate-pulse">
+                  <span className="bg-orange-500 text-white text-xs sm:text-sm px-3 py-1 rounded-full animate-pulse">
                     {pendingProjects.length}
                   </span>
                 </h2>
@@ -1281,58 +1413,82 @@ const AdminDashboard = () => {
                 {loading ? (
                   <div className="bg-white rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading pending projects...</p>
+                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading pending projects...</p>
                   </div>
                 ) : (
                   <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
                     <div className="overflow-x-auto">
-                      <table className="w-full">
+                      <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-orange-50 to-yellow-50">
                           <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Author ID</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Submitted</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Project
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                              Author ID
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                              Category
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Price
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
+                              Submitted
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Actions
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {pendingProjects.map((project, index) => (
-                            <tr key={project.id} className="hover:bg-orange-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                                    <span className="text-white font-bold text-lg">{project.title.charAt(0)}</span>
+                            <tr
+                              key={project.id}
+                              className="hover:bg-orange-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                              style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                              <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white font-bold text-sm sm:text-lg">
+                                      {project.title.charAt(0)}
+                                    </span>
                                   </div>
-                                  <div>
-                                    <div className="font-semibold text-gray-900">{project.title}</div>
-                                    <div className="flex items-center gap-2 mt-1">
-                                      <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">Pending Review</span>
-                                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">{project.difficulty_level}</span>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-gray-900 truncate">{project.title}</div>
+                                    <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
+                                      <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">
+                                        Pending
+                                      </span>
+                                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                                        {project.difficulty_level}
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden sm:table-cell truncate">
                                 {project.author_id}
                               </td>
-                              <td className="px-6 py-4">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                                 <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
                                   {project.category}
                                 </span>
                               </td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-bold text-gray-900">₹{project.pricing?.sale_price}</span>
-                                  <span className="text-xs text-gray-500 line-through">₹{project.pricing?.original_price}</span>
+                              <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                  <span className="text-gray-900 font-bold">₹{project.pricing?.sale_price}</span>
+                                  <span className="text-gray-500 line-through text-xs">
+                                    ₹{project.pricing?.original_price}
+                                  </span>
                                 </div>
                               </td>
-                              <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden lg:table-cell">
                                 {new Date(project.created_at).toLocaleDateString()}
                               </td>
-                              <td className="px-6 py-4">
-                                <div className="flex space-x-2">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                <div className="flex space-x-1 sm:space-x-2">
                                   <button
                                     onClick={() => openProjectModal(project)}
                                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
@@ -1358,7 +1514,7 @@ const AdminDashboard = () => {
                           {pendingProjects.length === 0 && (
                             <tr>
                               <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
-                                 No pending projects found
+                                No pending projects found
                               </td>
                             </tr>
                           )}
@@ -1370,68 +1526,79 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {activeTab === 'transactions' && (
+            {activeTab === "transactions" && (
               <div className="animate-slideInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                  <DollarSign className="w-7 h-7 text-green-600" />
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+                  <DollarSign className="w-6 sm:w-7 h-6 sm:h-7 text-green-600" />
                   Transaction History
                 </h2>
 
                 {loading ? (
-                  <div className="text-center text-gray-500">Loading transactions...</div>
+                  <div className="text-center text-gray-500 text-sm sm:text-base">Loading transactions...</div>
                 ) : error ? (
-                  <div className="text-center text-red-500">{error}</div>
+                  <div className="text-center text-red-500 text-sm sm:text-base">{error}</div>
                 ) : transactions.length === 0 ? (
                   <div className="bg-white rounded-2xl p-8 text-center">
-                    <div className="text-gray-500 text-lg mb-4">No transactions found</div>
+                    <div className="text-gray-500 text-base sm:text-lg mb-4">No transactions found</div>
                   </div>
                 ) : (
                   <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
-                    <table className="min-w-full text-left text-sm text-gray-600">
+                    <table className="min-w-full text-left text-xs sm:text-sm text-gray-600">
                       <thead className="bg-gray-50 text-gray-700 font-semibold">
                         <tr>
-                          <th className="px-6 py-4">Transaction ID</th>
-                          <th className="px-6 py-4">Project</th>
-                          <th className="px-6 py-4">Buyer</th>
-                          <th className="px-6 py-4">Amount</th>
-                          <th className="px-6 py-4">Status</th>
-                          <th className="px-6 py-4">Date</th>
-                          <th className="px-6 py-4">Actions</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4">Transaction ID</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">Project</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">Buyer</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4">Amount</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">Status</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">Date</th>
+                          <th className="px-3 sm:px-6 py-3 sm:py-4">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {transactions.map((tx) => (
-                          <tr key={tx.id} className="border-t">
-                            <td className="px-6 py-4 font-mono">{tx.transaction_id}</td>
-                            <td className="px-6 py-4 flex items-center gap-3">
-                              <img src={tx.thumbnail} alt={tx.project.title} className="w-8 h-8 rounded" />
-                              {tx.project.title}
+                          <tr key={tx.id} className="border-t text-xs sm:text-sm">
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-xs sm:text-sm truncate">
+                              {tx.transaction_id}
                             </td>
-                            <td className="px-6 py-4">
-                              <div>{tx.buyer.full_name}</div>
-                              <div className="text-xs text-gray-400">{tx.buyer.email}</div>
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <img
+                                  src={tx.thumbnail || "/placeholder.svg"}
+                                  alt={tx.project.title}
+                                  className="w-8 h-8 rounded hidden sm:block"
+                                />
+                                <span className="truncate">{tx.project.title}</span>
+                              </div>
                             </td>
-                            <td className="px-6 py-4 font-semibold">
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                              <div className="truncate">{tx.buyer.full_name}</div>
+                              <div className="text-xs text-gray-400 truncate">{tx.buyer.email}</div>
+                            </td>
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold whitespace-nowrap">
                               {tx.amount} {tx.currency}
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                               <span
-                                className={`px-2 py-1 rounded-full text-xs ${tx.status === 'success'
-                                  ? 'bg-green-100 text-green-600'
-                                  : tx.status === 'pending'
-                                    ? 'bg-yellow-100 text-yellow-600'
-                                    : 'bg-red-100 text-red-600'
-                                  }`}
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  tx.status === "success"
+                                    ? "bg-green-100 text-green-600"
+                                    : tx.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-600"
+                                      : "bg-red-100 text-red-600"
+                                }`}
                               >
                                 {tx.status}
                               </span>
                             </td>
-                            <td className="px-6 py-4">{new Date(tx.created_at).toLocaleDateString()}</td>
-                            <td className="px-6 py-4">
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
+                              {new Date(tx.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="px-3 sm:px-6 py-3 sm:py-4">
                               <button
                                 onClick={() => {
-                                  setSelectedTransaction(tx);
-                                  setIsTransactionModalOpen(true);
+                                  setSelectedTransaction(tx)
+                                  setIsTransactionModalOpen(true)
                                 }}
                                 className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200"
                                 title="View transaction details"
@@ -1448,28 +1615,28 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {activeTab === 'reviews' && (
+            {activeTab === "reviews" && (
               <div className="animate-slideInUp">
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                    <MessageSquare className="w-7 h-7 text-blue-600" />
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                    <MessageSquare className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600" />
                     Manage Reviews
                   </h2>
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-auto">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="text"
                         placeholder="Search reviews..."
                         value={reviewSearchTerm}
                         onChange={(e) => setReviewSearchTerm(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                       />
                     </div>
                     <select
                       value={reviewFilterStatus}
                       onChange={(e) => setReviewFilterStatus(e.target.value)}
-                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                     >
                       <option value="all">All Reviews</option>
                       <option value="approved">Approved</option>
@@ -1481,78 +1648,108 @@ const AdminDashboard = () => {
                 {loading ? (
                   <div className="bg-white rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading reviews...</p>
+                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading reviews...</p>
                   </div>
                 ) : (
                   <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
                     <div className="overflow-x-auto">
-                      <table className="w-full">
+                      <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Review</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Project Name</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Student</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Rating</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Review
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                              Project Name
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                              Student
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Rating
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
+                              Status
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                              Date
+                            </th>
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              Actions
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {reviews
-                            .filter(review => reviewFilterStatus === 'all' ||
-                              (reviewFilterStatus === 'approved' && review.is_approved) ||
-                              (reviewFilterStatus === 'pending' && !review.is_approved))
-                            .filter(review => reviewSearchTerm === '' ||
-                              review.review_text.toLowerCase().includes(reviewSearchTerm.toLowerCase()) ||
-                              review.user.full_name.toLowerCase().includes(reviewSearchTerm.toLowerCase()))
+                            .filter(
+                              (review) =>
+                                reviewFilterStatus === "all" ||
+                                (reviewFilterStatus === "approved" && review.is_approved) ||
+                                (reviewFilterStatus === "pending" && !review.is_approved),
+                            )
+                            .filter(
+                              (review) =>
+                                reviewSearchTerm === "" ||
+                                review.review_text.toLowerCase().includes(reviewSearchTerm.toLowerCase()) ||
+                                review.user.full_name.toLowerCase().includes(reviewSearchTerm.toLowerCase()),
+                            )
                             .map((review, index) => (
-                              <tr key={review.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
-                                <td className="px-6 py-4">
-                                  <div className="max-w-xs">
-                                    <p className="text-sm text-gray-900 font-medium line-clamp-2">
-                                      {review.review_text}
-                                    </p>
-                                  </div>
+                              <tr
+                                key={review.id}
+                                className="hover:bg-gray-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                              >
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                  <p className="text-xs sm:text-sm text-gray-900 font-medium line-clamp-2">
+                                    {review.review_text}
+                                  </p>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden md:table-cell truncate">
                                   {review.project.title}
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
-                                      <span className="text-white font-bold text-sm">{review.user.full_name}</span>
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
+                                  <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                      <span className="text-white font-bold text-xs sm:text-sm">
+                                        {review.user.full_name.charAt(0)}
+                                      </span>
                                     </div>
-                                    <div>
-                                      <div className="font-semibold text-gray-900 text-sm">{review.user.full_name}</div>
-                                      <div className="text-xs text-gray-500">{review.user.email}</div>
+                                    <div className="min-w-0 hidden sm:block">
+                                      <div className="font-semibold text-gray-900 text-xs sm:text-sm truncate">
+                                        {review.user.full_name}
+                                      </div>
+                                      <div className="text-xs text-gray-500 truncate">{review.user.email}</div>
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
                                   <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
                                       <Star
                                         key={i}
-                                        className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                          }`}
+                                        className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                                          i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                                        }`}
                                       />
                                     ))}
                                   </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                  <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${review.is_approved
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                    {review.is_approved ? 'Approved' : 'Pending'}
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
+                                  <span
+                                    className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
+                                      review.is_approved
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-yellow-100 text-yellow-800"
+                                    }`}
+                                  >
+                                    {review.is_approved ? "Approved" : "Pending"}
                                   </span>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden md:table-cell text-xs">
                                   {new Date(review.created_at).toLocaleDateString()}
                                 </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex space-x-2">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                  <div className="flex space-x-1 sm:space-x-2">
                                     <button
                                       onClick={() => openReviewModal(review)}
                                       className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
@@ -1603,10 +1800,10 @@ const AdminDashboard = () => {
                                 </td>
                               </tr>
                             ))}
-                            {reviews.length === 0 && (
+                          {reviews.length === 0 && (
                             <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
-                                 No reviews found
+                              <td colSpan={7} className="px-6 py-8 text-center text-gray-600">
+                                No reviews found
                               </td>
                             </tr>
                           )}
@@ -1617,28 +1814,28 @@ const AdminDashboard = () => {
                 )}
               </div>
             )}
-
           </div>
         </div>
       </div>
 
-
-      {isUserModalOpen && <UserDetailsModal
-        isOpen={isUserModalOpen}
-        user={selectedUser}
-        onClose={() => {
-          setIsUserModalOpen(false);
-          setSelectedUser(null);
-        }}
-        onUpdateUserStatus={updateUserStatus}
-        updatingUser={updatingUser}
-      />}
+      {isUserModalOpen && (
+        <UserDetailsModal
+          isOpen={isUserModalOpen}
+          user={selectedUser}
+          onClose={() => {
+            setIsUserModalOpen(false)
+            setSelectedUser(null)
+          }}
+          onUpdateUserStatus={updateUserStatus}
+          updatingUser={updatingUser}
+        />
+      )}
       {isProjectModalOpen && (
         <ProjectDetailsModal
           isOpen={isProjectModalOpen}
           onClose={() => {
-            setIsProjectModalOpen(false);
-            setSelectedProject(null);
+            setIsProjectModalOpen(false)
+            setSelectedProject(null)
           }}
           project={selectedProject}
           canEditAll={false}
@@ -1664,8 +1861,8 @@ const AdminDashboard = () => {
         <ReviewDetailsModal
           isOpen={isReviewModalOpen}
           onClose={() => {
-            setIsReviewModalOpen(false);
-            setSelectedReview(null);
+            setIsReviewModalOpen(false)
+            setSelectedReview(null)
           }}
           review={selectedReview}
           isAdmin={true}
@@ -1677,10 +1874,8 @@ const AdminDashboard = () => {
           isDeleting={deletingReview === selectedReview.id}
         />
       )}
-
-
     </div>
-  );
-};
+  )
+}
 
-export default AdminDashboard;
+export default AdminDashboard

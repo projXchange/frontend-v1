@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Menu, X, User, Upload, Home,
@@ -23,6 +23,11 @@ const Navbar = () => {
   
 
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsProfileOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
