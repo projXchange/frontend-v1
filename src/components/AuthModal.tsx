@@ -26,7 +26,7 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
   const [isClosing, setIsClosing] = useState(false)
   const slideAnim = mode === "signup" ? "animate-slideInRight" : "animate-slideInLeft"
 
-  // Detect reset password token in URL (e.g., /reset-password/:token)
+  // Detect reset token in URL or initialMode
   useEffect(() => {
     const path = location.pathname
     if (path.includes("/reset-password/")) {
@@ -34,6 +34,18 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
     }
   }, [location])
 
+  // Auto-clear success message after 10 seconds
+  useEffect(() => {
+    if (errorMsg) {
+      const timer = setTimeout(() => {
+        setErrorMsg('');
+      }, 5000); // 10 seconds
+
+      return () => clearTimeout(timer); // Cleanup on unmount or when successMsg changes
+    }
+  }, [errorMsg]);
+
+  // Reset modal state when opened
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true)
@@ -47,6 +59,37 @@ const AuthModal: React.FC<any> = ({ isOpen, onClose, onSuccess, initialMode }) =
       if (initialMode) setMode(initialMode)
     }
   }, [isOpen, initialMode])
+
+  const handleEmailVerification = async (token: string) => {
+    if (!token) {
+      setVerifyStatus('error');
+      setErrorMsg('Invalid verification link. No token provided.');
+      return;
+    }
+
+    setVerifyStatus('loading');
+    try {
+      const result = await verifyEmail(token);
+
+      if (result.success) {
+        setVerifyStatus('success');
+        setSuccessMsg('Email verified successfully! Redirecting to login...');
+
+        // Wait 2 seconds before redirecting and closing modal
+        setTimeout(() => {
+          setMode('login');
+          setVerifyStatus('loading'); // Reset verify status
+          setSuccessMsg('Your email has been verified. Please login to continue.');
+        }, 2000);
+      } else {
+        setVerifyStatus('error');
+        setErrorMsg(result.message || 'Email verification failed. The link may be invalid or expired.');
+      }
+    } catch (error: any) {
+      setVerifyStatus('error');
+      setErrorMsg(error.response?.data?.message || 'Something went wrong during verification.');
+    }
+  };
 
   const handleClose = () => {
     if (isClosing) return;

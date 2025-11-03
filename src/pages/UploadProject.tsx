@@ -385,6 +385,7 @@ const UploadProject = () => {
           tech_stack: formData.techStack.filter((tech) => tech.trim()),
           github_url: formData.githubUrl,
           demo_url: formData.liveDemo,
+          youtube_url: formData.youtubeUrl,
           pricing: {
             sale_price: Number.parseFloat(formData.price),
             original_price: formData.originalPrice

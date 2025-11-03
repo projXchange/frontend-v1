@@ -11,7 +11,7 @@ const Home = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<any[]>([]);
-  const { openAuthModal,user } = useAuth();
+  const { openAuthModal, user } = useAuth();
   const navigate = useNavigate();
 
   const handleJoinClick = () => {
@@ -31,7 +31,7 @@ const Home = () => {
         const data: ProjectResponse = await response.json();
         setProjects(data.data || []);
         console.log(data.data);
-        
+
         // Generate categories from real data
         const categoryCounts: { [key: string]: number } = {};
         data.data?.forEach(project => {
@@ -123,8 +123,8 @@ const Home = () => {
     .slice(0, 3);
 
   // If no featured projects from API, use first 3 projects or fallback
-  const displayProjects = featuredProjects.length > 0 
-    ? featuredProjects 
+  const displayProjects = featuredProjects.length > 0
+    ? featuredProjects
     : projects.slice(0, 3);
 
   const testimonials = [
@@ -196,7 +196,7 @@ const Home = () => {
 
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col overflow-hidden">
       {/* Hero Section */}
       <section
         className="relative mx-2 sm:mx-4 lg:mx-8 xl:mx-20 mt-3 sm:mt-5 bg-cover bg-center rounded-2xl sm:rounded-3xl overflow-hidden text-white min-h-[600px] sm:min-h-[700px] lg:min-h-[800px]"
@@ -298,13 +298,13 @@ const Home = () => {
                       <p className="text-blue-200 text-sm">{displayProjects[0].category} project</p>
                     </div>
                   </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-white">₹{displayProjects[0].pricing?.sale_price || 0}</span>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-white text-sm">4.8</span>
-                      </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-white">₹{displayProjects[0].pricing?.sale_price || 0}</span>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-white text-sm">4.8</span>
                     </div>
+                  </div>
                 </div>
               )}
 
@@ -422,15 +422,17 @@ const Home = () => {
 
           {/* Technologies Grid */}
           <div className="mb-20">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
               {loading ? (
-                // Loading skeleton for categories
                 Array.from({ length: 6 }).map((_, idx) => (
-                  <div key={idx} className="bg-white rounded-2xl p-6 text-center border border-gray-100 animate-pulse">
-                    <div className="w-16 h-16 bg-gray-200 rounded-xl mx-auto mb-4"></div>
-                    <div className="h-5 bg-gray-200 rounded mb-1"></div>
+                  <div
+                    key={idx}
+                    className="bg-white rounded-2xl p-4 sm:p-6 text-center border border-gray-100 animate-pulse"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-xl mx-auto mb-3 sm:mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-5 bg-gray-200 rounded"></div>
                   </div>
                 ))
               ) : (
@@ -440,22 +442,33 @@ const Home = () => {
                     initial={{ opacity: 0, y: 50, scale: 0.9 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{
-                      duration: 0.5, delay: 0.5 * 0.1,
-                      ease: "easeOut"
+                      duration: 0.5,
+                      delay: 0.5 * 0.1,
+                      ease: "easeOut",
                     }}
                     viewport={{ once: true }}
                     whileHover={{
                       scale: 1.05,
-                      transition: { duration: 0.2 }
+                      transition: { duration: 0.2 },
                     }}
                   >
-                    <Link to={`/projects?category=${category.name.toLowerCase()}`} className="group bg-white rounded-2xl p-6 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 block">
-                      <div className={`w-16 h-16 ${category.color} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110`}>
-                        <category.icon className="w-8 h-8 text-white" />
+                    <Link
+                      to={`/projects?category=${category.name.toLowerCase()}`}
+                      className="group bg-white rounded-2xl p-4 sm:p-6 text-center hover:shadow-xl transition-all duration-300 border border-gray-100 block h-full"
+                    >
+                      <div
+                        className={`w-12 h-12 sm:w-16 sm:h-16 ${category.color} rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 transition-transform group-hover:scale-110`}
+                      >
+                        <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{category.name}</h3>
-                      <p className="text-gray-600 text-sm">{category.count} projects</p>
-                      <div className="mt-2 inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-1 
+  overflow-hidden text-ellipsis whitespace-normal sm:whitespace-normal break-words">
+                        {category.name}
+                      </h3>
+                      <p className="text-gray-600 text-xs sm:text-sm break-words">
+                        {category.count} projects
+                      </p>
+                      <div className="mt-2 inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-xs font-medium">
                         <TrendingUp className="w-3 h-3 mr-1" />
                         {category.growth}
                       </div>
@@ -465,6 +478,7 @@ const Home = () => {
               )}
             </div>
           </div>
+
 
           {/* Featured Projects */}
           <motion.div

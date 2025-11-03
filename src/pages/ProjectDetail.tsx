@@ -615,10 +615,10 @@ const ProjectDetail = () => {
                 >
                   <iframe
                     src={
-                      project.demo_url.includes("watch?v=")
-                        ? project.demo_url.replace("watch?v=", "embed/")
-                        : project.demo_url.includes("youtu.be")
-                          ? project.demo_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
+                      project.youtube_url.includes("watch?v=")
+                        ? project.youtube_url.replace("watch?v=", "embed/")
+                        : project.youtube_url.includes("youtu.be")
+                          ? project.youtube_url.replace("https://youtu.be/", "https://www.youtube.com/embed/")
                           : project.youtube_url
                     }
                     title="Project Demo"
