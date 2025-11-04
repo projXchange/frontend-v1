@@ -65,10 +65,17 @@ const ProjectDetail = () => {
 
   // Fetch project data on component mount
   useEffect(() => {
-    if (id) {
-      fetchProjectData()
+    let isMounted = true;
+
+    if (id && isMounted) {
+      fetchProjectData();
     }
-  }, [id])
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
 
   useEffect(() => {
     checkIsPurchased()
@@ -94,10 +101,10 @@ const ProjectDetail = () => {
       }
 
       const data = await res.json()
-      setProject(data.project)
-      setUserStatus(data.user_status)
-      setAuthorDetails(data.author_details || null)
-      setRelatedProjects(Array.isArray(data.related_projects) ? data.related_projects : [])
+      setProject(data.project || null);
+      setUserStatus(data.user_status || { has_purchased: false, in_wishlist: false, in_cart: false });
+      setAuthorDetails(data.author_details || null);
+      setRelatedProjects(Array.isArray(data.related_projects) ? data.related_projects : []);
     } catch (err) {
       console.error("Error fetching project data:", err)
       setError("Could not load project details. Please try again later.")
@@ -107,6 +114,7 @@ const ProjectDetail = () => {
   }
 
   const fetchReviews = async () => {
+    if (!id) return;
     try {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/reviews`, {
         method: "GET",
@@ -124,16 +132,18 @@ const ProjectDetail = () => {
 
         setApprovedReviews(approved)
         setPendingReviews(pending)
-        setAverageRating(data.stats.average_rating)
+        setAverageRating(data.stats.average_rating || 0)
       } else {
         console.error("Reviews API response not ok:", response.status, response.statusText)
         setApprovedReviews([])
         setPendingReviews([])
+        setAverageRating(0)
       }
     } catch (error) {
       console.error("Failed to fetch reviews:", error)
       setApprovedReviews([])
       setPendingReviews([])
+      setAverageRating(0)
     }
   }
 
@@ -181,17 +191,25 @@ const ProjectDetail = () => {
   }
 
   const checkIsPurchased = () => {
-    const currentUserId = user?.id || ""
-    if (!project || !currentUserId) return
-    const hasBought = Array.isArray((project as any)?.buyers) && (project as any).buyers.includes(currentUserId)
-    if (hasBought) {
-      setUserStatus((prev) => ({
-        ...(prev || { has_purchased: false, in_wishlist: false, in_cart: false }),
-        has_purchased: true,
-      }))
-      console.log("User has purchased the project")
+    const currentUserId = user?.id || '';
+    if (!project || !currentUserId) return;
+    
+    try { // ADD TRY-CATCH
+      const buyers = Array.isArray((project as any)?.buyers) ? (project as any).buyers : [];
+      const hasBought = buyers.includes(currentUserId);
+      
+      if (hasBought) {
+        setUserStatus(prev => ({
+          has_purchased: true,
+          in_wishlist: prev?.in_wishlist || false,
+          in_cart: prev?.in_cart || false,
+        }));
+        console.log('User has purchased the project');
+      }
+    } catch (err) {
+      console.error('Error checking purchase status:', err);
     }
-  }
+  };
 
   // Helper function to check if current user has already submitted a review
   const getUserReview = () => {
@@ -440,7 +458,7 @@ const ProjectDetail = () => {
 
   const isPurchased = Boolean(
     userStatus?.has_purchased ||
-      (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false),
+    (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false),
   )
   const wishlistStatus = project ? userStatus?.in_wishlist || isInWishlist(project.id) : false
   const cartStatus = project ? userStatus?.in_cart || isInCart(project.id) : false
@@ -608,7 +626,7 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video - improved aspect ratio handling for mobile */}
-              {project?.demo_url && (
+              {project?.youtube_url && (
                 <div
                   className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300"
                   style={{ animationDelay: "600ms" }}
@@ -668,11 +686,10 @@ const ProjectDetail = () => {
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`py-2 sm:py-3 lg:py-4 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-colors animate-fadeInUp whitespace-nowrap ${
-                        activeTab === tab
+                      className={`py-2 sm:py-3 lg:py-4 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-colors animate-fadeInUp whitespace-nowrap ${activeTab === tab
                           ? "border-blue-500 text-blue-600 scale-105"
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
-                      }`}
+                        }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
                       {tab === "reviews" && approvedReviews.length + pendingReviews.length > 0 && (
@@ -703,7 +720,7 @@ const ProjectDetail = () => {
                       Tech Stack
                     </h4>
                     <div className="flex flex-wrap gap-2 sm:gap-3">
-                      {project.tech_stack.map((tech, index) => (
+                    {Array.isArray(project.tech_stack) && project.tech_stack.map((tech, index) => (
                         <span
                           key={index}
                           className="px-2 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-800 rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
