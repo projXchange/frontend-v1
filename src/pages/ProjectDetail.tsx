@@ -558,14 +558,14 @@ const ProjectDetail = () => {
                     style={{ animationDelay: "200ms" }}
                   >
                     <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistStatus ? "text-red-500 fill-current" : ""}`} />
-                    <span className="font-medium hidden sm:inline">{wishlistStatus ? "Wishlisted" : "Wishlist"}</span>
+                    <span className="font-medium sm:inline">{wishlistStatus ? "Wishlisted" : "Wishlist"}</span>
                   </button>
                   <button
                     className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
                     style={{ animationDelay: "300ms" }}
                   >
                     <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="font-medium hidden sm:inline">Share</span>
+                    <span className="font-medium sm:inline">Share</span>
                   </button>
                 </div>
               </div>
@@ -588,7 +588,7 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="font-medium">{project.view_count || 0}</span>
+                  <span className="font-medium">{project.view_count || 0} Views</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -598,11 +598,11 @@ const ProjectDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="font-medium">{project.purchase_count}</span>
+                  <span className="font-medium">{project.purchase_count} Sales</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Download className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="font-medium">{project.download_count || 0}</span>
+                  <span className="font-medium">{project.download_count || 0} Downloads</span>
                 </div>
               </div>
 
