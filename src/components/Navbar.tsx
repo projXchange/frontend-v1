@@ -13,6 +13,8 @@ import {
   ShoppingCart,
   Gauge,
   FolderOpenDot,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
@@ -370,14 +372,16 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={() => openAuthModal(true)}
-                    className="block px-4 py-3 text-gray-700"
+                    className="flex items-center w-full text-left px-4 py-3 text-gray-700"
                   >
+                    <LogIn className="w-5 h-5 mr-2 text-gray-600" />
                     Sign In
                   </button>
                   <button
                     onClick={() => openAuthModal(false)}
-                    className="block px-4 py-3 text-blue-600 font-medium"
+                    className="flex items-center w-full text-left px-4 py-3 text-gray-700"
                   >
+                    <UserPlus className="w-5 h-5 mr-2 text-gray-600" />
                     Join Now
                   </button>
                 </>
