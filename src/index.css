@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+body, html {
+    background: linear-gradient(to bottom right, #eff6ff, #ffffff, #f0fdfa);
+    min-height: 100%;
+    overflow-x: hidden;
+  }
