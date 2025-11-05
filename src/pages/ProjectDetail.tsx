@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
 import {
   Star,
   Download,
@@ -60,10 +60,18 @@ const ProjectDetail = () => {
   const [editReviewRating, setEditReviewRating] = useState(0)
   const [updatingReview, setUpdatingReview] = useState(false)
   const [actionLoading, setActionLoading] = useState<boolean>(false)
-  const [authorDetails, setAuthorDetails] = useState<User | null>(null)
   const [relatedProjects, setRelatedProjects] = useState<Project[] | null>(null)
+  const [authorDetails, setAuthorDetails] = useState<{
+    authorId: string;
+    avatar: string | null;
+    full_name: string;
+    email: string;
+    total_projects: number;
+    rating: number;
+    total_sales: number;
+  } | null>(null);
 
-  // Fetch project data on component mount
+  const navigate = useNavigate(); // Fetch project data on component mount
   useEffect(() => {
     let isMounted = true;
 
@@ -340,89 +348,6 @@ const ProjectDetail = () => {
     }
   }
 
-  const handlePurchase = async () => {
-    if (!isAuthenticated || !project || !id) return
-    try {
-      setIsPurchasing(true)
-      const token = localStorage.getItem("token")
-      if (!token) {
-        alert("Please log in to continue.")
-        return
-      }
-
-      // Step 1: Purchase project
-      const purchaseRes = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/purchase`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-
-      if (!purchaseRes.ok) {
-        const errText = await purchaseRes.text()
-        throw new Error(errText || "Purchase failed")
-      }
-
-      // Step 2: Record transaction (DB-aligned schema)
-      const currentUserId = user?.id
-      if (!currentUserId) {
-        alert("Please log in to continue.")
-        return
-      }
-      const nowIso = new Date().toISOString()
-      const amountStr = String(project.pricing?.sale_price ?? "0")
-      const commission = "0"
-      const authorAmount = amountStr // adjust if commission applies
-
-      const transactionBody: Partial<Transaction> = {
-        transaction_id: crypto && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}`,
-        user_id: currentUserId,
-        project_id: project.id,
-        author_id: project.author_id,
-        type: "purchase",
-        status: "success",
-        amount: amountStr,
-        currency: project.pricing?.currency || "INR",
-        payment_method: "manual",
-        payment_gateway_response: "N/A",
-        commission_amount: commission,
-        author_amount: authorAmount,
-        metadata: JSON.stringify({ projectTitle: project.title }),
-        processed_at: nowIso,
-        created_at: nowIso,
-        updated_at: nowIso,
-      }
-
-      const txnRes = await fetch("https://projxchange-backend-v1.vercel.app/transactions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(transactionBody),
-      })
-
-      if (!txnRes.ok) {
-        const errText = await txnRes.text()
-        throw new Error(errText || "Failed to record transaction")
-      }
-
-      // Refresh user status/UI
-      setUserStatus((prev) => ({
-        has_purchased: true,
-        in_wishlist: prev?.in_wishlist || false,
-        in_cart: prev?.in_cart || false,
-      }))
-
-      alert("Purchase successful! You now have access to the project.")
-    } catch (error) {
-      console.error("Purchase error:", error)
-      alert("Failed to complete purchase. Please try again.")
-    } finally {
-      setIsPurchasing(false)
-    }
-  }
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-3 sm:px-4">
@@ -687,8 +612,8 @@ const ProjectDetail = () => {
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`py-2 sm:py-3 lg:py-4 px-3 border-b-2 font-semibold text-sm transition-all duration-200 whitespace-nowrap ${activeTab === tab
-                          ? "border-blue-500 text-blue-600 scale-105"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                        ? "border-blue-500 text-blue-600 scale-105"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
                         }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -1325,22 +1250,41 @@ const ProjectDetail = () => {
               {/* Buy / Wishlist / Cart Buttons */}
               {!isPurchased ? (
                 <div className="flex flex-col space-y-2 sm:space-y-3 mb-4 sm:mb-8">
+                  {/* Buy Now / Checkout Button */}
                   <button
-                    onClick={handlePurchase}
-                    disabled={!isAuthenticated || isPurchasing}
+                    onClick={async () => {
+                      if (!isAuthenticated) {
+                        toast.error('Please login to proceed');
+                        return;
+                      }
+
+                      if (cartStatus) {
+                          navigate("/cart")
+                      } else {
+                        // If not in cart, add to cart then open cart
+                        const added = await addToCart(project);
+                        if (added) {
+                          navigate("/cart")
+                        }
+                      }
+                    }}
+                    disabled={loading}
                     className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-2 sm:py-3 lg:py-4 rounded-xl font-bold text-xs sm:text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ animationDelay: "300ms" }}
                   >
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" />
                     <span className="line-clamp-1">
                       {isAuthenticated
-                        ? isPurchasing
+                        ? loading
                           ? "Processing..."
-                          : `Buy (₹${project.pricing?.sale_price || 0})`
+                          : cartStatus
+                            ? "Checkout"
+                            : `Buy (₹${project.pricing?.sale_price || 0})`
                         : "Login to Buy"}
                     </span>
                   </button>
 
+                  {/* Wishlist Button */}
                   <button
                     onClick={handleToggleWishlist}
                     className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 text-gray-800 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base"
@@ -1350,9 +1294,13 @@ const ProjectDetail = () => {
                     <span className="line-clamp-1">{wishlistStatus ? "Remove from Wishlist" : "Add to Wishlist"}</span>
                   </button>
 
+                  {/* Add/Remove Cart Button */}
                   <button
-                    onClick={handleToggleCart}
-                    disabled={!isAuthenticated}
+                    onClick={() => {
+                      if (cartStatus) removeFromCart(project.id);
+                      else addToCart(project);
+                    }}
+                    disabled={!isAuthenticated || loading}
                     className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 text-gray-800 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ animationDelay: "380ms" }}
                   >
@@ -1371,6 +1319,7 @@ const ProjectDetail = () => {
                   </button>
                 </div>
               )}
+
 
               {/* Features */}
               <div
@@ -1431,7 +1380,7 @@ const ProjectDetail = () => {
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     Projects
                   </span>
-                  <span className="font-semibold text-gray-900">{authorDetails?.total_purchases || 0}</span>
+                  <span className="font-semibold text-gray-900">{authorDetails?.total_projects || 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
@@ -1450,13 +1399,6 @@ const ProjectDetail = () => {
                   <span className="font-semibold text-gray-900">{authorDetails?.total_sales || 0}</span>
                 </div>
               </div>
-
-              <Link
-                to={`/author/${project.author_id}`}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-2 sm:py-3 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 text-xs sm:text-base"
-              >
-                View Profile
-              </Link>
             </div>
           </div>
         </div>

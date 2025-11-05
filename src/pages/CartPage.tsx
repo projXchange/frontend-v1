@@ -1,18 +1,94 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { Transaction } from '../types/Transaction';
 
 const CartPage = () => {
   const { cart, removeFromCart, getCartTotal, getCartCount, clearCart, loading } = useCart();
+  const { user, isAuthenticated } = useAuth();
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   const handleRemoveFromCart = async (projectId: string) => {
     await removeFromCart(projectId);
   };
 
-  const handleCheckout = () => {
-    toast.success('Checkout functionality coming soon!');
+  const handleCheckout = async () => {
+    if (!isAuthenticated || cart.length === 0) {
+      toast.error('Please login and add items to cart before checkout.');
+      return;
+    }
+
+    try {
+      setIsPurchasing(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Please log in to continue.');
+        return;
+      }
+
+      // Loop through all cart items and purchase them one by one
+      for (const item of cart) {
+        // Step 1: Purchase project
+        const purchaseRes = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${item.project_id}/purchase`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!purchaseRes.ok) {
+          const errText = await purchaseRes.text();
+          throw new Error(errText || 'Purchase failed');
+        }
+
+        // Step 2: Record transaction
+        const nowIso = new Date().toISOString();
+        const transactionBody: Partial<Transaction> = {
+          transaction_id: crypto && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}`,
+          user_id: user?.id,
+          project_id: item.project_id,
+          author_id: item.project.author_id,
+          type: 'purchase',
+          status: 'success',
+          amount: item.project.pricing?.sale_price ?? 0,
+          currency: item.project.pricing?.currency || 'INR',
+          payment_method: 'online',
+          payment_gateway_response: 'N/A',
+          commission_amount: 0,
+          author_amount: item.project.pricing?.sale_price,
+          metadata: JSON.stringify({ projectTitle: item.project.title }),
+          processed_at: nowIso,
+          created_at: nowIso,
+          updated_at: nowIso,
+        };
+
+        const txnRes = await fetch('https://projxchange-backend-v1.vercel.app/transactions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(transactionBody),
+        });
+
+        if (!txnRes.ok) {
+          const errText = await txnRes.text();
+          throw new Error(errText || 'Failed to record transaction');
+        }
+      }
+
+      toast.success('Purchase successful! You now have access to all projects.');
+      clearCart();
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error('Failed to complete purchase. Please try again.');
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   if (loading) {
@@ -65,83 +141,63 @@ const CartPage = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-6">
-              {cart.map((item, index) => (
+              {cart.map((item) => (
                 <div
                   key={item.id}
                   className="bg-white/90 backdrop-blur-lg rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100"
                 >
-                  <div className="p-6">
-                    <div className="flex gap-6">
-                      {/* Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={item.project.thumbnail}
-                          alt={item.project.title}
-                          className="w-32 h-24 object-cover rounded-xl"
-                        />
-                      </div>
+                  <div className="p-6 flex gap-6">
+                    <img
+                      src={item.project.thumbnail}
+                      alt={item.project.title}
+                      className="w-32 h-24 object-cover rounded-xl flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 mb-2">{item.project.title}</h3>
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.project.description}</p>
 
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">
-                              {item.project.title}
-                            </h3>
-                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                              {item.project.description}
-                            </p>
-
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              {item.project.tech_stack?.slice(0, 3).map((tech: string, i: number) => (
-                                <span
-                                  key={i}
-                                  className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-medium"
-                                >
-                                  <Tag className="w-3 h-3" /> {tech}
-                                </span>
-                              ))}
-                            </div>
-
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                              <span className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                4.8 ({item.project.purchase_count || 0} reviews)
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {item.project.tech_stack?.slice(0, 3).map((tech, i) => (
+                              <span key={i} className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-medium">
+                                <Tag className="w-3 h-3" /> {tech}
                               </span>
-                              <span>Category: {item.project.category}</span>
-                            </div>
+                            ))}
                           </div>
 
-                          {/* Price and Actions */}
-                          <div className="flex flex-col items-end gap-3">
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-gray-900">₹{item.project.pricing?.sale_price}</div>
-                              {item.project?.pricing &&
-                                item.project.pricing.original_price > item.project.pricing.sale_price &&
-                                item.project.pricing.original_price !== 0 && (
-                                  <div className="text-sm text-gray-500 line-through">
-                                    ₹{item.project.pricing.original_price}
-                                  </div>
-                                )}
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                              4.8 ({item.project.purchase_count || 0} reviews)
+                            </span>
+                            <span>Category: {item.project.category}</span>
+                          </div>
+                        </div>
 
-                            </div>
+                        <div className="flex flex-col items-end gap-3">
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-gray-900">₹{item.project.pricing?.sale_price}</div>
+                            {item.project.pricing?.original_price && item.project.pricing.original_price > item.project.pricing.sale_price && (
+                              <div className="text-sm text-gray-500 line-through">
+                                ₹{item.project.pricing.original_price}
+                              </div>
+                            )}
+                          </div>
 
-                            <div className="flex gap-2">
-                              <Link
-                                to={`/project/${item.project.id}`}
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-200 flex items-center gap-1"
-                              >
-                                <Eye className="w-4 h-4" />
-                                View
-                              </Link>
-                              <button
-                                onClick={() => handleRemoveFromCart(item.project.id)}
-                                className="px-3 py-2 border border-red-300 rounded-lg text-red-600 hover:bg-red-50 hover:scale-105 transition-all duration-200 flex items-center gap-1"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                Remove
-                              </button>
-                            </div>
+                          <div className="flex gap-2">
+                            <Link
+                              to={`/project/${item.project.id}`}
+                              className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-200 flex items-center gap-1"
+                            >
+                              <Eye className="w-4 h-4" /> View
+                            </Link>
+                            <button
+                              onClick={() => handleRemoveFromCart(item.project.id)}
+                              className="px-3 py-2 border border-red-300 rounded-lg text-red-600 hover:bg-red-50 hover:scale-105 transition-all duration-200 flex items-center gap-1"
+                            >
+                              <Trash2 className="w-4 h-4" /> Remove
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -180,10 +236,11 @@ const CartPage = () => {
                 <div className="space-y-3">
                   <button
                     onClick={handleCheckout}
-                    className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-105"
+                    disabled={isPurchasing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CreditCard className="w-5 h-5" />
-                    Proceed to Checkout
+                    {isPurchasing ? 'Processing...' : 'Proceed to Checkout'}
                     <ArrowRight className="w-5 h-5" />
                   </button>
 

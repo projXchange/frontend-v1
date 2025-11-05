@@ -14,12 +14,12 @@ export interface Transaction {
   author_id: string;
   type: string;
   status: string;
-  amount: string;
+  amount: number;
   currency: string;
   payment_method: string;
   payment_gateway_response: string;
-  commission_amount: string;
-  author_amount: string;
+  commission_amount: number;
+  author_amount: number;
   metadata: string;
   processed_at: string;
   refunded_at: string;
