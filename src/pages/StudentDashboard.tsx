@@ -53,6 +53,8 @@ const StudentDashboard = () => {
   const [reviews, setReviews] = useState<Review[]>([])
   const [myProjects, setMyProjects] = useState<Project[]>([])
   const [projectsLoading, setProjectsLoading] = useState(false)
+  const [purchasedProjects, setPurchasedProjects] = useState<Project[]>([])
+  const [purchasedProjectsLoading, setPurchasedProjectsLoading] = useState(false)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [transactionsLoading, setTransactionsLoading] = useState(false)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -150,26 +152,42 @@ const StudentDashboard = () => {
 
   const fetchMyProjects = async () => {
     setProjectsLoading(true)
+    setPurchasedProjectsLoading(true)
+
     try {
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects?author_id=${user?.id}`, {
+      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/my`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
+
       if (!res.ok) throw new Error("Failed to fetch projects")
+
       const data = await res.json()
-      // Accept { data, pagination }, { projects }, or raw array
-      const projects = Array.isArray(data) ? data : data.data || data.projects || []
-      setMyProjects(projects)
+
+      // Defensive checks
+      const uploaded = Array.isArray(data.uploaded) ? data.uploaded : []
+      const purchased = Array.isArray(data.purchased) ? data.purchased : []
+
+      setMyProjects(uploaded)
+      setPurchasedProjects(purchased)
+
+      // Log the fresh data directly instead of relying on state
+      console.log("Uploaded projects:", uploaded)
+      console.log("Purchased projects:", purchased)
+
     } catch (err) {
-      console.error(err)
+      console.error("Error fetching projects:", err)
       setMyProjects([])
+      setPurchasedProjects([])
     } finally {
       setProjectsLoading(false)
+      setPurchasedProjectsLoading(false)
     }
   }
+
 
   const fetchMyTransactions = async () => {
     setTransactionsLoading(true)
@@ -330,17 +348,6 @@ const StudentDashboard = () => {
             projectEditData?.files?.documentation_files || selectedProject.files?.documentation_files || [],
         }
       }
-
-      // Add rating if it exists
-      if (selectedProject.rating || projectEditData?.rating) {
-        payload.rating = {
-          average_rating: projectEditData?.rating?.average_rating ?? selectedProject.rating?.average_rating ?? 0,
-          total_ratings: projectEditData?.rating?.total_ratings ?? selectedProject.rating?.total_ratings ?? 0,
-          rating_distribution:
-            projectEditData?.rating?.rating_distribution || selectedProject.rating?.rating_distribution || {},
-        }
-      }
-
       const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${selectedProject.id}`, {
         method: "PATCH",
         headers: {
@@ -562,7 +569,10 @@ const StudentDashboard = () => {
     if (activeTab === "overview" && !dashboardStats && !statsLoading) {
       fetchDashboardStats()
     }
-    if (activeTab === "projects" && myProjects.length === 0 && !projectsLoading) {
+    if (activeTab === "my-projects" && myProjects.length === 0 && !projectsLoading) {
+      fetchMyProjects()
+    }
+    if (activeTab === "purchased-projects" && purchasedProjects.length === 0 && !purchasedProjectsLoading) {
       fetchMyProjects()
     }
     if (activeTab === "reviews" && reviews.length === 0 && !loading) {
@@ -662,30 +672,31 @@ const StudentDashboard = () => {
         {/* Tabs */}
         <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 mb-8">
           <div className="border-b border-gray-200">
-            <nav className="flex overflow-x-auto sm:overflow-visible space-x-2 sm:space-x-8 px-4 sm:px-8 -mx-4 sm:mx-0">
+            <nav className="flex overflow-x-auto sm:overflow-visible sm:overflow-y-hidden space-x-2 sm:space-x-8 px-4 sm:px-8 -mx-4 sm:mx-0">
               {[
                 { id: "overview", label: "Overview", icon: BarChart3 },
-                { id: "projects", label: "My Projects", icon: ShoppingBag },
+                { id: "my-projects", label: "My Uploads", icon: ShoppingBag },
+                { id: "purchased-projects", label: "My Purchases", icon: ShoppingBag },
                 { id: "wishlist", label: "Wishlist", icon: Heart },
                 { id: "reviews", label: "Reviews", icon: Trophy },
-                { id: "transactions", label: "Transactions", icon: Clock },
+                { id: "transactions", label: "Payments", icon: Clock },
                 { id: "profile", label: "Profile", icon: Settings },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1 sm:gap-3 py-4 sm:py-6 px-2 sm:px-2 border-b-2 font-semibold text-xs sm:text-sm whitespace-nowrap transition-all duration-300 ${
-                    activeTab === tab.id
+                  className={`flex items-center gap-1 sm:gap-3 py-3 sm:py-6 px-3 sm:px-2 border-b-2 font-semibold text-xs sm:text-sm whitespace-nowrap transition-all duration-300 ${activeTab === tab.id
                       ? "border-blue-500 text-blue-600 scale-105"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
-                  }`}
+                    }`}
                 >
-                  <tab.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <tab.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                   <span className="hidden sm:inline">{tab.label}</span>
                 </button>
               ))}
             </nav>
           </div>
+
 
           <div className="p-4 sm:p-8">
             {activeTab === "overview" && (
@@ -850,7 +861,7 @@ const StudentDashboard = () => {
               </motion.div>
             )}
 
-            {activeTab === "projects" && (
+            {activeTab === "my-projects" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">My Projects</h2>
@@ -967,6 +978,92 @@ const StudentDashboard = () => {
                 )}
               </div>
             )}
+            {activeTab === 'purchased-projects' && (
+              <div className="animate-slideInUp">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900">My Purchases</h2>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        placeholder="Search purchased projects..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      />
+                    </div>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="completed">Completed</option>
+                      <option value="in-progress">In Progress</option>
+                    </select>
+                  </div>
+                </div>
+
+                {purchasedProjectsLoading ? (
+                  <div className="bg-white rounded-2xl p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading purchased projects...</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Title</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Purchased On</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {purchasedProjects.map((project, index) => (
+                            <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                              <td className="px-6 py-4">
+                                <div className="font-semibold text-gray-900">{project.title}</div>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-700">{project.category}</td>
+                              <td className="px-6 py-4 text-sm text-gray-700 font-semibold">₹{project.pricing?.sale_price || 0}</td>
+                              <td className="px-6 py-4">
+                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                  project.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                  {project.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600">{new Date(project.created_at).toLocaleDateString()}</td>
+                              <td className="px-6 py-4">
+                                <Link
+                                  to={`/project/${project.id}`}
+                                  className="px-3 py-2 text-blue-700 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors text-sm font-semibold inline-block"
+                                >
+                                  View
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                          {purchasedProjects.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">No purchased projects found.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
 
             {activeTab === "wishlist" && (
               <div className="animate-slideInUp">
@@ -1158,9 +1255,8 @@ const StudentDashboard = () => {
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
-                                      className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                                        i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
-                                      }`}
+                                      className={`w-3 h-3 sm:w-4 sm:h-4 ${i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                                        }`}
                                     />
                                   ))}
                                   <span className="ml-2 text-xs sm:text-sm font-semibold text-gray-700">
@@ -1170,9 +1266,8 @@ const StudentDashboard = () => {
                               </th>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
                                 <span
-                                  className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                    review.is_approved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                                  }`}
+                                  className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${review.is_approved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                                    }`}
                                 >
                                   {review.is_approved ? "Approved" : "Pending"}
                                 </span>
@@ -1301,13 +1396,12 @@ const StudentDashboard = () => {
                               </th>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
                                 <span
-                                  className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                    txn.status === "success" || txn.status === "completed"
-                                      ? "bg-green-100 text-green-800"
-                                      : txn.status === "pending"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-red-100 text-red-800"
-                                  }`}
+                                  className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${txn.status === "success" || txn.status === "completed"
+                                    ? "bg-green-100 text-green-800"
+                                    : txn.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-red-100 text-red-800"
+                                    }`}
                                 >
                                   {txn.status}
                                 </span>
