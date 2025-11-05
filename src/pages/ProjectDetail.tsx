@@ -193,11 +193,11 @@ const ProjectDetail = () => {
   const checkIsPurchased = () => {
     const currentUserId = user?.id || '';
     if (!project || !currentUserId) return;
-    
+
     try { // ADD TRY-CATCH
       const buyers = Array.isArray((project as any)?.buyers) ? (project as any).buyers : [];
       const hasBought = buyers.includes(currentUserId);
-      
+
       if (hasBought) {
         setUserStatus(prev => ({
           has_purchased: true,
@@ -678,22 +678,22 @@ const ProjectDetail = () => {
 
               {/* Tabs - improved responsive tab navigation */}
               <div
-                className="border-b border-gray-200 mb-4 sm:mb-2 animate-slideInUp overflow-x-auto"
+                className="border-b border-gray-200 mb-4 sm:mb-2 animate-slideInUp overflow-x-auto scrollbar-hide px-2"
                 style={{ animationDelay: "700ms" }}
               >
-                <nav className="flex gap-2 sm:gap-4 lg:gap-8 min-w-max">
+                <nav className="flex gap-3 sm:gap-4 lg:gap-8 min-w-max">
                   {["description", "features", "instructions", "screenshots", "reviews"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`py-2 sm:py-3 lg:py-4 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-colors animate-fadeInUp whitespace-nowrap ${activeTab === tab
+                      className={`py-2 sm:py-3 lg:py-4 px-3 border-b-2 font-semibold text-sm transition-all duration-200 whitespace-nowrap ${activeTab === tab
                           ? "border-blue-500 text-blue-600 scale-105"
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
                         }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      {tab === "reviews" && approvedReviews.length + pendingReviews.length > 0 && (
-                        <span className="ml-1 sm:ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-0.5 sm:py-1 rounded-full text-xs">
+                      {tab === "reviews" && (approvedReviews.length + pendingReviews.length > 0) && (
+                        <span className="ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
                           {approvedReviews.length + pendingReviews.length}
                         </span>
                       )}
@@ -701,6 +701,8 @@ const ProjectDetail = () => {
                   ))}
                 </nav>
               </div>
+
+
 
               {/* Tab Content - improved responsive padding and layouts */}
               <div className="min-h-[250px] sm:min-h-[350px] animate-slideInUp" style={{ animationDelay: "800ms" }}>
@@ -720,7 +722,7 @@ const ProjectDetail = () => {
                       Tech Stack
                     </h4>
                     <div className="flex flex-wrap gap-2 sm:gap-3">
-                    {Array.isArray(project.tech_stack) && project.tech_stack.map((tech, index) => (
+                      {Array.isArray(project.tech_stack) && project.tech_stack.map((tech, index) => (
                         <span
                           key={index}
                           className="px-2 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-800 rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
