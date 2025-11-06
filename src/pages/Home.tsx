@@ -188,94 +188,89 @@ const Home = () => {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
       {/* Hero Section */}
-     <section
-  className="relative mx-2 sm:mx-4 lg:mx-8 xl:mx-20 mt-3 sm:mt-5 bg-cover bg-center rounded-2xl sm:rounded-3xl overflow-hidden text-white min-h-[500px] sm:min-h-[600px] lg:min-h-[650px]"
->
-  {/* Background Video */}
-  <video
-    autoPlay
-    muted
-    loop
-    playsInline
-    className="absolute inset-0 w-full h-full object-cover"
-  >
-    <source
-      src="https://fiverr-res.cloudinary.com/video/upload/f_auto:video,q_auto:best/v1/video-attachments/generic_asset/asset/18ad23debdc5ce914d67939eceb5fc27-1738830703211/Desktop%20Header%20new%20version"
-      type="video/mp4"
-    />
-    Your browser does not support the video tag.
-  </video>
+      <section
+        className="relative mx-2 sm:mx-4 lg:mx-8 xl:mx-20 mt-3 sm:mt-5 bg-cover bg-center rounded-2xl sm:rounded-3xl overflow-hidden text-white min-h-[600px] sm:min-h-[700px] lg:min-h-[800px]"
 
-  {/* Overlay */}
-  <div className="absolute inset-0 bg-black/20" />
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="https://fiverr-res.cloudinary.com/video/upload/f_auto:video,q_auto:best/v1/video-attachments/generic_asset/asset/18ad23debdc5ce914d67939eceb5fc27-1738830703211/Desktop%20Header%20new%20version" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 xl:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
-  {/* Content */}
-  <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 xl:py-14">
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left">
+              <div className="animate-slideInDown">
+                <p className="text-xs sm:text-sm uppercase tracking-widest text-white/70 mb-3 font-medium">
+                  Empowering student innovation
+                </p>
 
-      {/* Left Content */}
-      <div className="text-center lg:text-left space-y-4">
-        <div className="animate-slideInDown">
-          <p className="text-xs sm:text-sm uppercase tracking-widest text-white/70 mb-2 font-medium">
-            Empowering student innovation
-          </p>
+                <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-yellow-400" />
+                  Trusted by 10,000+ students worldwide
+                </div>
 
-          <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
-            <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-yellow-400" />
-            Trusted by 10,000+ students worldwide
-          </div>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight tracking-tight">
+                  <span className="block animate-fadeIn">Explore & Contribute to</span>
+                  <span className="block bg-gradient-to-r from-blue-400 via-teal-300 to-green-300 bg-clip-text text-transparent animate-slideInLeft" style={{ animationDelay: '0.5s' }}>
+                    Real Academic Projects
+                  </span>
+                </h1>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-extrabold mb-3 sm:mb-4 leading-tight tracking-tight">
-            <span className="block animate-fadeIn">Explore & Contribute to</span>
-            <span
-              className="block bg-gradient-to-r from-blue-400 via-teal-300 to-green-300 bg-clip-text text-transparent animate-slideInLeft"
-              style={{ animationDelay: '0.5s' }}
-            >
-              Real Academic Projects
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-slideInUp" style={{ animationDelay: '1s' }}>
-            Discover high-quality student projects, learn from expert code, and accelerate your academic journey with our curated marketplace.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mt-4 animate-slideInUp" style={{ animationDelay: '1.5s' }}>
-            <Link
-              to="/projects"
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold text-base sm:text-lg hover:from-blue-700 hover:to-teal-600 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
-            >
-              Browse Projects
-              <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              to="/upload"
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white rounded-xl font-semibold text-base sm:text-lg hover:bg-white hover:text-blue-900 transition-all duration-200 hover:shadow-xl hover:scale-105"
-            >
-              Upload Yours 🚀
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Floating Cards */}
-      <div className="hidden lg:flex flex-col space-y-4 animate-slideInRight max-h-[600px] overflow-y-auto pr-2" style={{ animationDelay: '1s' }}>
-        {topprojects.map((project, index) => (
-          <div
-            key={index}
-            className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 shadow-xl float-animation hover:scale-105 transition-transform duration-300"
-          >
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
-                <Code className="w-5 h-5 text-white" />
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-10 text-blue-100 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-slideInUp" style={{ animationDelay: '1s' }}>
+                  Discover high-quality student projects, learn from expert code, and accelerate your academic journey with our curated marketplace.
+                </p>
               </div>
-              <div>
-                <h3 className="text-white font-semibold text-sm">
-                  {project.title.length > 20
-                    ? `${project.title.substring(0, 20)}...`
-                    : project.title}
-                </h3>
-                <p className="text-blue-200 text-xs">{project.category} project</p>
+
+              {/* Search Bar */}
+              <form onSubmit={handleSearch} className="mb-6 sm:mb-10 animate-slideInUp" style={{ animationDelay: '1.5s' }}>
+                <div className="relative w-full max-w-2xl mx-auto lg:mx-0">
+                  <div className="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search for projects, tech stacks, or keywords..."
+                    className="block w-full pl-12 sm:pl-14 pr-28 sm:pr-36 py-3 sm:py-4 text-sm sm:text-base lg:text-lg border-0 rounded-xl sm:rounded-2xl bg-white/90 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/20 shadow-2xl transition-all duration-300 hover:bg-white focus:bg-white"
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-3">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-4 sm:px-6 lg:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+                    >
+                      <Search className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Search</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start animate-slideInUp" style={{ animationDelay: '2s' }}>
+                <Link
+                  to="/projects"
+                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
+                >
+                  Browse Projects
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  to="/upload"
+                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white rounded-xl font-semibold text-base sm:text-lg hover:bg-white hover:text-blue-900 transition-all duration-200 hover:shadow-xl hover:scale-105"
+                >
+                  Upload Yours 🚀
+                </Link>
               </div>
             </div>
 
@@ -318,28 +313,8 @@ const Home = () => {
               </div>
             </div>
           </div>
-        ))}
-
-        {/* Floating Stats Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation mt-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">10K+</div>
-              <div className="text-blue-200 text-sm">Students</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">{projects.length}+</div>
-              <div className="text-blue-200 text-sm">Projects</div>
-            </div>
-          </div>
         </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
+      </section>
 
       <section className="py-12 sm:py-16 lg:py-20 mt-12 sm:mt-16 lg:mt-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
