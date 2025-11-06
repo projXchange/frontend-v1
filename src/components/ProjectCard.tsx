@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Star, Tag, Flame, Heart, ShoppingCart } from "lucide-react"
@@ -5,8 +6,6 @@ import type { Project } from "../types/Project"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
 import { useAuth } from "../contexts/AuthContext"
-import { useState } from "react"
-
 
 interface ProjectCardProps {
   project: Project
@@ -17,12 +16,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { addToCart, isInCart, removeFromCart } = useCart()
   const { isAuthenticated, openAuthModal } = useAuth()
-  const [showFullDesc, setShowFullDesc] = useState(false)
-  const isLongDesc = project.description.length > 100
-
-  const displayDesc = showFullDesc
-    ? project.description
-    : `${project.description.substring(0, 100)}${isLongDesc ? "..." : ""}`
+  // Calculate discount from consolidated project data
   const discount =
     project.pricing?.original_price && project.pricing?.sale_price
       ? project.pricing.original_price > project.pricing.sale_price
@@ -93,8 +87,9 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInWishlist(project.id) ? "hover:bg-red-100 text-red-500" : "hover:bg-pink-100 text-pink-500"
-              }`}
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${
+              isInWishlist(project.id) ? "hover:bg-red-100 text-red-500" : "hover:bg-pink-100 text-pink-500"
+            }`}
             title={isInWishlist(project.id) ? "Remove from wishlist" : "Add to wishlist"}
             type="button"
             onClick={(e) => {
@@ -121,8 +116,9 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInCart(project.id) ? "hover:bg-green-100 text-green-500" : "hover:bg-blue-100 text-blue-500"
-              }`}
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${
+              isInCart(project.id) ? "hover:bg-green-100 text-green-500" : "hover:bg-blue-100 text-blue-500"
+            }`}
             title={isInCart(project.id) ? "Remove from cart" : "Add to cart"}
             type="button"
             onClick={(e) => {
@@ -192,32 +188,11 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </div>
             <div className="text-xs sm:text-sm text-gray-600">{project.purchase_count} sales</div>
           </div>
-          
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.15 + 0.35, duration: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-none">
-              {displayDesc}
-            </p>
-
-            {isLongDesc && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  setShowFullDesc(!showFullDesc)
-                }}
-                className="text-indigo-600 text-xs sm:text-sm font-medium hover:underline focus:outline-none"
-              >
-                {showFullDesc ? "Read less" : "Read more"}
-              </button>
-            )}
-          </motion.div>
-
+          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
+            {project.description.length > 100 ? `${project.description.substring(0, 100)}...` : project.description}
+          </p>
           <div className="text-center">
+            
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-full text-sm sm:text-base font-semibold shadow"

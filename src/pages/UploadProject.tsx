@@ -250,8 +250,8 @@ const UploadProject = () => {
       case "description":
         if (!value.trim()) {
           newErrors.description = "Description is required"
-        } else if (value.length < 50) {
-          newErrors.description = "Description must be at least 50 characters"
+        } else if (value.length < 100) {
+          newErrors.description = "Description must be at least 100 characters"
         } else {
           delete newErrors.description
         }
