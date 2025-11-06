@@ -56,7 +56,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
     >
       <Link
         to={`/project/${project.id}`}
-        className="group bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative block"
+        className="group bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative flex flex-col w-full h-full min-h-[500px]"
       >
         {/* Image */}
         <div className="relative overflow-hidden">
@@ -167,31 +167,6 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
           <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition line-clamp-2">
             {project.title}
           </h3>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.15 + 0.35, duration: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-none">
-              {displayDesc}
-            </p>
-
-            {isLongDesc && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  setShowFullDesc(!showFullDesc)
-                }}
-                className="text-indigo-600 text-xs sm:text-sm font-medium hover:underline focus:outline-none"
-              >
-                {showFullDesc ? "Read less" : "Read more"}
-              </button>
-            )}
-          </motion.div>
-
-
           <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
             {project.tech_stack.slice(0, 3).map((tech: string, i: number) => (
               <span
@@ -217,6 +192,30 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </div>
             <div className="text-xs sm:text-sm text-gray-600">{project.purchase_count} sales</div>
           </div>
+          
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.15 + 0.35, duration: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-none">
+              {displayDesc}
+            </p>
+
+            {isLongDesc && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setShowFullDesc(!showFullDesc)
+                }}
+                className="text-indigo-600 text-xs sm:text-sm font-medium hover:underline focus:outline-none"
+              >
+                {showFullDesc ? "Read less" : "Read more"}
+              </button>
+            )}
+          </motion.div>
 
           <div className="text-center">
             <motion.div
