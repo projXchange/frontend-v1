@@ -15,6 +15,8 @@ const ProjectListing = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
 
   // Debounce price range input
   useEffect(() => {
@@ -23,6 +25,34 @@ const ProjectListing = () => {
     }, 500);
     return () => clearTimeout(handler);
   }, [priceRange]);
+
+  useEffect(() => {
+    if (!projects || projects.length === 0) return;
+
+    // --- Categories ---
+    const categoryMap: { [key: string]: string } = {}; // key = lowercase, value = original
+    projects.forEach(p => {
+      if (p.category) {
+        const key = p.category.toLowerCase();
+        if (!categoryMap[key]) categoryMap[key] = p.category;
+      }
+    });
+    setAvailableCategories(['all', ...Object.values(categoryMap)]);
+
+    // --- Tags ---
+    const tagMap: { [key: string]: string } = {};
+    projects.forEach(p => {
+      (p.tech_stack || []).forEach(tag => {
+        if (tag) {
+          const key = tag.toLowerCase();
+          if (!tagMap[key]) tagMap[key] = tag;
+        }
+      });
+    });
+    setAvailableTags(Object.values(tagMap));
+
+  }, [projects]);
+
 
   // Fetch projects
   const fetchProjects = async (page = 1, append = false) => {
@@ -80,25 +110,19 @@ const ProjectListing = () => {
     }
   };
 
-  const categories = [
-    'all','web_development','mobile_development','desktop_application',
-    'data_science','machine_learning','api_backend','other'
-  ];
   const getCategoryDisplayName = (category: string) => {
     const map: { [key: string]: string } = {
-      'all':'All Categories',
-      'web_development':'Web Development',
-      'mobile_development':'Mobile Development',
-      'desktop_application':'Desktop Application',
-      'data_science':'Data Science',
-      'machine_learning':'Machine Learning',
-      'api_backend':'API & Backend',
-      'other':'Other'
+      'all': 'All Categories',
+      'web_development': 'Web Development',
+      'mobile_development': 'Mobile Development',
+      'desktop_application': 'Desktop Application',
+      'data_science': 'Data Science',
+      'machine_learning': 'Machine Learning',
+      'api_backend': 'API & Backend',
+      'other': 'Other'
     };
     return map[category] || category;
   };
-
-  const allTags = ['React','Node.js','MongoDB','Stripe','Java','Spring Boot','MySQL','Python','Django','PostgreSQL','Chart.js','Firebase','Material-UI','PHP','Laravel','Bootstrap','React Native','Swing'];
 
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
@@ -108,8 +132,8 @@ const ProjectListing = () => {
         project.description.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
-      const matchesPrice = project.pricing?.sale_price 
-        ? project.pricing.sale_price >= debouncedPriceRange[0] && project.pricing.sale_price <= debouncedPriceRange[1] 
+      const matchesPrice = project.pricing?.sale_price
+        ? project.pricing.sale_price >= debouncedPriceRange[0] && project.pricing.sale_price <= debouncedPriceRange[1]
         : true;
       const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => project.tech_stack.includes(tag));
 
@@ -117,7 +141,7 @@ const ProjectListing = () => {
     });
   }, [projects, searchTerm, selectedCategory, debouncedPriceRange, selectedTags]);
 
-  const toggleTag = (tag: string) => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t!==tag) : [...prev, tag]);
+  const toggleTag = (tag: string) => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -150,7 +174,7 @@ const ProjectListing = () => {
               <div className="text-blue-200 font-medium">Projects</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">{categories.length}+</div>
+              <div className="text-3xl font-bold text-white mb-2">{availableCategories.length}+</div>
               <div className="text-blue-200 font-medium">Categories</div>
             </div>
             <div className="text-center">
@@ -179,7 +203,7 @@ const ProjectListing = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full p-2 sm:p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer font-medium"
                 >
-                  {categories.map(category => (
+                  {availableCategories.map(category => (
                     <option key={category} value={category}>
                       {getCategoryDisplayName(category)}
                     </option>
@@ -215,14 +239,14 @@ const ProjectListing = () => {
               <div className="flex items-center gap-2 sm:gap-3">
                 <input
                   type="text"
-                  onChange={e => setPriceRange([parseInt(e.target.value)||0, priceRange[1]])}
+                  onChange={e => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
                   placeholder="Min ₹"
                   className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <span className="text-gray-500">to</span>
                 <input
                   type="text"
-                  onChange={e => setPriceRange([priceRange[0], parseInt(e.target.value)||1000])}
+                  onChange={e => setPriceRange([priceRange[0], parseInt(e.target.value) || 1000])}
                   placeholder="Max ₹"
                   className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -236,7 +260,7 @@ const ProjectListing = () => {
           <div className="mt-6 sm:mt-8">
             <label className="block text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Filter by Technology</label>
             <div className="flex flex-wrap gap-2 sm:gap-3">
-              {allTags.map(tag => (
+              {availableTags.map(tag => (
                 <button
                   key={tag}
                   onClick={() => toggleTag(tag)}
