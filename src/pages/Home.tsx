@@ -189,8 +189,7 @@ const Home = () => {
     <div className="min-h-screen flex flex-col overflow-hidden">
       {/* Hero Section */}
       <section
-        className="relative mx-2 sm:mx-4 lg:mx-8 xl:mx-20 mt-3 sm:mt-5 bg-cover bg-center rounded-2xl sm:rounded-3xl overflow-hidden text-white min-h-[600px] sm:min-h-[700px] lg:min-h-[800px]"
-
+        className="relative mx-2 sm:mx-4 lg:mx-8 xl:mx-20 mt-2 sm:mt-4 bg-cover bg-center rounded-xl sm:rounded-2xl overflow-hidden text-white min-h-[450px] sm:min-h-[550px] lg:min-h-[650px]"
       >
         <video
           autoPlay
@@ -204,8 +203,8 @@ const Home = () => {
         </video>
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 xl:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
 
             {/* Left Content */}
             <div className="text-center lg:text-left">
@@ -230,32 +229,6 @@ const Home = () => {
                   Discover high-quality student projects, learn from expert code, and accelerate your academic journey with our curated marketplace.
                 </p>
               </div>
-
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="mb-6 sm:mb-10 animate-slideInUp" style={{ animationDelay: '1.5s' }}>
-                <div className="relative w-full max-w-2xl mx-auto lg:mx-0">
-                  <div className="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search for projects, tech stacks, or keywords..."
-                    className="block w-full pl-12 sm:pl-14 pr-28 sm:pr-36 py-3 sm:py-4 text-sm sm:text-base lg:text-lg border-0 rounded-xl sm:rounded-2xl bg-white/90 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/20 shadow-2xl transition-all duration-300 hover:bg-white focus:bg-white"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-3">
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-4 sm:px-6 lg:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
-                    >
-                      <Search className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="hidden sm:inline">Search</span>
-                    </button>
-                  </div>
-                </div>
-              </form>
-
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start animate-slideInUp" style={{ animationDelay: '2s' }}>
                 <Link
@@ -515,13 +488,66 @@ const Home = () => {
               </div>
             )}
           </div>
+          {/* Top Rated Projects */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-center mb-14 mt-24"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Top Rated Projects
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Projects that received the highest ratings from our community
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse"
+                >
+                  <div className="h-56 bg-gray-200"></div>
+                  <div className="p-5">
+                    <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="flex gap-2 mb-4">
+                      <div className="h-6 bg-gray-200 rounded w-16"></div>
+                      <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    </div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))
+            ) : topprojects.length > 0 ? (
+              topprojects.map((project, idx) => (
+                <ProjectCard key={project.id} project={project} index={idx} />
+              ))
+            ) : (
+              // No projects message
+              <div className="col-span-full text-center py-12">
+                <div className="text-gray-500 text-lg mb-4">
+                  No top rated projects available right now
+                </div>
+                <p className="text-gray-400">
+                  Check back soon for more highly rated projects!
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
 
 
       {/* Testimonials */}
-      <section className="py-24 bg-white">
+      <section className="py-10 bg-white">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -604,63 +630,11 @@ const Home = () => {
 
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top Rated Projects */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-center mb-14 mt-24"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Top Rated Projects
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Projects that received the highest ratings from our community
-            </p>
-          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: 3 }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse"
-                >
-                  <div className="h-56 bg-gray-200"></div>
-                  <div className="p-5">
-                    <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                    <div className="flex gap-2 mb-4">
-                      <div className="h-6 bg-gray-200 rounded w-16"></div>
-                      <div className="h-6 bg-gray-200 rounded w-20"></div>
-                    </div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              ))
-            ) : topprojects.length > 0 ? (
-              topprojects.map((project, idx) => (
-                <ProjectCard key={project.id} project={project} index={idx} />
-              ))
-            ) : (
-              // No projects message
-              <div className="col-span-full text-center py-12">
-                <div className="text-gray-500 text-lg mb-4">
-                  No top rated projects available right now
-                </div>
-                <p className="text-gray-400">
-                  Check back soon for more highly rated projects!
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </section>
       {/* CTA Section */}
-      <section className="relative py-28 sm:py-32 bg-white text-gray-900 overflow-hidden">
+      <section className="relative py-10 sm:py-14 bg-white text-gray-900 overflow-hidden">
 
         {/* Light Dotted Overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(0,0,0,0.03)_1px,_transparent_1px)] bg-[length:40px_40px] pointer-events-none" />
@@ -738,8 +712,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-
     </div>
   );
 };
