@@ -278,13 +278,43 @@ const Home = () => {
                 <p className="text-blue-200 text-xs">{project.category} project</p>
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-white">
-                ₹{project.pricing?.sale_price || 0}
-              </span>
-              <div className="flex items-center space-x-1">
-                <Star className="w-3.5 h-3.5 text-yellow-400 fill-current" />
-                <span className="text-white text-xs">4.8</span>
+
+            {/* Right Side - Floating Cards */}
+            <div className="hidden lg:flex flex-col space-y-6 animate-slideInRight" style={{ animationDelay: '1s' }}>
+              {/* Floating Project Card */}
+              {topprojects.length > 0 && (
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
+                      <Code className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold">{topprojects[0].title.length > 20 ? `${topprojects[0].title.substring(0, 20)}...` : topprojects[0].title}</h3>
+                      <p className="text-blue-200 text-sm">{topprojects[0].category} project</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-white">₹{topprojects[0].pricing?.sale_price || 0}</span>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-white text-sm">4.8</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Floating Stats Card */}
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation" style={{ animationDelay: '0.5s' }}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">10K+</div>
+                    <div className="text-blue-200 text-sm">Students</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{projects.length}+</div>
+                    <div className="text-blue-200 text-sm">Projects</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -498,8 +528,8 @@ const Home = () => {
                   </div>
                 </div>
               ))
-            ) : topprojects.length > 0 ? (
-              topprojects.map((project, idx) => (
+            ) : projects.length > 0 ? (
+              projects.map((project, idx) => (
                 <ProjectCard key={project.id} project={project} index={idx} />
               ))
             ) : (
@@ -510,9 +540,9 @@ const Home = () => {
               </div>
             )}
           </div>
-
         </div>
       </section>
+
 
 
       {/* Testimonials */}
@@ -597,9 +627,66 @@ const Home = () => {
         </motion.div>
       </section>
 
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Rated Projects */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-center mb-14 mt-24"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Top Rated Projects
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Projects that received the highest ratings from our community
+            </p>
+          </motion.div>
 
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse"
+                >
+                  <div className="h-56 bg-gray-200"></div>
+                  <div className="p-5">
+                    <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="flex gap-2 mb-4">
+                      <div className="h-6 bg-gray-200 rounded w-16"></div>
+                      <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    </div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))
+            ) : topprojects.length > 0 ? (
+              topprojects.map((project, idx) => (
+                <ProjectCard key={project.id} project={project} index={idx} />
+              ))
+            ) : (
+              // No projects message
+              <div className="col-span-full text-center py-12">
+                <div className="text-gray-500 text-lg mb-4">
+                  No top rated projects available right now
+                </div>
+                <p className="text-gray-400">
+                  Check back soon for more highly rated projects!
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
       {/* CTA Section */}
       <section className="relative py-28 sm:py-32 bg-white text-gray-900 overflow-hidden">
+
         {/* Light Dotted Overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(0,0,0,0.03)_1px,_transparent_1px)] bg-[length:40px_40px] pointer-events-none" />
 
