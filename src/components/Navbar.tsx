@@ -89,6 +89,32 @@ const Navbar = () => {
                 <span>Home</span>
               </Link>
 
+              {isAuthenticated && (
+                <Link
+                  to="/dashboard"
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isActive("/dashboard")
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    }`}
+                >
+                  <Gauge className="w-5 h-5" />
+                  <span>Dashboard</span>
+                </Link>
+              )}
+
+              {isAuthenticated && isAdmin && (
+                <Link
+                  to="/admin"
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isActive("/admin")
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    }`}
+                >
+                  <Gauge className="w-5 h-5" />
+                  <span>Admin</span>
+                </Link>
+              )}
+
               <Link
                 to="/projects"
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium ${isActive("/projects")
@@ -196,30 +222,16 @@ const Navbar = () => {
                         </div>
 
                         <div className="py-2">
-                          {!isAdmin && (
-                            <Link
-                              to="/dashboard"
-                              onClick={() => setIsProfileOpen(false)}
-                              className={`flex items-center px-6 py-3 text-sm font-medium transition ${isActive("/dashboard")
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-700 hover:bg-gray-50"
-                                }`}
-                            >
-                              <User className="w-4 h-4 mr-3" /> Dashboard
-                            </Link>
-                          )}
-                          {isAdmin && (
-                            <Link
-                              to="/admin"
-                              onClick={() => setIsProfileOpen(false)}
-                              className={`flex items-center px-6 py-3 text-sm font-medium transition ${isActive("/admin")
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-700 hover:bg-gray-50"
-                                }`}
-                            >
-                              <Settings className="w-4 h-4 mr-3" /> Admin Panel
-                            </Link>
-                          )}
+                          <Link
+                            to="/profile"
+                            onClick={() => setIsProfileOpen(false)}
+                            className={`flex items-center px-6 py-3 text-sm font-medium transition ${isActive("/profile")
+                              ? "bg-blue-50 text-blue-600"
+                              : "text-gray-700 hover:bg-gray-50"
+                              }`}
+                          >
+                            <User className="w-4 h-4 mr-3" /> Profile
+                          </Link>
                           <button
                             onClick={handleLogout}
                             className="flex items-center w-full px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
@@ -332,19 +344,17 @@ const Navbar = () => {
                     )}
                   </Link>
 
-                  {!isAdmin && (
-                    <Link
-                      to="/dashboard"
-                      className={`flex items-center px-4 py-3 text-gray-700${isActive("/dashboard")
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-700 hover:bg-gray-50"
-                        }`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Gauge className={`w-5 h-5 mr-2 ${isActive("/dashboard") ? "text-blue-600" : "text-gray-600"}`} />
-                      Dashboard
-                    </Link>
-                  )}
+                  <Link
+                    to="/dashboard"
+                    className={`flex items-center px-4 py-3 text-gray-700${isActive("/dashboard")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Gauge className={`w-5 h-5 mr-2 ${isActive("/dashboard") ? "text-blue-600" : "text-gray-600"}`} />
+                    Dashboard
+                  </Link>
                   {isAdmin && (
                     <Link
                       to="/admin"
@@ -358,6 +368,17 @@ const Navbar = () => {
                       Admin Panel
                     </Link>
                   )}
+                  <Link
+                    to="/profile"
+                    className={`flex items-center px-4 py-3 text-gray-700${isActive("/profile")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className={`w-5 h-5 mr-2 ${isActive("/profile") ? "text-blue-600" : "text-gray-600"}`} />
+                    Profile
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex items-center w-full text-left px-4 py-3 text-gray-700"

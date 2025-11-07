@@ -584,6 +584,11 @@ const StudentDashboard = () => {
     }
   }, [activeTab])
 
+  // Load profile data on mount for the navbar dropdown
+  useEffect(() => {
+    fetchUserProfile()
+  }, [])
+
   if (!user) return <p>No profile data found</p>
 
   return (
@@ -678,7 +683,6 @@ const StudentDashboard = () => {
                 { id: "wishlist", label: "Wishlist", icon: Heart },
                 { id: "reviews", label: "Reviews", icon: Trophy },
                 { id: "transactions", label: "Payments", icon: Clock },
-                { id: "profile", label: "Profile", icon: Settings },
               ].map((tab) => (
                 <button
                   key={tab.id}

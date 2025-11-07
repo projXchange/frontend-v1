@@ -12,6 +12,7 @@ import WishlistPage from './pages/WishlistPage';
 import CartPage from './pages/CartPage';
 import ResetPassword from './pages/ResetPassword';
 import NotFoundPage from './pages/NotFoundPage';
+import ProfilePage from './pages/ProfilePage';
 import { Toaster } from 'react-hot-toast';
 import EmailVerification from './pages/EmailVerification';
 
@@ -31,6 +32,11 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <StudentDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             } />
             <Route path="/admin" element={
