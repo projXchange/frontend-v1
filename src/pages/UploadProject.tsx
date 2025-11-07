@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   Upload,
   FileText,
@@ -16,6 +17,8 @@ import {
   Eye,
   Send,
   Users,
+  Clock,
+  ArrowRight,
 } from "lucide-react"
 
 const UploadProject = () => {
@@ -60,6 +63,9 @@ const UploadProject = () => {
   const [imagesUploading, setImagesUploading] = useState(false)
   const [sourceFilesUploading, setSourceFilesUploading] = useState(false)
   const [docFilesUploading, setDocFilesUploading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null)
 
   // Cloudinary configuration
   const CLOUDINARY_CLOUD_NAME = "dmfh4f4yg" // Replace with your cloud name
@@ -358,6 +364,9 @@ const UploadProject = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Prevent multiple submissions
+    if (isSubmitting) return
+
     // Validate all fields
     Object.keys(formData).forEach((key) => {
       if (typeof formData[key as keyof typeof formData] === "string") {
@@ -366,6 +375,7 @@ const UploadProject = () => {
     })
 
     if (Object.keys(errors).length === 0) {
+      setIsSubmitting(true)
       try {
         const token = localStorage.getItem("token")
 
@@ -557,7 +567,9 @@ const UploadProject = () => {
           console.error("Error updating project with files:", updateError)
         }
 
-        alert("Project submitted successfully! You will receive a notification once it's approved.")
+        // Store project ID and show success modal
+        setCreatedProjectId(backendProjectId)
+        setShowSuccessModal(true)
 
         // Reset form
         setFormData({
@@ -596,6 +608,8 @@ const UploadProject = () => {
       } catch (error) {
         console.error("Error submitting project:", error)
         alert("Failed to submit project. Please try again.")
+      } finally {
+        setIsSubmitting(false)
       }
     }
   }
@@ -1606,10 +1620,20 @@ const UploadProject = () => {
                         </button>
                         <button
                           type="submit"
-                          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-base hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                          disabled={isSubmitting}
+                          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-base hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
-                          <Send className="w-3 h-3 sm:w-4 sm:h-4" />
-                          Submit Project
+                          {isSubmitting ? (
+                            <>
+                              <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                              Submit Project
+                            </>
+                          )}
                         </button>
                       </div>
                     )}
@@ -1709,6 +1733,86 @@ const UploadProject = () => {
             </div>
           </div>
         )}
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <SuccessModal 
+            projectId={createdProjectId} 
+            onClose={() => {
+              setShowSuccessModal(false)
+              setCreatedProjectId(null)
+            }} 
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Success Modal Component
+const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClose: () => void }) => {
+  const navigate = useNavigate()
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-slideInUp">
+        {/* Success Icon */}
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+          <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+        </div>
+
+        {/* Title */}
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">
+          Project Submitted Successfully!
+        </h2>
+
+        {/* Description */}
+        <p className="text-gray-600 text-center mb-6 text-sm sm:text-base">
+          Your project has been created and saved as a <span className="font-semibold text-yellow-600">draft</span>. 
+        </p>
+
+        {/* Next Steps */}
+        <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
+          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-blue-600" />
+            Next Steps:
+          </h3>
+          <ol className="space-y-2 text-sm text-gray-700">
+            <li className="flex items-start gap-2">
+              <span className="font-bold text-blue-600 flex-shrink-0">1.</span>
+              <span>Go to <span className="font-semibold">My Uploads</span> in your dashboard</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="font-bold text-blue-600 flex-shrink-0">2.</span>
+              <span>Review your project details</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="font-bold text-blue-600 flex-shrink-0">3.</span>
+              <span>Click <span className="font-semibold">"Send for Approval"</span> when ready</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="font-bold text-blue-600 flex-shrink-0">4.</span>
+              <span>Our team will review within 24-48 hours</span>
+            </li>
+          </ol>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            Go to Dashboard
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onClose}
+            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+          >
+            Upload Another
+          </button>
+        </div>
       </div>
     </div>
   )
