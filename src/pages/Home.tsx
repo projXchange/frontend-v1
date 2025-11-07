@@ -119,7 +119,7 @@ const Home = () => {
 
   const testimonials = [
     {
-      name: 'Ganesh Patil',
+      name: 'Demo Patil',
       role: 'BTech',
       university: 'D Y Patil University, Pune',
       text: 'ProjXchange saved me weeks of development time. The projects are incredibly well-documented and the sellers are super responsive!',
