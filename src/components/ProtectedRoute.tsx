@@ -8,12 +8,15 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, user, loading, openAuthModal } = useAuth();
   const location = useLocation();
-  const {openAuthModal} = useAuth();
 
-  if (!isAuthenticated) {
-    openAuthModal(true)
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  if (!isAuthenticated && !user) {
+    openAuthModal(true);
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
@@ -23,5 +26,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
 
   return <>{children}</>;
 };
+
 
 export default ProtectedRoute;

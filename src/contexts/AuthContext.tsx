@@ -19,6 +19,7 @@ interface AuthContextType {
   isLoginMode: boolean;
   openAuthModal: (isLogin?: boolean) => void;
   closeAuthModal: () => void;
+  loading: boolean;
 }
 
 // Create context
@@ -30,13 +31,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoginMode, setIsLoginMode] = useState(true);
   
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('studystack_user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-   }
+    }
+    setLoading(false);
   }, []);
+  
 
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
@@ -257,7 +262,8 @@ const resendVerificationEmail = async (email: string): Promise<void> => {
     isAuthModalOpen,
     isLoginMode,
     openAuthModal,
-    closeAuthModal
+    closeAuthModal,
+    loading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
