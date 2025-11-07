@@ -98,10 +98,10 @@ const ProjectListing = () => {
       const sortMap: { [key: string]: { sort_by: string; sort_order: string } } = {
         newest: { sort_by: 'created_at', sort_order: 'desc' },
         oldest: { sort_by: 'created_at', sort_order: 'asc' },
-        'price-low': { sort_by: 'sale_price', sort_order: 'asc' },
-        'price-high': { sort_by: 'sale_price', sort_order: 'desc' },
+        'price-low': { sort_by: 'price', sort_order: 'asc' },
+        'price-high': { sort_by: 'price', sort_order: 'desc' },
         popular: { sort_by: 'purchase_count', sort_order: 'desc' },
-        trending: { sort_by: 'is_featured', sort_order: 'desc' },
+        trending: { sort_by: 'view_count', sort_order: 'desc' },
       };
       const sortConfig = sortMap[sortBy] || sortMap['newest'];
       params.append('sort_by', sortConfig.sort_by);
