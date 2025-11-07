@@ -564,11 +564,6 @@ const StudentDashboard = () => {
   })
 
   useEffect(() => {
-    // Load stats on mount
-    fetchDashboardStats()
-  }, [])
-
-  useEffect(() => {
     if (activeTab === "overview" && !dashboardStats && !statsLoading) {
       fetchDashboardStats()
     }
