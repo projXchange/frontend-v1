@@ -87,9 +87,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${
-              isInWishlist(project.id) ? "hover:bg-red-100 text-red-500" : "hover:bg-pink-100 text-pink-500"
-            }`}
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInWishlist(project.id) ? "hover:bg-red-100 text-red-500" : "hover:bg-pink-100 text-pink-500"
+              }`}
             title={isInWishlist(project.id) ? "Remove from wishlist" : "Add to wishlist"}
             type="button"
             onClick={(e) => {
@@ -116,9 +115,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${
-              isInCart(project.id) ? "hover:bg-green-100 text-green-500" : "hover:bg-blue-100 text-blue-500"
-            }`}
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInCart(project.id) ? "hover:bg-green-100 text-green-500" : "hover:bg-blue-100 text-blue-500"
+              }`}
             title={isInCart(project.id) ? "Remove from cart" : "Add to cart"}
             type="button"
             onClick={(e) => {
@@ -156,7 +154,9 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             <div className="flex items-center text-xs sm:text-sm">
               <Star className="w-3 sm:w-4 h-3 sm:h-4 text-yellow-400 fill-yellow-400" />
               <span className="ml-1 font-semibold text-gray-800">{project.rating?.average_rating || 0.0}</span>
-              <span className="ml-1 text-gray-500">({project.rating?.total_ratings || 0})</span>
+              <span className="ml-1 text-gray-500">
+                ({project.rating?.total_ratings || 0} {(project.rating?.total_ratings || 0) === 1 ? 'review' : 'reviews'})
+              </span>
             </div>
           </div>
 
@@ -192,7 +192,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             {project.description.length > 100 ? `${project.description.substring(0, 100)}...` : project.description}
           </p>
           <div className="text-center">
-            
+
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-full text-sm sm:text-base font-semibold shadow"

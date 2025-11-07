@@ -506,7 +506,9 @@ const ProjectDetail = () => {
                   <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current flex-shrink-0" />
                   <div className="min-w-0">
                     <span className="font-bold text-sm sm:text-base block">{averageRating || "0.0"}</span>
-                    <span className="font-medium text-xs">({approvedReviews.length + pendingReviews.length || 0})</span>
+                    <span className="font-medium text-xs">
+                      ({approvedReviews.length + pendingReviews.length || 0} {(approvedReviews.length + pendingReviews.length) === 1 ? 'review' : 'reviews'})
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
