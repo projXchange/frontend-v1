@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight, Shield } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { Transaction } from '../types/Transaction';
+import { useRazorpayCheckout } from '../hooks/useRazorpayCheckout';
 
 const CartPage = () => {
   const { cart, removeFromCart, getCartTotal, getCartCount, clearCart, loading } = useCart();
-  const { user, isAuthenticated } = useAuth();
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const { initiateCheckout, isProcessing } = useRazorpayCheckout();
 
   const handleRemoveFromCart = async (projectId: string) => {
     await removeFromCart(projectId);
@@ -21,74 +20,7 @@ const CartPage = () => {
       return;
     }
 
-    try {
-      setIsPurchasing(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please log in to continue.');
-        return;
-      }
-
-      // Loop through all cart items and purchase them one by one
-      for (const item of cart) {
-        // Step 1: Purchase project
-        const purchaseRes = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${item.project_id}/purchase`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!purchaseRes.ok) {
-          const errText = await purchaseRes.text();
-          throw new Error(errText || 'Purchase failed');
-        }
-
-        // Step 2: Record transaction
-        const nowIso = new Date().toISOString();
-        const transactionBody: Partial<Transaction> = {
-          transaction_id: crypto && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}`,
-          user_id: user?.id,
-          project_id: item.project_id,
-          author_id: item.project.author_id,
-          type: 'purchase',
-          status: 'success',
-          amount: item.project.pricing?.sale_price ?? 0,
-          currency: item.project.pricing?.currency || 'INR',
-          payment_method: 'online',
-          payment_gateway_response: 'N/A',
-          commission_amount: 0,
-          author_amount: item.project.pricing?.sale_price,
-          metadata: JSON.stringify({ projectTitle: item.project.title }),
-          processed_at: nowIso,
-          created_at: nowIso,
-          updated_at: nowIso,
-        };
-
-        const txnRes = await fetch('https://projxchange-backend-v1.vercel.app/transactions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(transactionBody),
-        });
-
-        if (!txnRes.ok) {
-          const errText = await txnRes.text();
-          throw new Error(errText || 'Failed to record transaction');
-        }
-      }
-
-      toast.success('Purchase successful! You now have access to all projects.');
-      clearCart();
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error('Failed to complete purchase. Please try again.');
-    } finally {
-      setIsPurchasing(false);
-    }
+    await initiateCheckout();
   };
 
   if (loading) {
@@ -236,11 +168,11 @@ const CartPage = () => {
                 <div className="space-y-3">
                   <button
                     onClick={handleCheckout}
-                    disabled={isPurchasing}
+                    disabled={isProcessing || loading}
                     className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CreditCard className="w-5 h-5" />
-                    {isPurchasing ? 'Processing...' : 'Proceed to Checkout'}
+                    {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
                     <ArrowRight className="w-5 h-5" />
                   </button>
 
@@ -252,15 +184,27 @@ const CartPage = () => {
                   </button>
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-50 rounded-xl">
-                  <h4 className="font-semibold text-blue-900 mb-2">What's included?</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Complete source code</li>
-                    <li>• Documentation & setup guide</li>
-                    <li>• Lifetime access</li>
-                    <li>• Free updates</li>
-                    <li>• 30-day money-back guarantee</li>
-                  </ul>
+                <div className="mt-6 space-y-4">
+                  <div className="p-4 bg-blue-50 rounded-xl">
+                    <h4 className="font-semibold text-blue-900 mb-2">What's included?</h4>
+                    <ul className="text-sm text-blue-800 space-y-1">
+                      <li>• Complete source code</li>
+                      <li>• Documentation & setup guide</li>
+                      <li>• Lifetime access</li>
+                      <li>• Free updates</li>
+                      <li>• 30-day money-back guarantee</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="w-5 h-5 text-green-600" />
+                      <h4 className="font-semibold text-green-900">Secure Payment</h4>
+                    </div>
+                    <p className="text-sm text-green-800">
+                      Powered by Razorpay - PCI DSS compliant payment gateway
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
