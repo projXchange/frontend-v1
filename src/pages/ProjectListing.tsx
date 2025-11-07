@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Filter, ChevronDown, Zap } from 'lucide-react';
 import { Project } from '../types/Project';
 import { ProjectCard } from '../components/ProjectCard';
@@ -18,6 +18,26 @@ const ProjectListing = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [techDropdownOpen, setTechDropdownOpen] = useState(false);
+  const [techSearchTerm, setTechSearchTerm] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setTechDropdownOpen(false);
+        setTechSearchTerm('');
+      }
+    };
+
+    if (techDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [techDropdownOpen]);
 
   // Debounce price range input
   useEffect(() => {
@@ -137,7 +157,16 @@ const ProjectListing = () => {
   // Remove client-side filtering since API already handles it
   const filteredProjects = projects;
 
-  const toggleTag = (tag: string) => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
+    setTechDropdownOpen(false);
+    setTechSearchTerm('');
+  };
+
+  // Filter and sort technologies for dropdown
+  const filteredTechnologies = availableTags
+    .filter(tag => tag.toLowerCase().includes(techSearchTerm.toLowerCase()))
+    .sort((a, b) => a.localeCompare(b));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -188,24 +217,66 @@ const ProjectListing = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         {/* Filters */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {/* Category */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Category</label>
+        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 overflow-visible">
+            {/* Filter by Technology Dropdown */}
+            <div ref={dropdownRef} className="relative z-20">
+              <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Filter by Technology</label>
               <div className="relative">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full p-2 sm:p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer font-medium"
+                <button
+                  onClick={() => setTechDropdownOpen(!techDropdownOpen)}
+                  className="w-full p-2 sm:p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer font-medium text-left flex items-center justify-between"
                 >
-                  {availableCategories.map(category => (
-                    <option key={category} value={category}>
-                      {getCategoryDisplayName(category)}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
+                  <span className="text-gray-700 truncate">
+                    {selectedTags.length > 0 ? `${selectedTags.length} selected` : 'Select Technologies'}
+                  </span>
+                  <ChevronDown className={`text-gray-400 w-4 h-4 sm:w-5 sm:h-5 transition-transform flex-shrink-0 ${techDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {techDropdownOpen && (
+                  <div className="absolute left-0 right-0 z-[9999] mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+                    {/* Search Input */}
+                    <div className="p-3 border-b border-gray-200 bg-white">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                          type="text"
+                          placeholder="Search technologies..."
+                          value={techSearchTerm}
+                          onChange={(e) => setTechSearchTerm(e.target.value)}
+                          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+
+                    {/* Technology List */}
+                    <div className="max-h-60 overflow-y-auto">
+                      {filteredTechnologies.length > 0 ? (
+                        filteredTechnologies.map(tag => (
+                          <button
+                            key={tag}
+                            onClick={() => toggleTag(tag)}
+                            className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${selectedTags.includes(tag) ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                              }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{tag}</span>
+                              {selectedTags.includes(tag) && (
+                                <span className="text-blue-600 font-bold">✓</span>
+                              )}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-gray-500 text-sm text-center">
+                          No technologies found
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -230,7 +301,7 @@ const ProjectListing = () => {
             </div>
 
             {/* Price Range */}
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Price Range (INR)</label>
               <div className="flex items-center gap-2 sm:gap-3">
                 <input
@@ -248,24 +319,53 @@ const ProjectListing = () => {
                 />
               </div>
             </div>
-
-            <div></div> {/* Empty placeholder */}
           </div>
 
-          {/* Technology Tags */}
-          <div className="mt-6 sm:mt-8">
-            <label className="block text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Filter by Technology</label>
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              {availableTags.map(tag => (
+          {/* Selected Technologies Tags */}
+          {selectedTags.length > 0 && (
+            <div className="mt-4 sm:mt-6">
+              <div className="flex items-center gap-2 mb-2">
+                <label className="text-sm font-semibold text-gray-700">Selected Technologies:</label>
                 <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1 sm:px-3 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 hover:scale-105 ${selectedTags.includes(tag)
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
+                  onClick={() => setSelectedTags([])}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Clear All
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedTags.map(tag => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-sm font-medium"
+                  >
+                    {tag}
+                    <button
+                      onClick={() => toggleTag(tag)}
+                      className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Category Tags */}
+          <div className="mt-6 sm:mt-8">
+            <label className="block text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Category</label>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {availableCategories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 hover:scale-105 ${selectedCategory === category
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
-                  {tag}
+                  {getCategoryDisplayName(category)}
                 </button>
               ))}
             </div>
