@@ -119,9 +119,9 @@ const Home = () => {
 
   const testimonials = [
     {
-      name: 'Demo Patil',
+      name: 'Ganesh Patil',
       role: 'BTech',
-      university: 'MIT',
+      university: 'D Y Patil University, Pune',
       text: 'ProjXchange saved me weeks of development time. The projects are incredibly well-documented and the sellers are super responsive!',
       rating: 5,
       avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100',
@@ -137,7 +137,7 @@ const Home = () => {
       project: 'Java Spring Boot API'
     },
     {
-      name: 'Dummy Pardeshi',
+      name: 'Demo Pardeshi',
       role: 'MCA Student',
       university: 'UC Berkeley',
       text: 'Perfect for students on a budget. The projects are affordable and come with excellent documentation and support.',
