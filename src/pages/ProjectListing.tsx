@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Zap } from 'lucide-react';
 import { Project } from '../types/Project';
 import { ProjectCard } from '../components/ProjectCard';
@@ -12,6 +12,7 @@ const ProjectListing = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -56,13 +57,17 @@ const ProjectListing = () => {
 
   // Fetch projects
   const fetchProjects = async (page = 1, append = false) => {
-    setLoading(true);
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     setError('');
     try {
       const params = new URLSearchParams();
       params.append('status', 'approved');
       params.append('page', page.toString());
-      params.append('limit', '12');
+      params.append('limit', '6');
 
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
       if (selectedTags.length > 0) params.append('tech_stack', selectedTags.join(','));
@@ -88,12 +93,17 @@ const ProjectListing = () => {
 
       const newProjects = data.data || data || [];
       setProjects(prev => append ? [...prev, ...newProjects] : newProjects);
-      setTotalPages(data.pagination?.total_pages || 1);
+
+      // Use pagination data from API response
+      const pagination = data.pagination || {};
+      setTotalPages(pagination.pages || 1);
+      setCurrentPage(pagination.page || page);
     } catch (err) {
       console.error(err);
       setError('Could not load projects. Please try again later.');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -124,22 +134,8 @@ const ProjectListing = () => {
     return map[category] || category;
   };
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter(project => {
-      const matchesSearch = !searchTerm ||
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.tech_stack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
-      const matchesPrice = project.pricing?.sale_price
-        ? project.pricing.sale_price >= debouncedPriceRange[0] && project.pricing.sale_price <= debouncedPriceRange[1]
-        : true;
-      const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => project.tech_stack.includes(tag));
-
-      return matchesSearch && matchesCategory && matchesPrice && matchesTags;
-    });
-  }, [projects, searchTerm, selectedCategory, debouncedPriceRange, selectedTags]);
+  // Remove client-side filtering since API already handles it
+  const filteredProjects = projects;
 
   const toggleTag = (tag: string) => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
 
@@ -290,11 +286,29 @@ const ProjectListing = () => {
             <button onClick={() => window.location.reload()} className="px-6 py-2 sm:px-8 sm:py-3 bg-blue-600 text-white rounded-xl">Try Again</button>
           </div>
         ) : filteredProjects.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredProjects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {filteredProjects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} />
+              ))}
+            </div>
+
+            {/* Loading More Skeleton */}
+            {loadingMore && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-6 sm:mt-8">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                    <div className="h-48 bg-gray-200"></div>
+                    <div className="p-6">
+                      <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-16">
             <Zap className="w-12 h-12 text-blue-600 mx-auto mb-4" />
@@ -304,13 +318,21 @@ const ProjectListing = () => {
         )}
 
         {/* Load More */}
-        {currentPage < totalPages && (
+        {!loading && currentPage < totalPages && (
           <div className="mt-10 text-center">
             <button
               onClick={loadMore}
-              className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105"
+              disabled={loadingMore}
+              className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
             >
-              Load More Projects
+              {loadingMore ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Loading...
+                </>
+              ) : (
+                'Load More Projects'
+              )}
             </button>
           </div>
         )}
