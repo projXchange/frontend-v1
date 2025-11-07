@@ -684,8 +684,8 @@ const StudentDashboard = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1 sm:gap-3 py-3 sm:py-6 px-3 sm:px-2 border-b-2 font-semibold text-xs sm:text-sm whitespace-nowrap transition-all duration-300 ${activeTab === tab.id
-                      ? "border-blue-500 text-blue-600 scale-105"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                    ? "border-blue-500 text-blue-600 scale-105"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
                     }`}
                 >
                   <tab.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -956,7 +956,11 @@ const StudentDashboard = () => {
                                     disabled={updatingProjectId === project.id || project.status !== "draft"}
                                     className="px-2 sm:px-3 py-1.5 sm:py-2 text-yellow-700 hover:text-yellow-900 hover:bg-yellow-50 rounded-lg transition-colors text-xs sm:text-sm font-semibold disabled:opacity-50 whitespace-nowrap"
                                   >
-                                    {updatingProjectId === project.id ? "Sending..." : "Send for Approval"}
+                                    {updatingProjectId === project.id
+                                      ? "Sending..."
+                                      : project.status === "pending"
+                                        ? "Sent for Approval"
+                                        : "Send for Approval"}
                                   </button>
                                 </div>
                               </td>
