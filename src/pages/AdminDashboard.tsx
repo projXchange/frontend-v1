@@ -29,6 +29,7 @@ import type { Transaction, TransactionsApiResponse } from "../types/Transaction"
 import toast from "react-hot-toast"
 import TransactionDetailsModal from "../components/TransactionDetailsModal"
 import ReviewDetailsModal from "../components/ReviewDetailsModal"
+import LoadingNumber from "../components/LoadingNumber"
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
@@ -430,7 +431,11 @@ const AdminDashboard = () => {
     setUpdatingTransaction(transactionId)
     const token = localStorage.getItem("token")
     try {
-      const requestBody: any = { status }
+      const requestBody: {
+        status: string
+        payment_gateway_response?: string
+        metadata?: string
+      } = { status }
       if (paymentGatewayResponse) requestBody.payment_gateway_response = paymentGatewayResponse
       if (metadata) requestBody.metadata = metadata
 
@@ -686,7 +691,25 @@ const AdminDashboard = () => {
     }
   }
 
-  const StatCard = ({ title, value, subtitle, icon: Icon, color, trend, onClick }: any) => (
+  const StatCard = ({
+    title,
+    value,
+    subtitle,
+    icon: Icon,
+    color,
+    trend,
+    onClick,
+    isLoading
+  }: {
+    title: string
+    value: string | number
+    subtitle: string
+    icon: React.ElementType
+    color: string
+    trend?: string
+    onClick?: () => void
+    isLoading?: boolean
+  }) => (
     <div
       className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group"
       onClick={onClick}
@@ -694,7 +717,11 @@ const AdminDashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+          <LoadingNumber
+            value={value}
+            isLoading={isLoading}
+            className="text-3xl font-bold text-gray-900 mb-1"
+          />
           <p className={`text-sm font-semibold ${color}`}>{subtitle}</p>
         </div>
         <div
@@ -703,7 +730,7 @@ const AdminDashboard = () => {
           <Icon className="w-7 h-7 text-white" />
         </div>
       </div>
-      {trend && (
+      {trend && !isLoading && (
         <div className="mt-4 flex items-center">
           <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
           <span className="text-sm text-green-600 font-semibold">{trend}</span>
@@ -758,14 +785,26 @@ const AdminDashboard = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-blue-300" />
-                  <span className="text-xs sm:text-sm">{stats.activeUsers} Active Users</span>
+                  <span className="text-xs sm:text-sm">
+                    <LoadingNumber
+                      value={`${stats.activeUsers} Active Users`}
+                      isLoading={loading}
+                      className="inline"
+                    />
+                  </span>
                 </div>
               </div>
             </div>
             <div className="text-left sm:text-right w-full sm:w-auto animate-slideInRight">
-              <div className="text-2xl sm:text-3xl font-bold">${stats.revenue.toLocaleString()}</div>
+              <LoadingNumber
+                value={`$${stats.revenue.toLocaleString()}`}
+                isLoading={loading}
+                className="text-2xl sm:text-3xl font-bold"
+              />
               <div className="text-blue-200 text-xs sm:text-sm">Monthly Revenue</div>
-              <div className="text-xs sm:text-sm text-green-300 font-semibold mt-1">+{stats.monthlyGrowth}% growth</div>
+              {!loading && (
+                <div className="text-xs sm:text-sm text-green-300 font-semibold mt-1">+{stats.monthlyGrowth}% growth</div>
+              )}
             </div>
           </div>
         </div>
@@ -782,6 +821,7 @@ const AdminDashboard = () => {
             color="text-blue-600"
             trend="+5 new projects"
             onClick={() => setActiveTab("projects")}
+            isLoading={loading}
           />
           <StatCard
             title="Pending Approval"
@@ -790,6 +830,7 @@ const AdminDashboard = () => {
             icon={AlertCircle}
             color="text-orange-600"
             onClick={() => setActiveTab("approval")}
+            isLoading={loading}
           />
           <StatCard
             title="Total Sales"
@@ -799,6 +840,7 @@ const AdminDashboard = () => {
             color="text-green-600"
             trend="+450 today"
             onClick={() => setActiveTab("transactions")}
+            isLoading={loading}
           />
           <StatCard
             title="Total Users"
@@ -808,6 +850,7 @@ const AdminDashboard = () => {
             color="text-purple-600"
             trend="+12 new users"
             onClick={() => setActiveTab("users")}
+            isLoading={loading}
           />
         </div>
 
@@ -851,11 +894,10 @@ const AdminDashboard = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 sm:gap-3 py-4 sm:py-6 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? "border-blue-500 text-blue-600 scale-105"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
-                  }`}
+                  className={`flex items-center gap-2 sm:gap-3 py-4 sm:py-6 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
+                    ? "border-blue-500 text-blue-600 scale-105"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                    }`}
                 >
                   <tab.icon className="w-4 sm:w-5 h-4 sm:h-5" />
                   {tab.label}
@@ -896,17 +938,16 @@ const AdminDashboard = () => {
                                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-blue-100 flex-shrink-0"
                               />
                               <div
-                                className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                                  activity.type === "project"
-                                    ? "bg-blue-500"
-                                    : activity.type === "approval"
-                                      ? "bg-green-500"
-                                      : activity.type === "user"
-                                        ? "bg-purple-500"
-                                        : activity.type === "payment"
-                                          ? "bg-yellow-500"
-                                          : "bg-red-500"
-                                }`}
+                                className={`w-3 h-3 rounded-full flex-shrink-0 ${activity.type === "project"
+                                  ? "bg-blue-500"
+                                  : activity.type === "approval"
+                                    ? "bg-green-500"
+                                    : activity.type === "user"
+                                      ? "bg-purple-500"
+                                      : activity.type === "payment"
+                                        ? "bg-yellow-500"
+                                        : "bg-red-500"
+                                  }`}
                               />
                               <div className="min-w-0 flex-1">
                                 <span className="text-gray-900 font-semibold text-sm sm:text-base truncate block">
@@ -920,17 +961,16 @@ const AdminDashboard = () => {
                                 {activity.time}
                               </span>
                               <div
-                                className={`text-xs px-2 py-1 rounded-full mt-1 ${
-                                  activity.status === "pending"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : activity.status === "approved"
-                                      ? "bg-green-100 text-green-700"
-                                      : activity.status === "completed"
-                                        ? "bg-blue-100 text-blue-700"
-                                        : activity.status === "active"
-                                          ? "bg-purple-100 text-purple-700"
-                                          : "bg-red-100 text-red-700"
-                                }`}
+                                className={`text-xs px-2 py-1 rounded-full mt-1 ${activity.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : activity.status === "approved"
+                                    ? "bg-green-100 text-green-700"
+                                    : activity.status === "completed"
+                                      ? "bg-blue-100 text-blue-700"
+                                      : activity.status === "active"
+                                        ? "bg-purple-100 text-purple-700"
+                                        : "bg-red-100 text-red-700"
+                                  }`}
                               >
                                 {activity.status}
                               </div>
@@ -1206,17 +1246,16 @@ const AdminDashboard = () => {
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4">
                                   <span
-                                    className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                      project.status === "approved"
-                                        ? "bg-green-100 text-green-800"
-                                        : project.status === "pending"
-                                          ? "bg-yellow-100 text-yellow-800"
-                                          : project.status === "suspended"
-                                            ? "bg-red-100 text-red-800"
-                                            : project.status === "archived"
-                                              ? "bg-gray-100 text-gray-800"
-                                              : "bg-gray-100 text-gray-800"
-                                    }`}
+                                    className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === "approved"
+                                      ? "bg-green-100 text-green-800"
+                                      : project.status === "pending"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : project.status === "suspended"
+                                          ? "bg-red-100 text-red-800"
+                                          : project.status === "archived"
+                                            ? "bg-gray-100 text-gray-800"
+                                            : "bg-gray-100 text-gray-800"
+                                      }`}
                                   >
                                     {project.status.replace("_", " ")}
                                   </span>
@@ -1232,11 +1271,10 @@ const AdminDashboard = () => {
                                     <button
                                       onClick={() => handleToggleFeatured(project.id, project.is_featured)}
                                       disabled={updatingProject === project.id}
-                                      className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${
-                                        project.is_featured
-                                          ? "text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50"
-                                          : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-                                      }`}
+                                      className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${project.is_featured
+                                        ? "text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50"
+                                        : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                                        }`}
                                     >
                                       <Star className={`w-4 h-4 ${project.is_featured ? "fill-current" : ""}`} />
                                     </button>
@@ -1334,11 +1372,10 @@ const AdminDashboard = () => {
                               </td>
                               <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
                                 <span
-                                  className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                    user.user_type === "admin"
-                                      ? "bg-purple-100 text-purple-800"
-                                      : "bg-blue-100 text-blue-800"
-                                  }`}
+                                  className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${user.user_type === "admin"
+                                    ? "bg-purple-100 text-purple-800"
+                                    : "bg-blue-100 text-blue-800"
+                                    }`}
                                 >
                                   {user.user_type}
                                 </span>
@@ -1348,13 +1385,12 @@ const AdminDashboard = () => {
                               </td>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
                                 <span
-                                  className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                    user.verification_status === "verified"
-                                      ? "bg-green-100 text-green-800"
-                                      : user.verification_status === "rejected"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-yellow-100 text-yellow-800"
-                                  }`}
+                                  className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${user.verification_status === "verified"
+                                    ? "bg-green-100 text-green-800"
+                                    : user.verification_status === "rejected"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                    }`}
                                 >
                                   {user.verification_status}
                                 </span>
@@ -1562,29 +1598,28 @@ const AdminDashboard = () => {
                             <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
                               <div className="flex items-center gap-2 sm:gap-3">
                                 <img
-                                  src={tx.thumbnail || "/placeholder.svg"}
-                                  alt={tx.project.title}
+                                  src={tx.project?.thumbnail || "/placeholder.svg"}
+                                  alt={tx.project?.title || "Project"}
                                   className="w-8 h-8 rounded hidden sm:block"
                                 />
-                                <span className="truncate">{tx.project.title}</span>
+                                <span className="truncate">{tx.project?.title || "N/A"}</span>
                               </div>
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
-                              <div className="truncate">{tx.buyer.full_name}</div>
-                              <div className="text-xs text-gray-400 truncate">{tx.buyer.email}</div>
+                              <div className="truncate">User ID: {tx.user_id}</div>
+                              <div className="text-xs text-gray-400 truncate">Type: {tx.type}</div>
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold whitespace-nowrap">
                               {tx.amount} {tx.currency}
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                               <span
-                                className={`px-2 py-1 rounded-full text-xs ${
-                                  tx.status === "success"
-                                    ? "bg-green-100 text-green-600"
-                                    : tx.status === "pending"
-                                      ? "bg-yellow-100 text-yellow-600"
-                                      : "bg-red-100 text-red-600"
-                                }`}
+                                className={`px-2 py-1 rounded-full text-xs ${tx.status === "success"
+                                  ? "bg-green-100 text-green-600"
+                                  : tx.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-600"
+                                    : "bg-red-100 text-red-600"
+                                  }`}
                               >
                                 {tx.status}
                               </span>
@@ -1725,20 +1760,18 @@ const AdminDashboard = () => {
                                     {[...Array(5)].map((_, i) => (
                                       <Star
                                         key={i}
-                                        className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                                          i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
-                                        }`}
+                                        className={`w-3 h-3 sm:w-4 sm:h-4 ${i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                                          }`}
                                       />
                                     ))}
                                   </div>
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                                   <span
-                                    className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
-                                      review.is_approved
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-yellow-100 text-yellow-800"
-                                    }`}
+                                    className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${review.is_approved
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                      }`}
                                   >
                                     {review.is_approved ? "Approved" : "Pending"}
                                   </span>

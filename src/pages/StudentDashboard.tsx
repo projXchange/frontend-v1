@@ -37,6 +37,7 @@ import type { Transaction } from "../types/Transaction"
 import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import toast from "react-hot-toast"
+import LoadingNumber from "../components/LoadingNumber"
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
@@ -100,12 +101,16 @@ const StudentDashboard = () => {
     return matchesSearch && matchesFilter
   })
 
-  const StatCard = ({ title, value, subtitle, icon: Icon, color, trend }: any) => (
+  const StatCard = ({ title, value, subtitle, icon: Icon, color, trend, isLoading }: any) => (
     <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+          <LoadingNumber
+            value={value}
+            isLoading={isLoading}
+            className="text-3xl font-bold text-gray-900 mb-1"
+          />
           <p className={`text-sm font-semibold ${color}`}>{subtitle}</p>
         </div>
         <div
@@ -114,7 +119,7 @@ const StudentDashboard = () => {
           <Icon className="w-7 h-7 text-white" />
         </div>
       </div>
-      {trend && (
+      {trend && !isLoading && (
         <div className="mt-4 flex items-center">
           <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
           <span className="text-sm text-green-600 font-semibold">{trend}</span>
@@ -648,6 +653,7 @@ const StudentDashboard = () => {
             subtitle={`${dashboardStats?.monthly_activity?.new_projects_created || 0} new this month`}
             icon={ShoppingBag}
             color="text-blue-600"
+            isLoading={statsLoading}
           />
           <StatCard
             title="Total Purchases"
@@ -655,6 +661,7 @@ const StudentDashboard = () => {
             subtitle={`${dashboardStats?.monthly_activity?.new_projects_purchased || 0} this month`}
             icon={Award}
             color="text-green-600"
+            isLoading={statsLoading}
           />
           <StatCard
             title="Wishlist Items"
@@ -662,6 +669,7 @@ const StudentDashboard = () => {
             subtitle="Ready to buy"
             icon={Heart}
             color="text-pink-600"
+            isLoading={statsLoading}
           />
           <StatCard
             title="Avg Rating"
@@ -669,6 +677,7 @@ const StudentDashboard = () => {
             subtitle="Overall rating"
             icon={Star}
             color="text-yellow-600"
+            isLoading={statsLoading}
           />
         </div>
 
@@ -722,27 +731,35 @@ const StudentDashboard = () => {
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
                         <div>
                           <p className="text-gray-500 text-xs sm:text-sm">Projects Owned</p>
-                          <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                            {dashboardStats?.user_performance?.projects_owned || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.user_performance?.projects_owned || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                          />
                         </div>
                         <div>
                           <p className="text-gray-500 text-xs sm:text-sm">Purchases</p>
-                          <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                            {dashboardStats?.user_performance?.total_purchases || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.user_performance?.total_purchases || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                          />
                         </div>
                         <div>
                           <p className="text-gray-500 text-xs sm:text-sm">Wishlist</p>
-                          <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                            {dashboardStats?.user_performance?.wishlist_items || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.user_performance?.wishlist_items || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                          />
                         </div>
                         <div>
                           <p className="text-gray-500 text-xs sm:text-sm">Avg. Rating</p>
-                          <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                            {dashboardStats?.user_performance?.average_rating || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.user_performance?.average_rating || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                          />
                         </div>
                       </div>
                     </div>
@@ -756,21 +773,27 @@ const StudentDashboard = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center">
                         <div>
                           <p className="text-blue-700 text-xs sm:text-sm">New Projects</p>
-                          <p className="text-xl sm:text-2xl font-bold text-blue-900">
-                            {dashboardStats?.monthly_activity?.new_projects_created || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.monthly_activity?.new_projects_created || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-blue-900"
+                          />
                         </div>
                         <div>
                           <p className="text-blue-700 text-xs sm:text-sm">Downloads</p>
-                          <p className="text-xl sm:text-2xl font-bold text-blue-900">
-                            {dashboardStats?.monthly_activity?.downloads_received || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.monthly_activity?.downloads_received || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-blue-900"
+                          />
                         </div>
                         <div>
                           <p className="text-blue-700 text-xs sm:text-sm">Purchases</p>
-                          <p className="text-xl sm:text-2xl font-bold text-blue-900">
-                            {dashboardStats?.monthly_activity?.new_projects_purchased || 0}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.monthly_activity?.new_projects_purchased || 0}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-blue-900"
+                          />
                         </div>
                       </div>
                     </div>
@@ -784,21 +807,27 @@ const StudentDashboard = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center">
                         <div>
                           <p className="text-green-700 text-xs sm:text-sm">Total Revenue</p>
-                          <p className="text-xl sm:text-2xl font-bold text-green-900">
-                            ₹{dashboardStats?.revenue_financial?.total_revenue_earned || 0}
-                          </p>
+                          <LoadingNumber
+                            value={`₹${dashboardStats?.revenue_financial?.total_revenue_earned || 0}`}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-green-900"
+                          />
                         </div>
                         <div>
                           <p className="text-green-700 text-xs sm:text-sm">Avg. Sale Price</p>
-                          <p className="text-xl sm:text-2xl font-bold text-green-900">
-                            ₹{dashboardStats?.revenue_financial?.average_sale_price || 0}
-                          </p>
+                          <LoadingNumber
+                            value={`₹${dashboardStats?.revenue_financial?.average_sale_price || 0}`}
+                            isLoading={statsLoading}
+                            className="text-xl sm:text-2xl font-bold text-green-900"
+                          />
                         </div>
                         <div>
                           <p className="text-green-700 text-xs sm:text-sm">Revenue Trend</p>
-                          <p className="text-xs sm:text-sm text-green-900">
-                            {dashboardStats?.revenue_financial?.monthly_revenue_trend?.[0]?.month || "N/A"}
-                          </p>
+                          <LoadingNumber
+                            value={dashboardStats?.revenue_financial?.monthly_revenue_trend?.[0]?.month || "N/A"}
+                            isLoading={statsLoading}
+                            className="text-xs sm:text-sm text-green-900"
+                          />
                         </div>
                       </div>
                     </div>
@@ -815,19 +844,35 @@ const StudentDashboard = () => {
                       <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                         <p>
                           <span className="font-semibold">Best Project:</span>{" "}
-                          {dashboardStats?.project_performance?.best_performing_project?.title || "N/A"}
+                          <LoadingNumber
+                            value={dashboardStats?.project_performance?.best_performing_project?.title || "N/A"}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                         <p>
                           <span className="font-semibold">Total Sales:</span>{" "}
-                          {dashboardStats?.project_performance?.best_performing_project?.total_sales || 0}
+                          <LoadingNumber
+                            value={dashboardStats?.project_performance?.best_performing_project?.total_sales || 0}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                         <p>
                           <span className="font-semibold">Downloads:</span>{" "}
-                          {dashboardStats?.project_performance?.best_performing_project?.total_downloads || 0}
+                          <LoadingNumber
+                            value={dashboardStats?.project_performance?.best_performing_project?.total_downloads || 0}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                         <p>
                           <span className="font-semibold">Views:</span>{" "}
-                          {dashboardStats?.project_performance?.best_performing_project?.total_views || 0}
+                          <LoadingNumber
+                            value={dashboardStats?.project_performance?.best_performing_project?.total_views || 0}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                       </div>
                     </div>
@@ -841,20 +886,35 @@ const StudentDashboard = () => {
                       <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                         <p>
                           <span className="font-semibold">Total Views:</span>{" "}
-                          {dashboardStats?.engagement_metrics?.total_project_views || 0}
+                          <LoadingNumber
+                            value={dashboardStats?.engagement_metrics?.total_project_views || 0}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                         <p>
                           <span className="font-semibold">Wishlist → Purchase %:</span>{" "}
-                          {dashboardStats?.engagement_metrics?.wishlist_to_purchase_conversion || 0}%
+                          <LoadingNumber
+                            value={`${dashboardStats?.engagement_metrics?.wishlist_to_purchase_conversion || 0}%`}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                         <p>
                           <span className="font-semibold">Positive Reviews:</span>{" "}
-                          {dashboardStats?.engagement_metrics?.positive_review_percentage || 0}%
+                          <LoadingNumber
+                            value={`${dashboardStats?.engagement_metrics?.positive_review_percentage || 0}%`}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                         <p>
                           <span className="font-semibold">Repeat Customers:</span>{" "}
-                          {dashboardStats?.engagement_metrics?.repeat_customer_count || 0} (
-                          {dashboardStats?.engagement_metrics?.repeat_customer_percentage || 0}%)
+                          <LoadingNumber
+                            value={`${dashboardStats?.engagement_metrics?.repeat_customer_count || 0} (${dashboardStats?.engagement_metrics?.repeat_customer_percentage || 0}%)`}
+                            isLoading={statsLoading}
+                            className="inline"
+                          />
                         </p>
                       </div>
                     </div>
