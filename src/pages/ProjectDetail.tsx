@@ -97,8 +97,18 @@ const ProjectDetail = () => {
     setLoading(true)
     setError("")
     try {
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        throw new Error("Authentication token not found. Please login again.")
+      }
       const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       })
 
       if (!res.ok) {
@@ -1280,12 +1290,12 @@ const ProjectDetail = () => {
                                       <span
                                         className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}
                                       >
-                                        {review.is_verified_purchase ? "✓ Verified" : "✗ Not Verified"}
+                                        {review.is_verified_purchase ? "✓ Verified Buyer" : "✗ Not Verified Buyer"}
                                       </span>
                                       <span
                                         className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}
                                       >
-                                        {review.is_approved ? "✓ Approved" : "⏳ Pending"}
+                                        {review.is_approved ? "✓ Verified Review" : "⏳ Yet to Verify"}
                                       </span>
                                     </div>
                                   </div>
