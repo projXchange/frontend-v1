@@ -19,6 +19,7 @@ export interface Project {
   delivery_time: number;
   status: string;
   is_featured: boolean;
+  isPurchased?: boolean;
   created_at: string;
   updated_at: string;
   discount_percentage?: number;

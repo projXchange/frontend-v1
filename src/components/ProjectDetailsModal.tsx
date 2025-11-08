@@ -96,17 +96,16 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
             {/* Status Badges */}
             <span
-              className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                project.status === "approved"
-                  ? "bg-green-100 text-green-700"
-                  : project.status === "pending"
+              className={`px-2 py-1 text-xs font-semibold rounded-full ${project.status === "approved"
+                ? "bg-green-100 text-green-700"
+                : project.status === "pending"
                   ? "bg-yellow-100 text-yellow-700"
                   : project.status === "suspended"
-                  ? "bg-red-100 text-red-700"
-                  : project.status === "draft"
-                  ? "bg-gray-100 text-gray-700"
-                  : "bg-blue-100 text-blue-700"
-              }`}
+                    ? "bg-red-100 text-red-700"
+                    : project.status === "draft"
+                      ? "bg-gray-100 text-gray-700"
+                      : "bg-blue-100 text-blue-700"
+                }`}
             >
               {project.status?.toUpperCase()}
             </span>
@@ -139,11 +138,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-3 py-2 font-medium text-xs sm:text-sm rounded-t-lg transition-colors whitespace-nowrap ${
-                activeTab === tab
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-2 font-medium text-xs sm:text-sm rounded-t-lg transition-colors whitespace-nowrap ${activeTab === tab
+                ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
             >
               {tab === 'basic' && '📋 Basic'}
               {tab === 'technical' && '⚙️ Technical'}
@@ -390,7 +388,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">System Requirements</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      System Requirements
+                      <span className="ml-2 text-xs text-green-600">(Public - Visible to all)</span>
+                    </label>
                     <input
                       type="text"
                       placeholder="Windows 10, 8GB RAM (comma separated)"
@@ -405,7 +406,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Dependencies</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Dependencies
+                      {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
+                    </label>
                     <input
                       type="text"
                       placeholder="Node.js 16+, npm 8+ (comma separated)"
@@ -420,7 +424,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Installation Steps</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Installation Steps
+                      {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
+                    </label>
                     <textarea
                       rows={3}
                       placeholder="Step 1: npm install, Step 2: configure .env (comma separated)"
@@ -448,7 +455,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">GitHub Repository</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      GitHub Repository
+                      {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
+                    </label>
                     <input
                       type="url"
                       placeholder="https://github.com/username/project"
@@ -460,7 +470,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Live Demo</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Live Demo
+                      <span className="ml-2 text-xs text-green-600">(Public - Visible to all)</span>
+                    </label>
                     <input
                       type="url"
                       placeholder="https://project-demo.com"
@@ -472,7 +485,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">YouTube Video</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      YouTube Video
+                      {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
+                    </label>
                     <input
                       type="url"
                       placeholder="https://youtube.com/watch?v=..."

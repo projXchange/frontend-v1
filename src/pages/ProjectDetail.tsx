@@ -379,7 +379,9 @@ const ProjectDetail = () => {
     )
   }
 
+  // Use isPurchased from backend (project.isPurchased) or fallback to userStatus
   const isPurchased = Boolean(
+    project?.isPurchased ||
     userStatus?.has_purchased ||
     (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false),
   )
@@ -551,7 +553,7 @@ const ProjectDetail = () => {
               </div>
 
               {/* Demo Video - improved aspect ratio handling for mobile */}
-              {project?.youtube_url && (
+              {isPurchased && project?.youtube_url ? (
                 <div
                   className="aspect-video bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-shadow duration-300"
                   style={{ animationDelay: "600ms" }}
@@ -570,35 +572,116 @@ const ProjectDetail = () => {
                     allowFullScreen
                   />
                 </div>
-              )}
+              ) : !isPurchased ? (
+                <div
+                  className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp relative group cursor-pointer"
+                  style={{ animationDelay: "600ms" }}
+                  onClick={handleToggleCart}
+                >
+                  {/* Project Thumbnail - Always visible */}
+                  {project.thumbnail && (
+                    <img
+                      src={project.thumbnail}
+                      alt={project.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  )}
+
+                  {/* Overlay - Shows on hover/touch */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                  {/* Lock Indicator - Always visible in corner */}
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center border-2 border-white/30">
+                      <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Content - Shows on hover/touch */}
+                  <div className="absolute inset-0 flex items-center justify-center text-center z-10 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div>
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-md rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-white/30 animate-pulse">
+                        <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                      </div>
+                      <h4 className="text-base sm:text-lg font-bold text-white mb-2">Video Tutorial Available</h4>
+                      <p className="text-xs sm:text-sm text-white/90 mb-4">Purchase this project to watch the complete video tutorial</p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleCart();
+                        }}
+                        disabled={actionLoading}
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all duration-200 text-xs sm:text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50"
+                      >
+                        <ShoppingCart className="w-4 h-4 inline mr-2" />
+                        Purchase to Unlock
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               {/* External Links - improved responsive button layout */}
               <div
-                className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 sm:gap-3 mb-4 sm:mb-8 animate-slideInUp"
+                className="flex flex-col items-stretch gap-2 sm:gap-3 mb-4 sm:mb-8 animate-slideInUp"
                 style={{ animationDelay: "650ms" }}
               >
-                {project.github_url && (
-                  <a
-                    href={project.github_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors duration-200 text-xs sm:text-sm font-medium"
-                  >
-                    <Github className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
-                    <span>View Source</span>
-                  </a>
-                )}
+                {/* Demo URL - Always visible to all users - FIRST */}
                 {project.demo_url && (
                   <a
                     href={project.demo_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 text-xs sm:text-sm font-medium"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 text-xs sm:text-sm font-medium shadow-md"
                   >
                     <ExternalLink className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
                     <span>Live Demo</span>
                   </a>
                 )}
+
+                {/* GitHub URL - Always show, locked for non-purchasers */}
+                {isPurchased && project.github_url ? (
+                  <a
+                    href={project.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors duration-200 text-xs sm:text-sm font-medium shadow-md"
+                  >
+                    <Github className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
+                    <span>GitHub Code</span>
+                  </a>
+                ) : !isPurchased ? (
+                  <button
+                    onClick={handleToggleCart}
+                    disabled={actionLoading}
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 rounded-xl border-2 border-dashed border-gray-300 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all"
+                  >
+                    <Lock className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
+                    <span>GitHub Code</span>
+                  </button>
+                ) : null}
+
+                {/* YouTube URL - Always show, locked for non-purchasers */}
+                {isPurchased && project.youtube_url ? (
+                  <a
+                    href={project.youtube_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors duration-200 text-xs sm:text-sm font-medium shadow-md"
+                  >
+                    <ExternalLink className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
+                    <span>Watch Tutorial</span>
+                  </a>
+                ) : !isPurchased ? (
+                  <button
+                    onClick={handleToggleCart}
+                    disabled={actionLoading}
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 rounded-xl border-2 border-dashed border-gray-300 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all"
+                  >
+                    <Lock className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
+                    <span>Video Tutorial</span>
+                  </button>
+                ) : null}
               </div>
 
               {/* Tabs - improved responsive tab navigation */}
@@ -711,95 +794,196 @@ const ProjectDetail = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-6 gap-2">
                       <h3 className="text-lg sm:text-2xl font-bold animate-slideInUp">Setup Instructions</h3>
                       {!isPurchased && (
-                        <div className="flex items-center gap-2 text-gray-500 bg-gray-100 px-2 sm:px-4 py-2 rounded-xl animate-slideInUp text-xs sm:text-sm">
+                        <div className="flex items-center gap-2 text-orange-600 bg-orange-50 px-2 sm:px-4 py-2 rounded-xl animate-slideInUp text-xs sm:text-sm border border-orange-200">
                           <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                          <span className="font-medium">Purchase to unlock</span>
+                          <span className="font-semibold">Purchase to unlock full details</span>
                         </div>
                       )}
                     </div>
-                    <div
-                      className={`${!isPurchased ? "filter blur-sm" : ""} animate-slideInUp transition-all duration-300`}
-                      style={{ animationDelay: "100ms" }}
-                    >
+
+                    <div className="space-y-3 sm:space-y-6 animate-slideInUp" style={{ animationDelay: "100ms" }}>
+                      {/* System Requirements - Always visible to everyone */}
+                      {project?.requirements?.system_requirements &&
+                        project.requirements.system_requirements.length > 0 && (
+                          <div>
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 flex items-center gap-2">
+                              <Shield className="w-4 h-4" />
+                              System Requirements
+                              <span className="text-xs text-green-600 font-normal">(Public)</span>
+                            </h4>
+                            <ul className="space-y-2">
+                              {project.requirements.system_requirements.map((req, index) => (
+                                <li
+                                  key={index}
+                                  className="flex items-start gap-2 text-gray-700 text-xs sm:text-base"
+                                >
+                                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                  {req}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                      {/* Dependencies - Only for purchasers */}
                       {isPurchased ? (
-                        <div className="space-y-3 sm:space-y-6">
-                          {project?.requirements?.system_requirements &&
-                            project.requirements.system_requirements.length > 0 && (
-                              <div>
-                                <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
-                                  System Requirements
-                                </h4>
-                                <ul className="space-y-2">
-                                  {project.requirements.system_requirements.map((req, index) => (
-                                    <li
-                                      key={index}
-                                      className="flex items-start gap-2 text-gray-700 text-xs sm:text-base"
-                                    >
-                                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                      {req}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                          {project?.requirements?.dependencies && project.requirements.dependencies.length > 0 && (
-                            <div>
-                              <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
-                                Dependencies
-                              </h4>
-                              <ul className="space-y-2">
-                                {project.requirements.dependencies.map((dep, index) => (
-                                  <li key={index} className="flex items-start gap-2 text-gray-700 text-xs sm:text-base">
-                                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                    <span className="text-gray-700">{dep}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {project?.requirements?.installation_steps &&
-                            project.requirements.installation_steps.length > 0 && (
-                              <div>
-                                <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
-                                  Installation Steps
-                                </h4>
-                                <ol className="space-y-2 sm:space-y-3">
-                                  {project.requirements.installation_steps.map((step, index) => (
-                                    <li key={index} className="flex gap-2 sm:gap-3">
-                                      <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
-                                        {index + 1}
-                                      </span>
-                                      <span className="text-gray-700 text-xs sm:text-base">{step}</span>
-                                    </li>
-                                  ))}
-                                </ol>
-                              </div>
-                            )}
-
-                          {project.files?.documentation_files && (
-                            <div>
-                              <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
-                                Documentation
-                              </h4>
-                              <div className="bg-gray-900 rounded-xl p-3 sm:p-6 font-mono text-xs sm:text-sm shadow-2xl overflow-x-auto">
-                                <pre className="whitespace-pre-wrap text-green-400 text-xs sm:text-sm">
-                                  {project.files.documentation_files}
-                                </pre>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        project?.requirements?.dependencies && project.requirements.dependencies.length > 0 && (
+                          <div>
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
+                              Dependencies
+                            </h4>
+                            <ul className="space-y-2">
+                              {project.requirements.dependencies.map((dep, index) => (
+                                <li key={index} className="flex items-start gap-2 text-gray-700 text-xs sm:text-base">
+                                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-gray-700">{dep}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )
                       ) : (
-                        <div className="text-center py-6 sm:py-12">
-                          <Lock className="w-10 h-10 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-                          <h4 className="text-sm sm:text-lg font-semibold text-gray-600 mb-2">Instructions Locked</h4>
-                          <p className="text-gray-500 text-xs sm:text-base">
-                            Purchase this project to unlock detailed setup instructions and documentation.
-                          </p>
+                        <div
+                          onClick={handleToggleCart}
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                        >
+                          <div className="absolute top-2 right-2">
+                            <Lock className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" />
+                            Dependencies
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse" />
+                            <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
+                          </div>
                         </div>
                       )}
+
+                      {/* Installation Steps - Only for purchasers */}
+                      {isPurchased ? (
+                        project?.requirements?.installation_steps &&
+                        project.requirements.installation_steps.length > 0 && (
+                          <div>
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
+                              Installation Steps
+                            </h4>
+                            <ol className="space-y-2 sm:space-y-3">
+                              {project.requirements.installation_steps.map((step, index) => (
+                                <li key={index} className="flex gap-2 sm:gap-3">
+                                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
+                                    {index + 1}
+                                  </span>
+                                  <span className="text-gray-700 text-xs sm:text-base">{step}</span>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        )
+                      ) : (
+                        <div
+                          onClick={handleToggleCart}
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                        >
+                          <div className="absolute top-2 right-2">
+                            <Lock className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400">Installation Steps</h4>
+                          <div className="flex gap-3">
+                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs text-gray-500 font-bold flex-shrink-0">
+                              1
+                            </div>
+                            <div className="h-4 bg-gray-300 rounded w-full animate-pulse" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Source Files - Only for purchasers */}
+                      {isPurchased ? (
+                        project?.files?.source_files && project.files.source_files.length > 0 && (
+                          <div>
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 flex items-center gap-2">
+                              <Download className="w-4 h-4" />
+                              Source Files
+                            </h4>
+                            <div className="space-y-2">
+                              {project.files.source_files.map((file, index) => (
+                                <a
+                                  key={index}
+                                  href={file}
+                                  download
+                                  className="flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
+                                >
+                                  <Download className="w-4 h-4 text-green-600 flex-shrink-0" />
+                                  <span className="text-gray-700 font-medium">Download Source Code {index + 1}</span>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <div
+                          onClick={handleToggleCart}
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                        >
+                          <div className="absolute top-2 right-2">
+                            <Lock className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400 flex items-center gap-2">
+                            <Download className="w-4 h-4" />
+                            Source Files
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse" />
+                            <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Documentation Files - Only for purchasers */}
+                      {isPurchased ? (
+                        project?.files?.documentation_files && project.files.documentation_files.length > 0 && (
+                          <div>
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 flex items-center gap-2">
+                              <Download className="w-4 h-4" />
+                              Documentation Files
+                            </h4>
+                            <div className="space-y-2">
+                              {project.files.documentation_files.map((file, index) => (
+                                <a
+                                  key={index}
+                                  href={file}
+                                  download
+                                  className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
+                                >
+                                  <Download className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                  <span className="text-gray-700 font-medium">Download Documentation {index + 1}</span>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <div
+                          onClick={handleToggleCart}
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                        >
+                          <div className="absolute top-2 right-2">
+                            <Lock className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400 flex items-center gap-2">
+                            <Download className="w-4 h-4" />
+                            Documentation Files
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse" />
+                            <div className="h-4 bg-gray-300 rounded w-2/3 animate-pulse" />
+                          </div>
+                        </div>
+                      )}
+
+
                     </div>
                   </div>
                 )}
@@ -1259,7 +1443,7 @@ const ProjectDetail = () => {
                       }
 
                       if (cartStatus) {
-                          navigate("/cart")
+                        navigate("/cart")
                       } else {
                         // If not in cart, add to cart then open cart
                         const added = await addToCart(project);
