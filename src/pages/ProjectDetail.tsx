@@ -1,5 +1,5 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import {
   Star,
@@ -70,44 +70,29 @@ const ProjectDetail = () => {
   } | null>(null);
 
   const navigate = useNavigate(); // Fetch project data on component mount
-  useEffect(() => {
-    let isMounted = true;
 
-    if (id && isMounted) {
-      fetchProjectData();
+  useEffect(() => {
+    if (project && user) {
+      checkIsPurchased()
     }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
-
-
-  useEffect(() => {
-    checkIsPurchased()
   }, [project, user])
 
   useEffect(() => {
-    if (activeTab === "reviews") {
+    if (activeTab === "reviews" && id) {
       fetchReviews()
     }
-  }, [activeTab])
+  }, [activeTab, id])
 
-  const fetchProjectData = async () => {
+  const fetchProjectData = useCallback(async () => {
     setLoading(true)
-    setError("")
+    setError(null)
     try {
-      const token = localStorage.getItem("token")
 
-      if (!token) {
-        throw new Error("Authentication token not found. Please login again.")
-      }
       const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          accept: "application/json",
-          Authorization: `Bearer ${token}`,
+          accept: "application/json"
         },
       })
 
@@ -122,12 +107,19 @@ const ProjectDetail = () => {
       setAuthorDetails(data.author_details || null);
       setRelatedProjects(Array.isArray(data.related_projects) ? data.related_projects : []);
     } catch (err) {
+
       console.error("Error fetching project data:", err)
       setError("Could not load project details. Please try again later.")
     } finally {
       setLoading(false)
     }
-  }
+  }, [id])
+
+  useEffect(() => {
+    if (id) {
+      fetchProjectData();
+    }
+  }, [id, fetchProjectData]);
 
   const fetchReviews = async () => {
     if (!id) return;
@@ -135,7 +127,8 @@ const ProjectDetail = () => {
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/reviews`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+          accept: "application/json"
         },
       })
       if (response.ok) {
@@ -164,42 +157,43 @@ const ProjectDetail = () => {
   }
 
   const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!reviewText.trim() || !project || formRating === 0) return // must select rating
+    e.preventDefault();
+    if (!reviewText.trim() || !project || formRating === 0) return;
 
-    setSubmittingReview(true)
+    setSubmittingReview(true);
     try {
-      const token = localStorage.getItem("token")
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           project_id: id,
-          rating: formRating, // <-- now dynamic
+          rating: formRating,
           review_text: reviewText,
         }),
-      })
+      });
+
+      const data = await response.json();
 
       if (response.ok) {
-        setReviewText("")
-        setFormRating(0) // reset stars
-        toast.success("Review submitted successfully!")
-
-        // Refresh reviews from backend after successful submission
-        await fetchReviews()
+        setReviewText("");
+        setFormRating(0);
+        toast.success("✅ Review submitted successfully!");
+        await fetchReviews();
       } else {
-        alert("Failed to submit review. Please try again.")
+        // handle both possible formats: {message: "..."} or {error: "..."}
+        toast.error(data.error || data.message || "❌ Failed to submit review. Please try again.");
       }
     } catch (error) {
-      console.error("Failed to submit review:", error)
-      alert("Failed to submit review. Please try again.")
+      console.error("Failed to submit review:", error);
+      toast.error("⚠️ An unexpected error occurred. Please try again later.");
     } finally {
-      setSubmittingReview(false)
+      setSubmittingReview(false);
     }
-  }
+  };
+
 
   // Helper function to check if user can edit a review
   const canEditReview = (review: Review) => {
@@ -1251,6 +1245,27 @@ const ProjectDetail = () => {
                             </form>
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {isAuthenticated && !isPurchased && (
+                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-8 border border-orange-200 shadow-lg animate-slideInUp">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Lock className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-900">Purchase Required</h4>
+                            <p className="text-sm text-gray-600">Only verified buyers can write reviews</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleToggleCart}
+                          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                          Purchase to Write Review
+                        </button>
                       </div>
                     )}
 
