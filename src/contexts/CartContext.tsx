@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem, Project } from '../types/Project';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api'
 
 interface CartContextType {
   cart: CartItem[];
@@ -36,10 +37,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/cart`, {
+      const response = await fetch(getApiUrl('/cart'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -79,11 +79,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://projxchange-backend-v1.vercel.app/cart', {
+      const response = await fetch(getApiUrl('/cart'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ project_id: project.id, quantity: 1 }),
@@ -127,7 +126,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (cartItem) {
         // Try to remove from backend first
-        const response = await fetch(`https://projxchange-backend-v1.vercel.app/cart/${cartItem.project_id}`, {
+        const response = await fetch(getApiUrl(`/cart/${cartItem.project_id}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -166,7 +165,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('https://projxchange-backend-v1.vercel.app/cart', {
+      const response = await fetch(getApiUrl('/cart'), {
         method: 'DELETE',
         headers: {
           accept: 'application/json',

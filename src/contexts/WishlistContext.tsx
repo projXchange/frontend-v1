@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { WishlistItem, Project } from '../types/Project';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../config/api'
 
 interface WishlistContextType {
   wishlist: WishlistItem[];
@@ -34,10 +35,9 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/wishlist`, {
+      const response = await fetch(getApiUrl('/wishlist'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -77,7 +77,6 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const wishlistItem: Omit<WishlistItem, 'id'> = {
         project_id: project.id,
         user_id: user.id,
@@ -86,10 +85,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       // Try to save to backend first
-      const response = await fetch('https://projxchange-backend-v1.vercel.app/wishlist', {
+      const response = await fetch(getApiUrl('/wishlist'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(wishlistItem),
@@ -130,17 +129,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const wishlistItem = wishlist.find(item => item.project_id === projectId);
 
-
-      
       if (wishlistItem) {
         // Try to remove from backend first
-        const response = await fetch(`https://projxchange-backend-v1.vercel.app/wishlist/${wishlistItem.project_id}`, {
+        const response = await fetch(getApiUrl(`/wishlist/${wishlistItem.project_id}`), {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
           },
         });

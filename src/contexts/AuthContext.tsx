@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { AuthResult, User } from '../types/User';
+import { getApiUrl } from '../config/api'
 
 
 interface AuthContextType {
@@ -30,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
   
+  
 
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signin', {
+      const res = await fetch(getApiUrl('/auth/signin'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -80,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     role: 'student' | 'admin'
   ): Promise<AuthResult> => {
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/signup', {
+      const res = await fetch(getApiUrl('/auth/signup'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,13 +115,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem('token');
-
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/logout', {
+      
+      const res = await fetch(getApiUrl('/auth/logout'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {})
         }
       });
 
@@ -144,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ✅ 1. Forgot Password API
   const resetPassword = async (email: string): Promise<boolean> => {
     try {
-      const res = await fetch('https://projxchange-backend-v1.vercel.app/auth/forgot-password', {
+      const res = await fetch(getApiUrl('/auth/forgot-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const confirmResetPassword = async (token: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(
-        `https://projxchange-backend-v1.vercel.app/auth/reset-password/${token}`,
+        getApiUrl(`/auth/reset-password/${token}`),
         {
           method: 'POST',
           headers: {
@@ -201,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Verify email with token
   const verifyEmail = async (token: string): Promise<AuthResult> => {
     try {
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/auth/verify-email/${token}`, {
+      const res = await fetch(getApiUrl(`/auth/verify-email/${token}`), {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -227,7 +228,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 // Resend verification email
 const resendVerificationEmail = async (email: string): Promise<void> => {
   try {
-    await fetch('https://projxchange-backend-v1.vercel.app/auth/resend-verification', {
+    await fetch(getApiUrl('/auth/resend-verification'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
