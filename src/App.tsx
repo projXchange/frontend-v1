@@ -13,6 +13,7 @@ import CartPage from './pages/CartPage';
 import ResetPassword from './pages/ResetPassword';
 import NotFoundPage from './pages/NotFoundPage';
 import ProfilePage from './pages/ProfilePage';
+import HowItWorks from './pages/HowItWorks';
 import { Toaster } from 'react-hot-toast';
 import EmailVerification from './pages/EmailVerification';
 
@@ -24,6 +25,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/projects" element={<ProjectListing />} />
             <Route path="/project/:id" element={<ProjectDetail />} />
             <Route path="/auth/reset-password/:token" element={<ResetPassword />} />

@@ -289,26 +289,28 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 lg:py-20 mt-12 sm:mt-16 lg:mt-20 bg-white">
+      {/* Monetize Your Skills Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
             className="text-center mb-12 sm:mb-16"
           >
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
-              Everything students need in one place
+              Monetize Your Skills, Build Your Future
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-              Join thousands of students who are already accelerating their learning journey
+              Turn your academic projects into a source of income.{' '}
+              <span className="text-blue-600 font-semibold">projXchange</span>{' '}
+              empowers you to showcase or talent and earn from your creations.
             </p>
           </motion.div>
 
-          {/* Feature Cards */}
+          {/* Feature Cards Grid */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -316,51 +318,104 @@ const Home = () => {
               visible: { transition: { staggerChildren: 0.15 } },
             }}
             viewport={{ once: true }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mt-12 sm:mt-20"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-16"
           >
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-                viewport={{ once: true }}
-                className="text-center group hover:scale-105 transition-all duration-300"
-              >
-                <div className="mb-6 flex justify-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-100 to-teal-100 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
-                  </div>
-                </div>
-                <div className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </div>
-                <div className="text-sm sm:text-base text-gray-600">
-                  {feature.subtitle}
-                </div>
-              </motion.div>
-            ))}
+            {/* Card 1 - Earn from Your Projects */}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+            >
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+                <DollarSign className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+                Earn from Your Projects
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                Get paid for the hard work you put into academic assignments and side projects.
+              </p>
+            </motion.div>
+
+            {/* Card 2 - Global Exposure */}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+            >
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+                <Globe className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+                Global Exposure
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                Reach or worldwide audience of potential employers looking innovative solutions.
+              </p>
+            </motion.div>
+
+            {/* Card 3 - Build Your Portfolio */}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+            >
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+                <Award className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+                Build Your Portfolio
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                Enhance resume with real-world and positive feedback.
+              </p>
+            </motion.div>
+
+            {/* Card 4 - Flexible Income */}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+            >
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+                <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+                Flexible Income
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                Work on own terms and set or own prices.
+              </p>
+            </motion.div>
           </motion.div>
 
           {/* CTA Button */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
-            className="mt-16 sm:mt-20 text-center"
+            className="text-center"
           >
-            <button
-
-              onClick={handleJoinClick}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
+            <Link
+              to="/how-it-works"
+              className="inline-flex items-center justify-center px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
-              🚀 Join Projxchange Now
-            </button>
+              Learn How It Works
+            </Link>
           </motion.div>
-
         </div>
       </section>
 
@@ -627,6 +682,83 @@ const Home = () => {
           </div>
         </motion.div>
       </section>
+
+      {/* Everything Students Need Section */}
+      <section className="py-12 sm:py-16 lg:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+              Everything students need in one place
+            </h2>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands of students who are already accelerating their learning journey
+            </p>
+          </motion.div>
+
+          {/* Feature Cards */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.15 } },
+            }}
+            viewport={{ once: true }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mt-12 sm:mt-20"
+          >
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                viewport={{ once: true }}
+                className="text-center group hover:scale-105 transition-all duration-300"
+              >
+                <div className="mb-6 flex justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-100 to-teal-100 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                  </div>
+                </div>
+                <div className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                  {feature.title}
+                </div>
+                <div className="text-sm sm:text-base text-gray-600">
+                  {feature.subtitle}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTA Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 1 }}
+            viewport={{ once: true }}
+            className="mt-16 sm:mt-20 text-center"
+          >
+            <button
+
+              onClick={handleJoinClick}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
+            >
+              🚀 Join Projxchange Now
+            </button>
+          </motion.div>
+
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="relative py-10 sm:py-14 bg-white text-gray-900 overflow-hidden">
 
@@ -657,7 +789,7 @@ const Home = () => {
               className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto text-center leading-relaxed"
             >
               Join thousands of students transforming their future with&nbsp;
-              <strong className="text-white font-semibold">StudyStack</strong> — one project at a time.
+              <strong className="text-white font-semibold">projXchange</strong> — one project at a time.
             </motion.p>
 
             {/* CTA Buttons */}
