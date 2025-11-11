@@ -362,6 +362,53 @@ const ProjectDetail = () => {
     }
   }
 
+  const handleDownloadFile = async (fileUrl: string, fileName: string) => {
+    if (!isAuthenticated || !isPurchased) {
+      toast.error("Please purchase this project to download files");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Authentication required");
+      return;
+    }
+
+    try {
+      toast.loading("Preparing download...", { id: "download" });
+
+      // Use backend proxy endpoint for authenticated downloads
+      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/download`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ file_url: fileUrl }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Download failed: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("File downloaded successfully!", { id: "download" });
+    } catch (error: any) {
+      console.error("Download error:", error);
+      toast.error(error.message || "Failed to download file. Please try again.", { id: "download" });
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-3 sm:px-4">
@@ -925,15 +972,14 @@ const ProjectDetail = () => {
                             </h4>
                             <div className="space-y-2">
                               {project.files.source_files.map((file, index) => (
-                                <a
+                                <button
                                   key={index}
-                                  href={file}
-                                  download
-                                  className="flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
+                                  onClick={() => handleDownloadFile(file, `source-code-${index + 1}.zip`)}
+                                  className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
                                 >
                                   <Download className="w-4 h-4 text-green-600 flex-shrink-0" />
                                   <span className="text-gray-700 font-medium">Download Source Code {index + 1}</span>
-                                </a>
+                                </button>
                               ))}
                             </div>
                           </div>
@@ -967,15 +1013,14 @@ const ProjectDetail = () => {
                             </h4>
                             <div className="space-y-2">
                               {project.files.documentation_files.map((file, index) => (
-                                <a
+                                <button
                                   key={index}
-                                  href={file}
-                                  download
-                                  className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
+                                  onClick={() => handleDownloadFile(file, `documentation-${index + 1}.pdf`)}
+                                  className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
                                 >
                                   <Download className="w-4 h-4 text-blue-600 flex-shrink-0" />
                                   <span className="text-gray-700 font-medium">Download Documentation {index + 1}</span>
-                                </a>
+                                </button>
                               ))}
                             </div>
                           </div>
