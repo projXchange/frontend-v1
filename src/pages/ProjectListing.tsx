@@ -5,6 +5,7 @@ import { ProjectCard } from '../components/ProjectCard';
 
 const ProjectListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
@@ -38,6 +39,14 @@ const ProjectListing = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [techDropdownOpen]);
+
+  // Debounce search term input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   // Debounce price range input
   useEffect(() => {
@@ -93,7 +102,7 @@ const ProjectListing = () => {
       if (selectedTags.length > 0) params.append('tech_stack', selectedTags.join(','));
       if (debouncedPriceRange[0] > 0) params.append('min_price', debouncedPriceRange[0].toString());
       if (debouncedPriceRange[1] < 1000) params.append('max_price', debouncedPriceRange[1].toString());
-      if (searchTerm) params.append('search', searchTerm);
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
 
       const sortMap: { [key: string]: { sort_by: string; sort_order: string } } = {
         newest: { sort_by: 'created_at', sort_order: 'desc' },
@@ -130,7 +139,7 @@ const ProjectListing = () => {
   useEffect(() => {
     setCurrentPage(1);
     fetchProjects(1, false);
-  }, [searchTerm, selectedCategory, sortBy, debouncedPriceRange, selectedTags]);
+  }, [debouncedSearchTerm, selectedCategory, sortBy, debouncedPriceRange, selectedTags]);
 
   const loadMore = () => {
     if (currentPage < totalPages) {
