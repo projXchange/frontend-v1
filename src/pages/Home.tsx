@@ -27,7 +27,18 @@ const Home = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects/home');
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch('https://projxchange-backend-v1.vercel.app/projects/home', {
+          method: 'GET',
+          headers,
+        });
         const data = await response.json();
 
         setProjects(data.featured_projects || []);

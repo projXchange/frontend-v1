@@ -88,12 +88,18 @@ const ProjectDetail = () => {
     setError(null)
     try {
 
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        accept: "application/json"
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json"
-        },
+        headers,
       })
 
       if (!res.ok) {
@@ -124,12 +130,18 @@ const ProjectDetail = () => {
   const fetchReviews = async () => {
     if (!id) return;
     try {
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        accept: "application/json"
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/reviews`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json"
-        },
+        headers,
       })
       if (response.ok) {
         const data = await response.json()

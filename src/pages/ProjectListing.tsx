@@ -116,7 +116,18 @@ const ProjectListing = () => {
       params.append('sort_by', sortConfig.sort_by);
       params.append('sort_order', sortConfig.sort_order);
 
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects?${params.toString()}`);
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects?${params.toString()}`, {
+        method: 'GET',
+        headers,
+      });
       if (!res.ok) throw new Error(`Failed to fetch projects: ${res.status}`);
       const data = await res.json();
 
