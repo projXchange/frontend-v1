@@ -1248,26 +1248,7 @@ const ProjectDetail = () => {
                       </div>
                     )}
 
-                    {isAuthenticated && !isPurchased && (
-                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-8 border border-orange-200 shadow-lg animate-slideInUp">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Lock className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="text-lg font-bold text-gray-900">Purchase Required</h4>
-                            <p className="text-sm text-gray-600">Only verified buyers can write reviews</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleToggleCart}
-                          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-                        >
-                          <ShoppingCart className="w-5 h-5" />
-                          Purchase to Write Review
-                        </button>
-                      </div>
-                    )}
+
 
                     {/* Reviews List - improved responsive review cards */}
                     <div className="space-y-3 sm:space-y-6">
