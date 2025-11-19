@@ -32,7 +32,6 @@ const ProjectDetail = () => {
   const { isAuthenticated, user } = useAuth()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { addToCart, removeFromCart, isInCart } = useCart()
-  const [averageRating, setAverageRating] = useState(0)
   const [formRating, setFormRating] = useState(0)
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null)
   const [editReviewText, setEditReviewText] = useState("")
@@ -140,18 +139,15 @@ const ProjectDetail = () => {
 
         setApprovedReviews(approved)
         setPendingReviews(pending)
-        setAverageRating(data.stats.average_rating || 0)
       } else {
         console.error("Reviews API response not ok:", response.status, response.statusText)
         setApprovedReviews([])
         setPendingReviews([])
-        setAverageRating(0)
       }
     } catch (error) {
       console.error("Failed to fetch reviews:", error)
       setApprovedReviews([])
       setPendingReviews([])
-      setAverageRating(0)
     }
   }
 
@@ -569,9 +565,9 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-2">
                   <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current flex-shrink-0" />
                   <div className="min-w-0">
-                    <span className="font-bold text-sm sm:text-base block">{averageRating || "0.0"}</span>
+                    <span className="font-bold text-sm sm:text-base block">{project.rating?.average_rating?.toFixed(1) || "0.0"}</span>
                     <span className="font-medium text-xs">
-                      ({approvedReviews.length + pendingReviews.length || 0} {(approvedReviews.length + pendingReviews.length) === 1 ? 'review' : 'reviews'})
+                      ({project.rating?.total_ratings || 0} {(project.rating?.total_ratings || 0) === 1 ? 'review' : 'reviews'})
                     </span>
                   </div>
                 </div>
@@ -1655,7 +1651,7 @@ const ProjectDetail = () => {
                   const socialLink = linkedin || github || twitter;
                   const SocialIcon = linkedin ? Linkedin : github ? Github : Twitter;
                   const platform = linkedin ? 'LinkedIn' : github ? 'GitHub' : 'Twitter';
-                  
+
                   return socialLink ? (
                     <a
                       href={socialLink}
