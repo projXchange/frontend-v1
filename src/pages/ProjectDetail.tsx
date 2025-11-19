@@ -1,7 +1,7 @@
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
-import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award, Clock, Shield, CheckCircle, MessageSquare, Send, Github, ExternalLink, Edit2, Save, X } from 'lucide-react'
+import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award, Clock, Shield, CheckCircle, MessageSquare, Send, Github, ExternalLink, Edit2, Save, X, Linkedin, Twitter } from 'lucide-react'
 import { useAuth } from "../contexts/AuthContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
@@ -48,6 +48,11 @@ const ProjectDetail = () => {
     total_projects: number;
     rating: number;
     total_sales: number;
+    social_links?: {
+      github?: string;
+      linkedin?: string;
+      twitter?: string;
+    };
   } | null>(null);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
 
@@ -1642,6 +1647,29 @@ const ProjectDetail = () => {
                   <span className="font-semibold text-gray-900 dark:text-gray-100">{authorDetails?.total_sales || 0}</span>
                 </div>
               </div>
+
+              {/* Social Link - Priority: LinkedIn > GitHub > Twitter */}
+              {authorDetails?.social_links && (
+                (() => {
+                  const { linkedin, github, twitter } = authorDetails.social_links;
+                  const socialLink = linkedin || github || twitter;
+                  const SocialIcon = linkedin ? Linkedin : github ? Github : Twitter;
+                  const platform = linkedin ? 'LinkedIn' : github ? 'GitHub' : 'Twitter';
+                  
+                  return socialLink ? (
+                    <a
+                      href={socialLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+                      title={`Connect on ${platform}`}
+                    >
+                      <SocialIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-semibold">Connect on {platform}</span>
+                    </a>
+                  ) : null;
+                })()
+              )}
             </div>
           </div>
         </div>

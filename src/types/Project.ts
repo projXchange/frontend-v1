@@ -42,6 +42,20 @@ export interface Project {
   view_count: number;
   purchase_count: number;
   download_count: number;
+  author_details?: {
+    authorId: string;
+    avatar: string | null;
+    full_name: string;
+    email: string;
+    total_projects: number;
+    rating: number;
+    total_sales: number;
+    social_links?: {
+      github?: string;
+      linkedin?: string;
+      twitter?: string;
+    };
+  };
 }
 
 
