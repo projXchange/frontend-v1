@@ -20,6 +20,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react"
+import toast from "react-hot-toast"
 
 const UploadProject = () => {
   const [formData, setFormData] = useState({
@@ -122,7 +123,7 @@ const UploadProject = () => {
     if (!file) return
 
     if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file")
+      toast.error("Please upload an image file")
       return
     }
 
@@ -138,9 +139,9 @@ const UploadProject = () => {
       setThumbnailFile(file) // CHANGE THIS
       setFormData((prev) => ({ ...prev, thumbnailUrl: "TEMP_FILE" }))
 
-      alert("Thumbnail selected! It will be uploaded when you submit the project.")
+      toast.success("Thumbnail selected! It will be uploaded when you submit the project.")
     } catch (error) {
-      alert("Failed to process thumbnail.")
+      toast.error("Failed to process thumbnail.")
     } finally {
       setThumbnailUploading(false)
     }
@@ -153,7 +154,7 @@ const UploadProject = () => {
 
     const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"))
     if (imageFiles.length === 0) {
-      alert("Please upload image files only")
+      toast.error("Please upload image files only")
       return
     }
 
@@ -161,7 +162,7 @@ const UploadProject = () => {
     const remainingSlots = 3 - alreadyUploadedImages
 
     if (imageFiles.length > remainingSlots) {
-      alert(
+      toast.error(
         `You can upload a maximum of 3 images. You already uploaded ${alreadyUploadedImages}, so you can select up to ${remainingSlots} more.`,
       )
       return
@@ -169,7 +170,7 @@ const UploadProject = () => {
 
     setImagesUploading(true)
     setUploadedFiles((prev) => [...prev, ...imageFiles])
-    alert(`${imageFiles.length} image(s) selected! They will be uploaded when you submit the project.`)
+    toast.success(`${imageFiles.length} image(s) selected! They will be uploaded when you submit the project.`)
     setImagesUploading(false)
   }
 
@@ -190,13 +191,13 @@ const UploadProject = () => {
     )
 
     if (sourceFiles.length === 0) {
-      alert("Please upload valid source files (.zip, .rar, .7z, .tar, .gz) with a maximum size of 10 MB.")
+      toast.error("Please upload valid source files (.zip, .rar, .7z, .tar, .gz) with a maximum size of 10 MB.")
       return
     }
 
     setSourceFilesUploading(true)
     setUploadedFiles((prev) => [...prev, ...sourceFiles])
-    alert(`${sourceFiles.length} source file(s) selected! They will be uploaded when you submit the project.`)
+    toast.success(`${sourceFiles.length} source file(s) selected! They will be uploaded when you submit the project.`)
     setSourceFilesUploading(false)
   }
 
@@ -218,13 +219,13 @@ const UploadProject = () => {
     )
 
     if (docFiles.length === 0) {
-      alert("Please upload valid documentation files (.pdf, .md, .txt, .docx, .doc) with a maximum size of 10 MB.")
+      toast.error("Please upload valid documentation files (.pdf, .md, .txt, .docx, .doc) with a maximum size of 10 MB.")
       return
     }
 
     setDocFilesUploading(true)
     setUploadedFiles((prev) => [...prev, ...docFiles])
-    alert(`${docFiles.length} documentation file(s) selected! They will be uploaded when you submit the project.`)
+    toast.success(`${docFiles.length} documentation file(s) selected! They will be uploaded when you submit the project.`)
     setDocFilesUploading(false)
   }
 
@@ -607,7 +608,7 @@ const UploadProject = () => {
         setCurrentStep(1)
       } catch (error) {
         console.error("Error submitting project:", error)
-        alert("Failed to submit project. Please try again.")
+        toast.error("Failed to submit project. Please try again.")
       } finally {
         setIsSubmitting(false)
       }

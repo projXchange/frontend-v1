@@ -400,7 +400,7 @@ const StudentDashboard = () => {
       toast.success("Project sent for approval.")
     } catch (err) {
       console.error(err)
-      alert("Failed to send for approval.")
+      toast.error("Failed to send for approval.")
     } finally {
       setUpdatingProjectId(null)
     }
@@ -516,7 +516,7 @@ const StudentDashboard = () => {
       setIsReviewModalOpen(false)
     } catch (error) {
       console.error("Error updating review:", error)
-      alert("Failed to update review. Please try again.")
+      toast.error("Failed to update review. Please try again.")
     } finally {
       setUpdatingReview(null)
     }

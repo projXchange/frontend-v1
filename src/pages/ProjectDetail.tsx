@@ -250,13 +250,13 @@ const ProjectDetail = () => {
 
     // Check if user is authenticated and token is available
     if (!isAuthenticated || !user) {
-      alert("Please log in to edit your review.")
+      toast.error("Please log in to edit your review.")
       return
     }
 
     const token = localStorage.getItem("token")
     if (!token) {
-      alert("Authentication token not found. Please log in again.")
+      toast.error("Authentication token not found. Please log in again.")
       return
     }
 
@@ -302,7 +302,7 @@ const ProjectDetail = () => {
       await fetchReviews()
     } catch (error) {
       console.error("Error updating review:", error)
-      alert("Failed to update review. Please try again.")
+      toast.error("Failed to update review. Please try again.")
     } finally {
       setUpdatingReview(false)
     }
@@ -310,13 +310,13 @@ const ProjectDetail = () => {
 
   const handleDeleteReview = async (reviewId: string) => {
     if (!isAuthenticated || !user) {
-      alert("Please log in to delete your review.")
+      toast.error("Please log in to delete your review.")
       return
     }
 
     const token = localStorage.getItem("token")
     if (!token) {
-      alert("Authentication token not found. Please log in again.")
+      toast.error("Authentication token not found. Please log in again.")
       return
     }
 
@@ -341,7 +341,7 @@ const ProjectDetail = () => {
 
       toast.success("Review deleted successfully!")
     } catch (error) {
-      alert("Failed to delete review. Please try again.")
+      toast.error("Failed to delete review. Please try again.")
     }
   }
 
@@ -436,7 +436,7 @@ const ProjectDetail = () => {
 
   const handleToggleWishlist = async () => {
     if (!isAuthenticated || !project) {
-      alert("Please login to manage wishlist.")
+      toast.error("Please login to manage wishlist.")
       return
     }
     try {

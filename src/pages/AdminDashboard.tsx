@@ -288,7 +288,7 @@ const AdminDashboard = () => {
       )
     } catch (error) {
       console.error("Error updating project status:", error)
-      alert("Failed to update project status. Please try again.")
+      toast.error("Failed to update project status. Please try again.")
     } finally {
       setUpdatingProject(null)
     }
@@ -324,7 +324,7 @@ const AdminDashboard = () => {
       setIsUserModalOpen(false)
     } catch (error) {
       console.error("Error updating user status:", error)
-      alert(`Failed to update user status: ${error instanceof Error ? error.message : "Unknown error"}`)
+      toast.error(`Failed to update user status: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setUpdatingUser(null)
     }
@@ -356,7 +356,7 @@ const AdminDashboard = () => {
       toast.success("User deleted successfully!")
     } catch (error) {
       console.error("Error deleting user:", error)
-      alert("Failed to delete user. Please try again.")
+      toast.error("Failed to delete user. Please try again.")
     }
   }
 
@@ -382,7 +382,7 @@ const AdminDashboard = () => {
       setIsUserModalOpen(true)
     } catch (error) {
       console.error("Error fetching user details:", error)
-      alert("Failed to fetch user details. Please try again.")
+      toast.error("Failed to fetch user details. Please try again.")
     } finally {
       setFetchingUserDetails(false)
     }
@@ -465,12 +465,11 @@ const AdminDashboard = () => {
         setSelectedTransaction((prev) => (prev ? { ...prev, ...updatedTransaction } : null))
       }
 
-      // Show success message (optional)
-      console.log("Transaction updated successfully")
+      // Show success message
+      toast.success("Transaction updated successfully")
     } catch (error) {
       console.error("Error updating transaction:", error)
-      // Show error message to user (you might want to use a toast notification)
-      alert("Failed to update transaction status")
+      toast.error("Failed to update transaction status")
     } finally {
       setUpdatingTransaction(null)
     }
@@ -577,13 +576,13 @@ const AdminDashboard = () => {
 
     // Check if token exists
     if (!token) {
-      alert("Authentication token not found. Please login again.")
+      toast.error("Authentication token not found. Please login again.")
       setUpdatingProjectStatus(false)
       return
     }
     // Check if project ID is valid
     if (!selectedProject.id || selectedProject.id.trim() === "") {
-      alert("Invalid project ID")
+      toast.error("Invalid project ID")
       setUpdatingProjectStatus(false)
       return
     }
@@ -640,7 +639,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Error updating project status:", error)
-      alert("Failed to update project status. Please try again.")
+      toast.error("Failed to update project status. Please try again.")
     } finally {
       setUpdatingProjectStatus(false)
     }
