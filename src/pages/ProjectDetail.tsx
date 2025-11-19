@@ -1,27 +1,7 @@
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
-import {
-  Star,
-  Download,
-  Lock,
-  ShoppingCart,
-  Heart,
-  Share2,
-  Eye,
-  Calendar,
-  Award,
-  Clock,
-  Shield,
-  CheckCircle,
-  MessageSquare,
-  Send,
-  Github,
-  ExternalLink,
-  Edit2,
-  Save,
-  X,
-} from "lucide-react"
+import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award, Clock, Shield, CheckCircle, MessageSquare, Send, Github, ExternalLink, Edit2, Save, X } from 'lucide-react'
 import { useAuth } from "../contexts/AuthContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
@@ -29,6 +9,7 @@ import type { Project, Review } from "../types/Project"
 import type { Transaction } from "../types/Transaction"
 import toast from "react-hot-toast"
 import type { User } from "../types/User"
+import { DownloadFilesModal } from "../components/DownloadFilesModal"
 
 interface UserStatus {
   has_purchased: boolean
@@ -68,6 +49,7 @@ const ProjectDetail = () => {
     rating: number;
     total_sales: number;
   } | null>(null);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
 
   const navigate = useNavigate(); // Fetch project data on component mount
 
@@ -656,7 +638,7 @@ const ProjectDetail = () => {
                   {/* Project Thumbnail - Always visible */}
                   {project.thumbnail && (
                     <img
-                      src={project.thumbnail}
+                      src={project.thumbnail || "/placeholder.svg"}
                       alt={project.title}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -1182,7 +1164,7 @@ const ProjectDetail = () => {
                                         </button>
                                       ))}
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                       {editReviewRating === 0 && "Click a star to rate"}
                                       {editReviewRating === 1 && "⭐ Poor"}
                                       {editReviewRating === 2 && "⭐⭐ Fair"}
@@ -1192,7 +1174,7 @@ const ProjectDetail = () => {
                                     </div>
                                   </div>
                                   <div>
-                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
+                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-2 sm:mb-3">
                                       💬 Your Feedback
                                     </label>
                                     <textarea
@@ -1572,7 +1554,9 @@ const ProjectDetail = () => {
                   <div className="text-center text-green-600 font-bold text-xs sm:text-base mb-2 sm:mb-4 bg-green-100 py-2 sm:py-3 rounded-xl animate-slideInUp">
                     ✅ Purchased
                   </div>
-                  <button className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 sm:py-3 lg:py-4 rounded-xl font-bold text-xs sm:text-base lg:text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 animate-slideInUp">
+                  <button
+                    onClick={() => setIsDownloadModalOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 sm:py-3 lg:py-4 rounded-xl font-bold text-xs sm:text-base lg:text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 animate-slideInUp">
                     <Download className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" />
                     Download Files
                   </button>
@@ -1664,7 +1648,7 @@ const ProjectDetail = () => {
 
         {/* Related Projects - improved responsive grid and card layout */}
         <div
-          className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight mt-4 sm:mt-6 lg:mt-8 transition-colors"
+          className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors"
           style={{ animationDelay: "400ms" }}
         >
           <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900 dark:text-white">Related Projects</h3>
@@ -1720,6 +1704,15 @@ const ProjectDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <DownloadFilesModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        sourceFiles={project?.files?.source_files || []}
+        documentationFiles={project?.files?.documentation_files || []}
+        onDownload={handleDownloadFile}
+      />
 
       {/* Animations */}
       <style>{`
