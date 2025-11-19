@@ -126,6 +126,9 @@ const Navbar = () => {
                 <span>Projects</span>
               </Link>
 
+              {/* Theme Toggle - Available for all users */}
+              <ThemeToggle />
+
               {isAuthenticated && (
                 <>
                   {/* Sell */}
@@ -139,9 +142,6 @@ const Navbar = () => {
                     <Upload className="w-5 h-5" />
                     <span>Sell</span>
                   </Link>
-
-                  {/* Theme Toggle */}
-                  <ThemeToggle />
 
                   {/* Wishlist */}
                   <Link
