@@ -620,20 +620,20 @@ const UploadProject = () => {
         {previewImage ? (
           <img src={previewImage || "/placeholder.svg"} alt="Preview" className="w-full h-48 object-cover" />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-teal-100 flex items-center justify-center">
-            <ImageIcon className="w-12 h-12 text-blue-400" />
+          <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-teal-100 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
+            <ImageIcon className="w-12 h-12 text-blue-400 dark:text-slate-400" />
           </div>
         )}
         <div className="absolute top-4 left-4 flex gap-2">
-          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full text-sm font-semibold">
             {categories.find((cat) => cat.value === formData.category)?.label || "Category"}
           </span>
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${formData.difficulty === "Beginner"
-              ? "bg-green-100 text-green-700"
+              ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200"
               : formData.difficulty === "Intermediate"
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-red-100 text-red-700"
+                ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200"
+                : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
               }`}
           >
             {formData.difficulty}
@@ -641,8 +641,8 @@ const UploadProject = () => {
         </div>
       </div>
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">{formData.title || "Your Project Title"}</h3>
-        <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-4 line-clamp-2">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{formData.title || "Your Project Title"}</h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
           {formData.description || "Your project description will appear here..."}
         </p>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -650,7 +650,7 @@ const UploadProject = () => {
             .filter((tech) => tech.trim())
             .slice(0, 3)
             .map((tech, index) => (
-              <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs font-medium">
+              <span key={index} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg text-xs font-medium">
                 {tech}
               </span>
             ))}
@@ -662,7 +662,7 @@ const UploadProject = () => {
               <span className="text-lg text-gray-500 dark:text-gray-400 line-through">₹{formData.originalPrice}</span>
             )}
           </div>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">View Details</button>
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">View Details</button>
         </div>
       </div>
     </div>
@@ -693,15 +693,15 @@ const UploadProject = () => {
         </div>
 
         {/* Progress Steps */}
-        <div className="mb-8 sm:mb-10 md:mb-12 animate-slideInUp overflow-x-auto">
-          <div className="flex items-center justify-center min-w-min">
+        <div className="mb-8 sm:mb-10 md:mb-12 animate-slideInUp">
+          <div className="flex items-center justify-center">
             <div className="flex items-center space-x-2 sm:space-x-4">
               {steps.map((step, index) => (
                 <React.Fragment key={step.id}>
                   <div
-                    className={`flex items-center gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${currentStep >= step.id
-                      ? "bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg scale-100 sm:scale-105"
-                      : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 dark:text-gray-300 shadow-md"
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${currentStep >= step.id
+                      ? "bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg"
+                      : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-md"
                       }`}
                   >
                     <step.icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -709,7 +709,7 @@ const UploadProject = () => {
                   </div>
                   {index < steps.length - 1 && (
                     <div
-                      className={`w-4 sm:w-6 md:w-8 h-1 rounded-full transition-colors duration-300 ${currentStep > step.id ? "bg-gradient-to-r from-blue-600 to-teal-600" : "bg-gray-200"
+                      className={`w-3 sm:w-6 md:w-8 h-1 rounded-full transition-colors duration-300 ${currentStep > step.id ? "bg-gradient-to-r from-blue-600 to-teal-600" : "bg-gray-200 dark:bg-gray-600"
                         }`}
                     />
                   )}
@@ -763,7 +763,8 @@ const UploadProject = () => {
                             name="category"
                             value={formData.category}
                             onChange={handleInputChange}
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                            className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors ${errors.category ? "border-red-300 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-slate-700"
+                              }`}
                           >
                             <option value="">Select a category</option>
                             {categories.map((category) => (
@@ -772,6 +773,12 @@ const UploadProject = () => {
                               </option>
                             ))}
                           </select>
+                          {errors.category && (
+                            <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
+                              <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                              {errors.category}
+                            </p>
+                          )}
                         </div>
 
                         <div>
@@ -992,6 +999,12 @@ const UploadProject = () => {
                             Add Feature
                           </button>
                         </div>
+                        {errors.features && (
+                          <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
+                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                            {errors.features}
+                          </p>
+                        )}
                       </div>
 
                       {/* Tech Stack */}
@@ -1033,6 +1046,12 @@ const UploadProject = () => {
                             Add Technology
                           </button>
                         </div>
+                        {errors.techStack && (
+                          <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
+                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                            {errors.techStack}
+                          </p>
+                        )}
                       </div>
 
                       {/* URLs */}
@@ -1136,6 +1155,12 @@ const UploadProject = () => {
                             </div>
                           )}
                         </div>
+                        {errors.thumbnail && (
+                          <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
+                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                            {errors.thumbnail}
+                          </p>
+                        )}
                       </div>
 
                       {/* 2. Multiple Images Upload */}
@@ -1595,7 +1620,56 @@ const UploadProject = () => {
                     {currentStep < 4 ? (
                       <button
                         type="button"
-                        onClick={() => setCurrentStep((prev) => prev + 1)}
+                        onClick={() => {
+                          // Validate required fields before moving to next step
+                          let hasErrors = false;
+                          const newErrors: Record<string, string> = {};
+
+                          if (currentStep === 1) {
+                            // Step 1: Basic Information validation
+                            if (!formData.title.trim()) {
+                              newErrors.title = "Project title is required";
+                              hasErrors = true;
+                            }
+                            if (!formData.description.trim()) {
+                              newErrors.description = "Description is required";
+                              hasErrors = true;
+                            } else if (formData.description.length < 100) {
+                              newErrors.description = "Description must be at least 100 characters";
+                              hasErrors = true;
+                            }
+                            if (!formData.category) {
+                              newErrors.category = "Please select a category";
+                              hasErrors = true;
+                            }
+                          } else if (currentStep === 2) {
+                            // Step 2: Details validation
+                            const validFeatures = formData.features.filter(f => f.trim());
+                            const validTechStack = formData.techStack.filter(t => t.trim());
+
+                            if (validFeatures.length === 0) {
+                              newErrors.features = "Please add at least one feature";
+                              hasErrors = true;
+                            }
+                            if (validTechStack.length === 0) {
+                              newErrors.techStack = "Please add at least one technology";
+                              hasErrors = true;
+                            }
+                          } else if (currentStep === 3) {
+                            // Step 3: Media & Files validation
+                            if (!formData.thumbnailUrl && !thumbnailFile) {
+                              newErrors.thumbnail = "Please upload a thumbnail image";
+                              hasErrors = true;
+                            }
+                          }
+
+                          if (hasErrors) {
+                            setErrors(newErrors);
+                          } else {
+                            setErrors({});
+                            setCurrentStep((prev) => prev + 1);
+                          }
+                        }}
                         className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-base hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
                       >
                         Next Step
@@ -1638,8 +1712,8 @@ const UploadProject = () => {
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             {/* Preview Card */}
-            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight">
-              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight">
+              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 Live Preview
               </h3>
@@ -1648,10 +1722,10 @@ const UploadProject = () => {
 
             {/* Benefits */}
             <div
-              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight"
+              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight"
               style={{ animationDelay: "200ms" }}
             >
-              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6">Why Upload Your Project?</h3>
+              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">Why Upload Your Project?</h3>
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex-shrink-0 flex items-center justify-center">
@@ -1682,10 +1756,10 @@ const UploadProject = () => {
 
             {/* Guidelines */}
             <div
-              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight"
+              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight"
               style={{ animationDelay: "400ms" }}
             >
-              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6">Submission Guidelines</h3>
+              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">Submission Guidelines</h3>
               <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
