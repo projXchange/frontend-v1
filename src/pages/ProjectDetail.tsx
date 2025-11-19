@@ -660,8 +660,8 @@ const ProjectDetail = () => {
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 dark:bg-slate-800/40 backdrop-blur-md rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-white/30 dark:border-slate-600/30 animate-pulse">
                         <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
-                      <h4 className="text-base sm:text-lg font-bold text-white mb-2">Video Tutorial Available</h4>
-                      <p className="text-xs sm:text-sm text-white/90 mb-4">Purchase this project to watch the complete video tutorial</p>
+                      <h4 className="text-base sm:text-lg font-bold text-white mb-2">Check out Free Live Demo</h4>
+                      <p className="text-xs sm:text-sm text-white/90 mb-4">Purchase this project to access all related resources</p>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
