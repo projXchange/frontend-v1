@@ -420,13 +420,15 @@ const Navbar = () => {
           )}
         </div>
 
-        {isProfileOpen && (
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsProfileOpen(false)}
-          />
-        )}
       </nav>
+
+      {/* Profile Dropdown Backdrop */}
+      {isProfileOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsProfileOpen(false)}
+        />
+      )}
 
       <AuthModal
         isOpen={isAuthModalOpen}
