@@ -71,28 +71,28 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
-      <div className="bg-white rounded-xl sm:rounded-2xl w-full max-w-5xl my-4 shadow-2xl flex flex-col max-h-[96vh]">
+      <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl w-full max-w-5xl my-4 shadow-2xl flex flex-col max-h-[96vh] transition-colors">
         {/* Compact Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 flex-shrink-0 transition-colors">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-base sm:text-lg">{project.title?.charAt(0) || 'P'}</span>
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 truncate">Project Details</h2>
-              <p className="text-xs text-gray-600 font-mono truncate">ID: {project.id}</p>
+              <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">Project Details</h2>
+              <p className="text-xs text-gray-600 dark:text-gray-400 font-mono truncate">ID: {project.id}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-white/80 rounded-lg transition-all flex-shrink-0 ml-2"
+            className="p-1.5 sm:p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white/80 dark:hover:bg-slate-800 rounded-lg transition-all flex-shrink-0 ml-2"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Compact Status Bar */}
-        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 flex-shrink-0 transition-colors">
           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
             {/* Status Badges */}
             <span
@@ -123,7 +123,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             )}
 
             {/* Dates - Hidden on mobile */}
-            <div className="hidden sm:flex items-center gap-3 ml-auto text-xs text-gray-600">
+            <div className="hidden sm:flex items-center gap-3 ml-auto text-xs text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{new Date(project.created_at).toLocaleDateString()}</span>
@@ -133,14 +133,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         </div>
 
         {/* Compact Tabs */}
-        <div className="flex gap-1 px-2 sm:px-3 pt-2 border-b border-gray-200 overflow-x-auto flex-shrink-0">
+        <div className="flex gap-1 px-2 sm:px-3 pt-2 border-b border-gray-200 dark:border-slate-700 overflow-x-auto flex-shrink-0">
           {(['basic', 'technical', 'media'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-3 py-2 font-medium text-xs sm:text-sm rounded-t-lg transition-colors whitespace-nowrap ${activeTab === tab
-                ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-800'
                 }`}
             >
               {tab === 'basic' && '📋 Basic'}
@@ -156,13 +156,13 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <div className="space-y-4 max-w-4xl mx-auto">
               {/* Title */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Project Title *</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Project Title *</label>
                 <input
                   type="text"
                   value={currentData.title || ''}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                 />
               </div>
 
@@ -198,7 +198,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     value={currentData.category || 'web_development'}
                     onChange={(e) => handleInputChange('category', e.target.value)}
                     disabled={!canEditAll}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 dark:disabled:bg-slate-900 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                   >
                     <option value="web_development">Web Development</option>
                     <option value="mobile_development">Mobile Development</option>
@@ -216,7 +216,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     value={currentData.difficulty_level || 'beginner'}
                     onChange={(e) => handleInputChange('difficulty_level', e.target.value)}
                     disabled={!canEditAll}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 bg-white"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 dark:disabled:bg-slate-900 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                   >
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
@@ -298,7 +298,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       value={currentData.pricing?.currency || 'INR'}
                       onChange={(e) => handleNestedChange('pricing', 'currency', e.target.value)}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-50 bg-white"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-50 dark:disabled:bg-slate-900 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     >
                       <option value="INR">🇮🇳 INR (₹)</option>
                       <option value="USD">🇺🇸 USD ($)</option>
@@ -306,10 +306,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                   </div>
                 </div>
                 {currentData.pricing?.original_price && currentData.pricing?.sale_price && (
-                  <div className="mt-2 p-2 bg-white/70 rounded-lg">
-                    <p className="text-xs sm:text-sm text-gray-600">
+                  <div className="mt-2 p-2 bg-white/70 dark:bg-slate-800/70 rounded-lg">
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                       <span className="font-semibold">Discount:</span>{' '}
-                      <span className="text-green-600 font-bold">
+                      <span className="text-green-600 dark:text-green-400 font-bold">
                         {Math.round(((currentData.pricing.original_price - currentData.pricing.sale_price) / currentData.pricing.original_price) * 100)}% OFF
                       </span>
                     </p>
@@ -331,7 +331,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       <select
                         value={projectUpdateData.status}
                         onChange={(e) => onUpdateDataChange({ ...projectUpdateData, status: e.target.value })}
-                        className="w-full px-3 py-2 text-sm border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+                        className="w-full px-3 py-2 text-sm border border-yellow-300 dark:border-yellow-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                       >
                         <option value="draft">Draft</option>
                         <option value="pending">Pending Review</option>
@@ -341,7 +341,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       </select>
                     </div>
 
-                    <label className="flex items-center gap-2 p-2.5 bg-white/70 rounded-lg cursor-pointer hover:bg-white">
+                    <label className="flex items-center gap-2 p-2.5 bg-white/70 dark:bg-slate-800/70 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-800">
                       <input
                         type="checkbox"
                         checked={projectUpdateData.is_featured}

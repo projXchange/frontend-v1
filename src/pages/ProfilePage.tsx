@@ -183,7 +183,7 @@ const ProfilePage = () => {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -199,16 +199,16 @@ const ProfilePage = () => {
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <Loader className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600" />
-              <span className="ml-2 text-sm sm:text-base text-gray-600">Loading profile...</span>
+              <span className="ml-2 text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400">Loading profile...</span>
             </div>
           )}
 
           {/* Profile Header */}
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-8">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Profile Settings</h2>
-                <p className="text-sm sm:text-base text-gray-600">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">Profile Settings</h2>
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400">
                   Manage your account information and preferences
                 </p>
               </div>
@@ -261,7 +261,7 @@ const ProfilePage = () => {
                 />
                 {isEditingProfile && (
                   <div className="mt-4 w-full">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Profile Picture</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Profile Picture</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -275,14 +275,14 @@ const ProfilePage = () => {
                         }
                         reader.readAsDataURL(file)
                       }}
-                      className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100"
                     />
                     {(avatarPreview || profileForm.avatar) && (
                       <div className="flex items-center gap-3 mt-3">
                         <button
                           type="button"
                           onClick={handleAvatarClear}
-                          className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-100 rounded-lg hover:bg-gray-200"
+                          className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
                         >
                           Remove
                         </button>
@@ -292,9 +292,9 @@ const ProfilePage = () => {
                 )}
               </div>
               <div className="flex-1 text-center sm:text-left">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">{user?.full_name}</h2>
-                <p className="text-gray-600 mb-4 text-sm">{user?.email}</p>
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">{user?.full_name}</h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">{user?.email}</p>
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
                     <span className="font-semibold">
@@ -322,10 +322,10 @@ const ProfilePage = () => {
             <div className="mt-8 space-y-6 sm:space-y-8">
               {/* Basic Information */}
               <div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Basic Information</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                       Bio
                     </label>
                     <textarea
@@ -334,12 +334,12 @@ const ProfilePage = () => {
                       onChange={(e) => handleInputChange("bio", e.target.value)}
                       disabled={!isEditingProfile}
                       placeholder="Tell us about yourself..."
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div className="space-y-4 sm:space-y-6">
                     <div>
-                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                         Location
                       </label>
                       <div className="relative">
@@ -350,12 +350,12 @@ const ProfilePage = () => {
                           onChange={(e) => handleInputChange("location", e.target.value)}
                           disabled={!isEditingProfile}
                           placeholder="Your location"
-                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                         Website
                       </label>
                       <div className="relative">
@@ -366,7 +366,7 @@ const ProfilePage = () => {
                           onChange={(e) => handleInputChange("website", e.target.value)}
                           disabled={!isEditingProfile}
                           placeholder="https://yourwebsite.com"
-                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         />
                       </div>
                     </div>
@@ -376,19 +376,19 @@ const ProfilePage = () => {
 
               {/* Professional Information */}
               <div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">
                   Professional Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                       Experience Level
                     </label>
                     <select
                       value={profileForm.experience_level}
                       onChange={(e) => handleInputChange("experience_level", e.target.value)}
                       disabled={!isEditingProfile}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     >
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
@@ -397,14 +397,14 @@ const ProfilePage = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                       Account Status
                     </label>
                     <select
                       value={profileForm.status}
                       onChange={(e) => handleInputChange("status", e.target.value)}
                       disabled={!isEditingProfile}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
@@ -415,13 +415,13 @@ const ProfilePage = () => {
 
               {/* Skills */}
               <div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Skills</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Skills</h3>
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex flex-wrap gap-2">
                     {profileForm.skills.map((skill, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium"
+                        className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs sm:text-sm font-medium"
                       >
                         {skill}
                         {isEditingProfile && (
@@ -443,7 +443,7 @@ const ProfilePage = () => {
                         value={newSkill}
                         onChange={(e) => setNewSkill(e.target.value)}
                         placeholder="Add a skill"
-                        className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault()
@@ -465,17 +465,17 @@ const ProfilePage = () => {
 
               {/* Social Links */}
               <div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Social Links</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Social Links</h3>
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                    <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 mt-2.5 sm:mt-0 flex-shrink-0" />
+                    <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300 mt-2.5 sm:mt-0 flex-shrink-0" />
                     <input
                       type="url"
                       value={profileForm.social_links.github}
                       onChange={(e) => handleSocialLinkChange("github", e.target.value)}
                       disabled={!isEditingProfile}
                       placeholder="https://github.com/username"
-                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
@@ -486,7 +486,7 @@ const ProfilePage = () => {
                       onChange={(e) => handleSocialLinkChange("linkedin", e.target.value)}
                       disabled={!isEditingProfile}
                       placeholder="https://linkedin.com/in/username"
-                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
@@ -497,7 +497,7 @@ const ProfilePage = () => {
                       onChange={(e) => handleSocialLinkChange("twitter", e.target.value)}
                       disabled={!isEditingProfile}
                       placeholder="https://twitter.com/username"
-                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
                 </div>
@@ -506,32 +506,32 @@ const ProfilePage = () => {
           </div>
 
           {/* Statistics */}
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Account Statistics</h3>
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Account Statistics</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 sm:p-6 text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-4 sm:p-6 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1 sm:mb-2">
                   {profileForm.rating || 0}
                 </div>
-                <div className="text-xs sm:text-sm text-blue-700 font-medium">Average Rating</div>
+                <div className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 font-medium">Average Rating</div>
               </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 sm:p-6 text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1 sm:mb-2">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl p-4 sm:p-6 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1 sm:mb-2">
                   {profileForm.total_sales}
                 </div>
-                <div className="text-xs sm:text-sm text-green-700 font-medium">Total Sales</div>
+                <div className="text-xs sm:text-sm text-green-700 dark:text-green-300 font-medium">Total Sales</div>
               </div>
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 sm:p-6 text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl p-4 sm:p-6 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1 sm:mb-2">
                   {profileForm.total_purchases}
                 </div>
-                <div className="text-xs sm:text-sm text-purple-700 font-medium">Total Purchases</div>
+                <div className="text-xs sm:text-sm text-purple-700 dark:text-purple-300 font-medium">Total Purchases</div>
               </div>
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-4 sm:p-6 text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1 sm:mb-2">
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-2xl p-4 sm:p-6 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1 sm:mb-2">
                   {profileForm.skills.length}
                 </div>
-                <div className="text-xs sm:text-sm text-orange-700 font-medium">Skills</div>
+                <div className="text-xs sm:text-sm text-orange-700 dark:text-orange-300 font-medium">Skills</div>
               </div>
             </div>
           </div>

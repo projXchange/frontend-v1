@@ -90,7 +90,7 @@ const FAQ = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-teal-600 text-white py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -121,7 +121,7 @@ const FAQ = () => {
               viewport={{ once: true }}
               className="mb-12"
             >
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
                 {category.category}
               </h2>
               
@@ -133,13 +133,13 @@ const FAQ = () => {
                   return (
                     <div
                       key={questionIndex}
-                      className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden"
+                      className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-gray-100 overflow-hidden"
                     >
                       <button
                         onClick={() => toggleQuestion(categoryIndex, questionIndex)}
-                        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                       >
-                        <span className="text-lg font-semibold text-gray-900 pr-4">
+                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100 pr-4">
                           {faq.question}
                         </span>
                         {isOpen ? (
@@ -157,7 +157,7 @@ const FAQ = () => {
                           transition={{ duration: 0.3 }}
                           className="px-6 pb-5"
                         >
-                          <p className="text-gray-600 leading-relaxed">
+                          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                             {faq.answer}
                           </p>
                         </motion.div>
@@ -172,7 +172,7 @@ const FAQ = () => {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -180,10 +180,10 @@ const FAQ = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Still have questions?
             </h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
               We're here to help! Reach out to our support team
             </p>
             <a

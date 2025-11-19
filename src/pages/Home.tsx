@@ -244,14 +244,14 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start animate-slideInUp" style={{ animationDelay: '2s' }}>
                 <Link
                   to="/projects"
-                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-blue-900 rounded-xl font-semibold text-base sm:text-lg hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
+                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white dark:bg-slate-800 text-blue-900 dark:text-gray-100 rounded-xl font-semibold text-base sm:text-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-200 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
                 >
                   Browse Projects
                   <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   to="/upload"
-                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white rounded-xl font-semibold text-base sm:text-lg hover:bg-white hover:text-blue-900 transition-all duration-200 hover:shadow-xl hover:scale-105"
+                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white dark:border-slate-600 text-white rounded-xl font-semibold text-base sm:text-lg hover:bg-white dark:hover:bg-slate-800 hover:text-blue-900 dark:hover:text-gray-100 transition-all duration-200 hover:shadow-xl hover:scale-105"
                 >
                   Upload Yours 🚀
                 </Link>
@@ -262,14 +262,14 @@ const Home = () => {
             <div className="hidden lg:flex flex-col space-y-6 animate-slideInRight" style={{ animationDelay: '1s' }}>
               {/* Floating Project Card */}
               {topprojects.length > 0 && (
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation">
+                <div className="bg-white/10 dark:bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-2xl float-animation">
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
                       <Code className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h3 className="text-white font-semibold">{topprojects[0].title.length > 20 ? `${topprojects[0].title.substring(0, 20)}...` : topprojects[0].title}</h3>
-                      <p className="text-blue-200 text-sm">{topprojects[0].category} project</p>
+                      <p className="text-blue-200 dark:text-blue-300 text-sm">{topprojects[0].category} project</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
@@ -283,15 +283,15 @@ const Home = () => {
               )}
 
               {/* Floating Stats Card */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl float-animation" style={{ animationDelay: '0.5s' }}>
+              <div className="bg-white/10 dark:bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-2xl float-animation" style={{ animationDelay: '0.5s' }}>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">10K+</div>
-                    <div className="text-blue-200 text-sm">Students</div>
+                    <div className="text-blue-200 dark:text-blue-300 text-sm">Students</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">{projects.length}+</div>
-                    <div className="text-blue-200 text-sm">Projects</div>
+                    <div className="text-blue-200 dark:text-blue-300 text-sm">Projects</div>
                   </div>
                 </div>
               </div>
@@ -301,7 +301,7 @@ const Home = () => {
       </section>
 
       {/* Monetize Your Skills Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -311,12 +311,12 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-6">
               Monetize Your Skills, Build Your Future
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 max-w-3xl mx-auto">
               Turn your academic projects into a source of income.{' '}
-              <span className="text-blue-600 font-semibold">projXchange</span>{' '}
+              <span className="text-blue-600 dark:text-blue-400 font-semibold">projXchange</span>{' '}
               empowers you to showcase or talent and earn from your creations.
             </p>
           </motion.div>
@@ -338,15 +338,15 @@ const Home = () => {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-gray-100 dark:border-slate-700"
             >
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
                 <DollarSign className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 mb-2 sm:mb-3">
                 Earn from Your Projects
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 leading-relaxed">
                 Get paid for the hard work you put into academic assignments and side projects.
               </p>
             </motion.div>
@@ -358,15 +358,15 @@ const Home = () => {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-gray-100 dark:border-slate-700"
             >
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
                 <Globe className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 mb-2 sm:mb-3">
                 Global Exposure
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 leading-relaxed">
                 Reach or worldwide audience of potential employers looking innovative solutions.
               </p>
             </motion.div>
@@ -378,15 +378,15 @@ const Home = () => {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-gray-100 dark:border-slate-700"
             >
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
                 <Award className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 mb-2 sm:mb-3">
                 Build Your Portfolio
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 leading-relaxed">
                 Enhance resume with real-world and positive feedback.
               </p>
             </motion.div>
@@ -398,15 +398,15 @@ const Home = () => {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-gray-100 dark:border-slate-700"
             >
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
                 <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2 sm:mb-3">
                 Flexible Income
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 leading-relaxed">
                 Work on own terms and set or own prices.
               </p>
             </motion.div>
@@ -431,7 +431,7 @@ const Home = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Title */}
           <motion.div
@@ -441,10 +441,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">
               Start Exploring & Building
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 dark:text-gray-300 max-w-3xl mx-auto">
               Discover trending technologies and real-world projects to level up your skills
             </p>
           </motion.div>
@@ -456,7 +456,7 @@ const Home = () => {
                 Array.from({ length: 6 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="bg-white rounded-2xl p-4 sm:p-6 text-center border border-gray-100 animate-pulse"
+                    className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 text-center border border-gray-100 dark:border-slate-700 animate-pulse"
                   >
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-xl mx-auto mb-3 sm:mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
@@ -483,17 +483,17 @@ const Home = () => {
                   >
                     <Link
                       to={`/projects?category=${category.name.toLowerCase()}`}
-                      className="group bg-white rounded-2xl p-4 sm:p-6 text-center hover:shadow-xl transition-all duration-300 border border-gray-100 block h-full"
+                      className="group bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 text-center hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-gray-100 dark:border-slate-700 block h-full"
                     >
                       <div
                         className={`w-12 h-12 sm:w-16 sm:h-16 ${category.color} rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 transition-transform group-hover:scale-110`}
                       >
                         <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                       </div>
-                      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-1 overflow-hidden text-ellipsis whitespace-normal sm:whitespace-normal break-words">
+                      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-1 overflow-hidden text-ellipsis whitespace-normal sm:whitespace-normal break-words">
                         {category.name}
                       </h3>
-                      <p className="text-gray-600 text-xs sm:text-sm break-words">
+                      <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 text-xs sm:text-sm break-words">
                         {category.count} projects
                       </p>
                       <div className="mt-2 inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-xs font-medium">
@@ -516,10 +516,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">
               Featured Projects
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-2xl mx-auto">
               Hand-picked projects to inspire your next build
             </p>
           </motion.div>
@@ -528,7 +528,7 @@ const Home = () => {
             {loading ? (
               // Loading skeleton
               Array.from({ length: 3 }).map((_, idx) => (
-                <div key={idx} className="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse">
+                <div key={idx} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-slate-700 animate-pulse transition-colors">
                   <div className="h-56 bg-gray-200"></div>
                   <div className="p-5">
                     <div className="h-4 bg-gray-200 rounded mb-3"></div>
@@ -549,7 +549,7 @@ const Home = () => {
             ) : (
               // No projects message
               <div className="col-span-full text-center py-12">
-                <div className="text-gray-500 text-lg mb-4">No projects available at the moment</div>
+                <div className="text-gray-500 dark:text-gray-400 text-lg mb-4">No projects available at the moment</div>
                 <p className="text-gray-400">Check back soon for new projects!</p>
               </div>
             )}
@@ -562,10 +562,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-14 mt-24"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">
               Top Rated Projects
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-2xl mx-auto">
               Projects that received the highest ratings from our community
             </p>
           </motion.div>
@@ -576,7 +576,7 @@ const Home = () => {
               Array.from({ length: 3 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse"
+                  className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-slate-700 animate-pulse transition-colors"
                 >
                   <div className="h-56 bg-gray-200"></div>
                   <div className="p-5">
@@ -598,7 +598,7 @@ const Home = () => {
             ) : (
               // No projects message
               <div className="col-span-full text-center py-12">
-                <div className="text-gray-500 text-lg mb-4">
+                <div className="text-gray-500 dark:text-gray-400 text-lg mb-4">
                   No top rated projects available right now
                 </div>
                 <p className="text-gray-400">
@@ -613,7 +613,7 @@ const Home = () => {
 
 
       {/* Testimonials */}
-      <section className="py-10 bg-white">
+      <section className="py-10 bg-white dark:bg-slate-900 transition-colors">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -629,8 +629,8 @@ const Home = () => {
 
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900">What Students Say</h2>
-            <p className="text-lg text-gray-600 mt-3 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100">What Students Say</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 mt-3 max-w-2xl mx-auto">
               Trusted by thousands of learners to showcase real, impactful project experience.
             </p>
           </motion.div>
@@ -640,7 +640,7 @@ const Home = () => {
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={i}
-                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300"
+                className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300"
                 custom={i}
                 variants={cardVariants}
                 initial="hidden"
@@ -661,7 +661,7 @@ const Home = () => {
                 </div>
 
                 {/* Testimonial Text */}
-                <p className="text-gray-700 italic leading-relaxed mb-6">
+                <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 italic leading-relaxed mb-6">
                   “{testimonial.text}”
                 </p>
 
@@ -673,8 +673,8 @@ const Home = () => {
                     className="w-12 h-12 rounded-full border border-gray-200 shadow-sm mr-4 object-cover"
                   />
                   <div>
-                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
                     <p className="text-sm text-blue-600">{testimonial.university}</p>
                   </div>
                 </div>
@@ -683,7 +683,7 @@ const Home = () => {
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-sm text-gray-500">
                     Worked on:{' '}
-                    <span className="text-gray-800 font-medium">
+                    <span className="text-gray-800 dark:text-gray-200 dark:text-gray-200 font-medium">
                       {testimonial.project}
                     </span>
                   </p>
@@ -695,7 +695,7 @@ const Home = () => {
       </section>
 
       {/* Everything Students Need Section */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-white">
+      <section className="py-12 sm:py-16 lg:py-20 bg-white dark:bg-slate-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Header */}
@@ -706,10 +706,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-6">
               Everything students need in one place
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-3xl mx-auto">
               Join thousands of students who are already accelerating their learning journey
             </p>
           </motion.div>
@@ -740,10 +740,10 @@ const Home = () => {
                     <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
                   </div>
                 </div>
-                <div className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                <div className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">
                   {feature.title}
                 </div>
-                <div className="text-sm sm:text-base text-gray-600">
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   {feature.subtitle}
                 </div>
               </motion.div>
@@ -771,7 +771,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-10 sm:py-14 bg-white text-gray-900 overflow-hidden">
+      <section className="relative py-10 sm:py-14 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 overflow-hidden transition-colors">
 
         {/* Light Dotted Overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(0,0,0,0.03)_1px,_transparent_1px)] bg-[length:40px_40px] pointer-events-none" />
@@ -813,14 +813,14 @@ const Home = () => {
             >
               <button
                 onClick={() => openAuthModal(false)}
-                className="group inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg hover:bg-blue-100 shadow-md transition transform hover:scale-105"
+                className="group inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-slate-800 text-blue-900 dark:text-gray-100 rounded-xl font-semibold text-lg hover:bg-blue-100 dark:hover:bg-slate-700 shadow-md transition transform hover:scale-105"
               >
                 Get Started Today
                 <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </button>
               <Link
                 to="/projects"
-                className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-900 transition"
+                className="inline-flex items-center justify-center px-8 py-4 border-2 border-white dark:border-slate-600 text-white rounded-xl font-semibold text-lg hover:bg-white dark:hover:bg-slate-800 hover:text-blue-900 dark:hover:text-gray-100 transition"
               >
                 Browse Projects
               </Link>

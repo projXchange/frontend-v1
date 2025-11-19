@@ -711,16 +711,16 @@ const AdminDashboard = () => {
     isLoading?: boolean
   }) => (
     <div
-      className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group"
+      className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group"
       onClick={onClick}
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1">{title}</p>
           <LoadingNumber
             value={value}
             isLoading={isLoading}
-            className="text-3xl font-bold text-gray-900 mb-1"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1"
           />
           <p className={`text-sm font-semibold ${color}`}>{subtitle}</p>
         </div>
@@ -759,7 +759,7 @@ const AdminDashboard = () => {
   }, [activeTab])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-8 sm:py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
@@ -855,9 +855,9 @@ const AdminDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 shadow-xl border border-white/30 mb-8 animate-slideInUp">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 shadow-xl border border-white/30 mb-8 animate-slideInUp">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Quick Actions</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100">Quick Actions</h2>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => navigate("/upload")}
@@ -879,7 +879,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden">
           <div className="border-b border-gray-200 overflow-x-auto">
             <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-8 min-w-max sm:min-w-0">
               {[
@@ -896,7 +896,7 @@ const AdminDashboard = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 sm:gap-3 py-4 sm:py-6 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
                     ? "border-blue-500 text-blue-600 scale-105"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:scale-105"
                     }`}
                 >
                   <tab.icon className="w-4 sm:w-5 h-4 sm:h-5" />
@@ -914,7 +914,7 @@ const AdminDashboard = () => {
           <div className="p-4 sm:p-8">
             {activeTab === "overview" && (
               <div className="animate-slideInUp">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8">Platform Overview</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 sm:mb-8">Platform Overview</h2>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Recent Activity */}
@@ -928,7 +928,7 @@ const AdminDashboard = () => {
                         {recentActivity.map((activity, index) => (
                           <div
                             key={activity.id}
-                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
                             style={{ animationDelay: `${index * 100}ms` }}
                           >
                             <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -950,14 +950,14 @@ const AdminDashboard = () => {
                                   }`}
                               />
                               <div className="min-w-0 flex-1">
-                                <span className="text-gray-900 font-semibold text-sm sm:text-base truncate block">
+                                <span className="text-gray-900 dark:text-gray-100 font-semibold text-sm sm:text-base truncate block">
                                   {activity.action}
                                 </span>
-                                <div className="text-xs sm:text-sm text-gray-600 truncate">by {activity.user}</div>
+                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 truncate">by {activity.user}</div>
                               </div>
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <span className="text-xs sm:text-sm text-gray-500 font-medium block">
+                              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium block">
                                 {activity.time}
                               </span>
                               <div
@@ -1040,7 +1040,7 @@ const AdminDashboard = () => {
 
             {activeTab === "analytics" && (
               <div className="animate-slideInUp">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 sm:mb-8 flex items-center gap-3">
                   <BarChart3 className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600" />
                   Analytics & Reports
                 </h2>
@@ -1053,7 +1053,7 @@ const AdminDashboard = () => {
                       {salesData.map((data, index) => (
                         <div key={index} className="animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2">
-                            <span className="text-gray-700 font-semibold text-sm sm:text-base">{data.month}</span>
+                            <span className="text-gray-700 dark:text-gray-300 font-semibold text-sm sm:text-base">{data.month}</span>
                             <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm">
                               <span className="text-green-600 font-bold">${data.sales}</span>
                               <span className="text-blue-600">{data.projects} projects</span>
@@ -1083,15 +1083,15 @@ const AdminDashboard = () => {
                       ].map((category, index) => (
                         <div
                           key={index}
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
                           style={{ animationDelay: `${index * 100}ms` }}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${category.color} flex-shrink-0`} />
-                            <span className="font-semibold text-gray-900 text-sm sm:text-base">{category.name}</span>
+                            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base">{category.name}</span>
                           </div>
                           <div className="text-right flex-shrink-0">
-                            <div className="font-bold text-gray-900 text-sm sm:text-base">
+                            <div className="font-bold text-gray-900 dark:text-gray-100 text-sm sm:text-base">
                               {category.projects} projects
                             </div>
                             <div className="text-xs sm:text-sm text-green-600 font-semibold">{category.sales}</div>
@@ -1104,23 +1104,23 @@ const AdminDashboard = () => {
 
                 {/* KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Conversion Rate</h4>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Conversion Rate</h4>
                     <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{stats.conversionRate}%</div>
                     <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 0.3% from last month</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Avg Order Value</h4>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Avg Order Value</h4>
                     <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">$34.50</div>
                     <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ $2.10 from last month</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">User Retention</h4>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">User Retention</h4>
                     <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">78%</div>
                     <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 5% from last month</div>
                   </div>
-                  <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    <h4 className="font-bold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Active Sellers</h4>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Active Sellers</h4>
                     <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">24</div>
                     <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 3 new this month</div>
                   </div>
@@ -1131,7 +1131,7 @@ const AdminDashboard = () => {
             {activeTab === "projects" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Manage Projects</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100">Manage Projects</h2>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -1140,53 +1140,53 @@ const AdminDashboard = () => {
                         placeholder="Search projects..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full sm:w-auto pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
+                        className="w-full sm:w-auto pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                       />
                     </div>
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
+                      className="px-4 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                     >
-                      <option value="all">All Status</option>
-                      <option value="approved">Approved</option>
-                      <option value="pending">Pending Review</option>
-                      <option value="suspended">Suspended</option>
-                      <option value="archived">Archived</option>
+                      <option value="all" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">All Status</option>
+                      <option value="approved" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Approved</option>
+                      <option value="pending" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Pending Review</option>
+                      <option value="suspended" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Suspended</option>
+                      <option value="archived" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Archived</option>
                     </select>
                   </div>
                 </div>
 
                 {loading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading projects...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300 text-sm sm:text-base">Loading projects...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Project
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
                               Author ID
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                               Category
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Price
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">
                               Sales
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Status
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
@@ -1200,7 +1200,7 @@ const AdminDashboard = () => {
                             .map((project, index) => (
                               <tr
                                 key={project.id}
-                                className="hover:bg-gray-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                                className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors animate-slideInUp text-xs sm:text-sm"
                                 style={{ animationDelay: `${index * 100}ms` }}
                               >
                                 <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1211,7 +1211,7 @@ const AdminDashboard = () => {
                                       </span>
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                      <div className="font-semibold text-gray-900 truncate">{project.title}</div>
+                                      <div className="font-semibold text-gray-900 dark:text-gray-100 truncate">{project.title}</div>
                                       <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
                                         {project.is_featured && (
                                           <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">
@@ -1225,7 +1225,7 @@ const AdminDashboard = () => {
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden sm:table-cell truncate">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden sm:table-cell truncate">
                                   {project.author_id}
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
@@ -1235,13 +1235,13 @@ const AdminDashboard = () => {
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4">
                                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                                    <span className="text-gray-900 font-bold">₹{project.pricing?.sale_price}</span>
-                                    <span className="text-gray-500 line-through text-xs">
+                                    <span className="text-gray-900 dark:text-gray-100 font-bold">₹{project.pricing?.sale_price}</span>
+                                    <span className="text-gray-500 dark:text-gray-400 line-through text-xs">
                                       ₹{project.pricing?.original_price}
                                     </span>
                                   </div>
                                 </td>
-                                <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-gray-900 hidden lg:table-cell">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-gray-900 dark:text-gray-100 hidden lg:table-cell">
                                   {project.purchase_count}
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1253,8 +1253,8 @@ const AdminDashboard = () => {
                                         : project.status === "suspended"
                                           ? "bg-red-100 text-red-800"
                                           : project.status === "archived"
-                                            ? "bg-gray-100 text-gray-800"
-                                            : "bg-gray-100 text-gray-800"
+                                            ? "bg-gray-100 text-gray-800 dark:text-gray-200 dark:text-gray-200"
+                                            : "bg-gray-100 text-gray-800 dark:text-gray-200 dark:text-gray-200"
                                       }`}
                                   >
                                     {project.status.replace("_", " ")}
@@ -1273,7 +1273,7 @@ const AdminDashboard = () => {
                                       disabled={updatingProject === project.id}
                                       className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${project.is_featured
                                         ? "text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50"
-                                        : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                                        : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:bg-slate-800"
                                         }`}
                                     >
                                       <Star className={`w-4 h-4 ${project.is_featured ? "fill-current" : ""}`} />
@@ -1299,9 +1299,9 @@ const AdminDashboard = () => {
             {activeTab === "users" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">User Management</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100">User Management</h2>
                   <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <select className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm">
+                    <select className="px-4 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 text-sm">
                       <option>All Users</option>
                       <option>Students</option>
                       <option>Admins</option>
@@ -1313,36 +1313,36 @@ const AdminDashboard = () => {
                       <input
                         type="text"
                         placeholder="Search users..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                       />
                     </div>
                   </div>
                 </div>
 
                 {loading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading users...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300 text-sm sm:text-base">Loading users...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               User
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
                               Role
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                               Joined
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Status
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
@@ -1351,7 +1351,7 @@ const AdminDashboard = () => {
                           {users.map((user, index) => (
                             <tr
                               key={user.id}
-                              className="hover:bg-gray-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                              className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors animate-slideInUp text-xs sm:text-sm"
                               style={{ animationDelay: `${index * 100}ms` }}
                             >
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1362,9 +1362,9 @@ const AdminDashboard = () => {
                                     </span>
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <div className="font-semibold text-gray-900 truncate">{user.full_name}</div>
-                                    <div className="text-xs sm:text-sm text-gray-600 truncate">{user.email}</div>
-                                    <div className="text-xs text-gray-500">
+                                    <div className="font-semibold text-gray-900 dark:text-gray-100 truncate">{user.full_name}</div>
+                                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 truncate">{user.email}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-400">
                                       Last: {new Date(user.updated_at).toLocaleDateString()}
                                     </div>
                                   </div>
@@ -1380,7 +1380,7 @@ const AdminDashboard = () => {
                                   {user.user_type}
                                 </span>
                               </td>
-                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden md:table-cell">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden md:table-cell">
                                 {new Date(user.created_at).toLocaleDateString()}
                               </td>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1421,7 +1421,7 @@ const AdminDashboard = () => {
                           ))}
                           {users.length === 0 && (
                             <tr>
-                              <td colSpan={5} className="px-6 py-8 text-center text-gray-600">
+                              <td colSpan={5} className="px-6 py-8 text-center text-gray-600 dark:text-gray-300 dark:text-gray-400">
                                 No users found
                               </td>
                             </tr>
@@ -1436,7 +1436,7 @@ const AdminDashboard = () => {
 
             {activeTab === "approval" && (
               <div className="animate-slideInUp">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3 flex-wrap">
                   <AlertCircle className="w-6 sm:w-7 h-6 sm:h-7 text-orange-600" />
                   Pending Approval
                   <span className="bg-orange-500 text-white text-xs sm:text-sm px-3 py-1 rounded-full animate-pulse">
@@ -1445,32 +1445,32 @@ const AdminDashboard = () => {
                 </h2>
 
                 {loading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading pending projects...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300 text-sm sm:text-base">Loading pending projects...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-orange-50 to-yellow-50">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Project
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
                               Author ID
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                               Category
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Price
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">
                               Submitted
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
@@ -1490,7 +1490,7 @@ const AdminDashboard = () => {
                                     </span>
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <div className="font-semibold text-gray-900 truncate">{project.title}</div>
+                                    <div className="font-semibold text-gray-900 dark:text-gray-100 truncate">{project.title}</div>
                                     <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
                                       <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">
                                         Pending
@@ -1502,7 +1502,7 @@ const AdminDashboard = () => {
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden sm:table-cell truncate">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden sm:table-cell truncate">
                                 {project.author_id}
                               </td>
                               <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
@@ -1512,13 +1512,13 @@ const AdminDashboard = () => {
                               </td>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
                                 <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                                  <span className="text-gray-900 font-bold">₹{project.pricing?.sale_price}</span>
-                                  <span className="text-gray-500 line-through text-xs">
+                                  <span className="text-gray-900 dark:text-gray-100 font-bold">₹{project.pricing?.sale_price}</span>
+                                  <span className="text-gray-500 dark:text-gray-400 line-through text-xs">
                                     ₹{project.pricing?.original_price}
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden lg:table-cell">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden lg:table-cell">
                                 {new Date(project.created_at).toLocaleDateString()}
                               </td>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1547,7 +1547,7 @@ const AdminDashboard = () => {
                           ))}
                           {pendingProjects.length === 0 && (
                             <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600 dark:text-gray-300 dark:text-gray-400">
                                 No pending projects found
                               </td>
                             </tr>
@@ -1562,23 +1562,23 @@ const AdminDashboard = () => {
 
             {activeTab === "transactions" && (
               <div className="animate-slideInUp">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
                   <DollarSign className="w-6 sm:w-7 h-6 sm:h-7 text-green-600" />
                   Transaction History
                 </h2>
 
                 {loading ? (
-                  <div className="text-center text-gray-500 text-sm sm:text-base">Loading transactions...</div>
+                  <div className="text-center text-gray-500 dark:text-gray-400 text-sm sm:text-base">Loading transactions...</div>
                 ) : error ? (
                   <div className="text-center text-red-500 text-sm sm:text-base">{error}</div>
                 ) : transactions.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
-                    <div className="text-gray-500 text-base sm:text-lg mb-4">No transactions found</div>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
+                    <div className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-4">No transactions found</div>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
-                    <table className="min-w-full text-left text-xs sm:text-sm text-gray-600">
-                      <thead className="bg-gray-50 text-gray-700 font-semibold">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-x-auto">
+                    <table className="min-w-full text-left text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400">
+                      <thead className="bg-gray-50 dark:bg-slate-800 dark:bg-slate-800 text-gray-700 dark:text-gray-300 dark:text-gray-300 font-semibold">
                         <tr>
                           <th className="px-3 sm:px-6 py-3 sm:py-4">Transaction ID</th>
                           <th className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">Project</th>
@@ -1651,7 +1651,7 @@ const AdminDashboard = () => {
             {activeTab === "reviews" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 sm:gap-3">
                     <MessageSquare className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600" />
                     Manage Reviews
                   </h2>
@@ -1663,51 +1663,51 @@ const AdminDashboard = () => {
                         placeholder="Search reviews..."
                         value={reviewSearchTerm}
                         onChange={(e) => setReviewSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                       />
                     </div>
                     <select
                       value={reviewFilterStatus}
                       onChange={(e) => setReviewFilterStatus(e.target.value)}
-                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
+                      className="px-4 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 text-sm"
                     >
-                      <option value="all">All Reviews</option>
-                      <option value="approved">Approved</option>
-                      <option value="pending">Pending</option>
+                      <option value="all" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">All Reviews</option>
+                      <option value="approved" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Approved</option>
+                      <option value="pending" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Pending</option>
                     </select>
                   </div>
                 </div>
 
                 {loading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600 text-sm sm:text-base">Loading reviews...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300 text-sm sm:text-base">Loading reviews...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Review
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                               Project Name
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
                               Student
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Rating
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">
                               Status
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
                               Date
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
@@ -1729,15 +1729,15 @@ const AdminDashboard = () => {
                             .map((review, index) => (
                               <tr
                                 key={review.id}
-                                className="hover:bg-gray-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                                className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors animate-slideInUp text-xs sm:text-sm"
                                 style={{ animationDelay: `${index * 100}ms` }}
                               >
                                 <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                  <p className="text-xs sm:text-sm text-gray-900 font-medium line-clamp-2">
+                                  <p className="text-xs sm:text-sm text-gray-900 dark:text-gray-100 font-medium line-clamp-2">
                                     {review.review_text}
                                   </p>
                                 </td>
-                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden md:table-cell truncate">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden md:table-cell truncate">
                                   {review.project.title}
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">
@@ -1748,10 +1748,10 @@ const AdminDashboard = () => {
                                       </span>
                                     </div>
                                     <div className="min-w-0 hidden sm:block">
-                                      <div className="font-semibold text-gray-900 text-xs sm:text-sm truncate">
+                                      <div className="font-semibold text-gray-900 dark:text-gray-100 text-xs sm:text-sm truncate">
                                         {review.user.full_name}
                                       </div>
-                                      <div className="text-xs text-gray-500 truncate">{review.user.email}</div>
+                                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{review.user.email}</div>
                                     </div>
                                   </div>
                                 </td>
@@ -1776,7 +1776,7 @@ const AdminDashboard = () => {
                                     {review.is_approved ? "Approved" : "Pending"}
                                   </span>
                                 </td>
-                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 font-medium hidden md:table-cell text-xs">
+                                <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden md:table-cell text-xs">
                                   {new Date(review.created_at).toLocaleDateString()}
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1833,7 +1833,7 @@ const AdminDashboard = () => {
                             ))}
                           {reviews.length === 0 && (
                             <tr>
-                              <td colSpan={7} className="px-6 py-8 text-center text-gray-600">
+                              <td colSpan={7} className="px-6 py-8 text-center text-gray-600 dark:text-gray-300 dark:text-gray-400">
                                 No reviews found
                               </td>
                             </tr>

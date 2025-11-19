@@ -189,7 +189,7 @@ const ProjectListing = () => {
     .sort((a, b) => a.localeCompare(b));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-teal-700 text-white py-16 sm:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
@@ -209,7 +209,7 @@ const ProjectListing = () => {
               placeholder="Search projects, technologies, or keywords..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/95 backdrop-blur-sm border border-white/20 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-300/50 focus:border-blue-300 transition-all duration-300 text-sm sm:text-lg shadow-2xl"
+              className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl text-gray-900 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-300/50 dark:focus:ring-blue-500/50 focus:border-blue-300 dark:focus:border-blue-500 transition-all duration-300 text-sm sm:text-lg shadow-2xl"
             />
           </div>
           {/* Quick Stats */}
@@ -237,34 +237,34 @@ const ProjectListing = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         {/* Filters */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30 relative z-10">
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30 dark:border-slate-700/30 relative z-10 transition-colors">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 overflow-visible">
             {/* Filter by Technology Dropdown */}
             <div ref={dropdownRef} className="relative z-20">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Filter by Technology</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">Filter by Technology</label>
               <div className="relative">
                 <button
                   onClick={() => setTechDropdownOpen(!techDropdownOpen)}
-                  className="w-full p-2 sm:p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer font-medium text-left flex items-center justify-between"
+                  className="w-full p-2 sm:p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300 cursor-pointer font-medium text-left flex items-center justify-between"
                 >
-                  <span className="text-gray-700 truncate">
+                  <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300 truncate">
                     {selectedTags.length > 0 ? `${selectedTags.length} selected` : 'Select Technologies'}
                   </span>
-                  <ChevronDown className={`text-gray-400 w-4 h-4 sm:w-5 sm:h-5 transition-transform flex-shrink-0 ${techDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`text-gray-400 dark:text-gray-500 dark:text-gray-400 w-4 h-4 sm:w-5 sm:h-5 transition-transform flex-shrink-0 ${techDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {techDropdownOpen && (
-                  <div className="absolute left-0 right-0 z-[9999] mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+                  <div className="absolute left-0 right-0 z-[9999] mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden">
                     {/* Search Input */}
-                    <div className="p-3 border-b border-gray-200 bg-white">
+                    <div className="p-3 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-gray-400 w-4 h-4" />
                         <input
                           type="text"
                           placeholder="Search technologies..."
                           value={techSearchTerm}
                           onChange={(e) => setTechSearchTerm(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                           onClick={(e) => e.stopPropagation()}
                           autoFocus
                         />
@@ -278,19 +278,19 @@ const ProjectListing = () => {
                           <button
                             key={tag}
                             onClick={() => toggleTag(tag)}
-                            className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${selectedTags.includes(tag) ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                            className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm ${selectedTags.includes(tag) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-gray-300 dark:text-gray-300'
                               }`}
                           >
                             <div className="flex items-center justify-between">
                               <span>{tag}</span>
                               {selectedTags.includes(tag) && (
-                                <span className="text-blue-600 font-bold">✓</span>
+                                <span className="text-blue-600 dark:text-blue-400 font-bold">✓</span>
                               )}
                             </div>
                           </button>
                         ))
                       ) : (
-                        <div className="px-4 py-3 text-gray-500 text-sm text-center">
+                        <div className="px-4 py-3 text-gray-500 dark:text-gray-400 dark:text-gray-400 text-sm text-center">
                           No technologies found
                         </div>
                       )}
@@ -302,19 +302,19 @@ const ProjectListing = () => {
 
             {/* Sort */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Sort By</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">Sort By</label>
               <div className="relative">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2 sm:p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer font-medium"
+                  className="w-full p-2 sm:p-3 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer font-medium"
                 >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="popular">Most Popular</option>
-                  <option value="trending">Trending</option>
+                  <option value="newest" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Newest First</option>
+                  <option value="oldest" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Oldest First</option>
+                  <option value="price-low" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Price: Low to High</option>
+                  <option value="price-high" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Price: High to Low</option>
+                  <option value="popular" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Most Popular</option>
+                  <option value="trending" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Trending</option>
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
               </div>
@@ -322,20 +322,20 @@ const ProjectListing = () => {
 
             {/* Price Range */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Price Range (INR)</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">Price Range (INR)</label>
               <div className="flex items-center gap-2 sm:gap-3">
                 <input
                   type="text"
                   onChange={e => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
                   placeholder="Min ₹"
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
-                <span className="text-gray-500">to</span>
+                <span className="text-gray-500 dark:text-gray-400">to</span>
                 <input
                   type="text"
                   onChange={e => setPriceRange([priceRange[0], parseInt(e.target.value) || 1000])}
                   placeholder="Max ₹"
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
               </div>
             </div>
@@ -345,7 +345,7 @@ const ProjectListing = () => {
           {selectedTags.length > 0 && (
             <div className="mt-4 sm:mt-6">
               <div className="flex items-center gap-2 mb-2">
-                <label className="text-sm font-semibold text-gray-700">Selected Technologies:</label>
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Selected Technologies:</label>
                 <button
                   onClick={() => setSelectedTags([])}
                   className="text-xs text-blue-600 hover:text-blue-800 font-medium"
@@ -374,7 +374,7 @@ const ProjectListing = () => {
 
           {/* Category Tags */}
           <div className="mt-6 sm:mt-8">
-            <label className="block text-sm font-semibold text-gray-700 mb-3 sm:mb-4">Category</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">Category</label>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               {availableCategories.map(category => (
                 <button
@@ -382,7 +382,7 @@ const ProjectListing = () => {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 hover:scale-105 ${selectedCategory === category
                     ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'
                     }`}
                 >
                   {getCategoryDisplayName(category)}
@@ -396,13 +396,13 @@ const ProjectListing = () => {
         {loading ? (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Loading amazing projects...</p>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">Loading amazing projects...</p>
           </div>
         ) : error ? (
           <div className="text-center py-16">
             <Filter className="w-12 h-12 text-red-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Projects</h3>
-            <p className="text-gray-600 text-lg mb-6">{error}</p>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Error Loading Projects</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">{error}</p>
             <button onClick={() => window.location.reload()} className="px-6 py-2 sm:px-8 sm:py-3 bg-blue-600 text-white rounded-xl">Try Again</button>
           </div>
         ) : filteredProjects.length > 0 ? (
@@ -417,7 +417,7 @@ const ProjectListing = () => {
             {loadingMore && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-6 sm:mt-8">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                  <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg overflow-hidden animate-pulse">
                     <div className="h-48 bg-gray-200"></div>
                     <div className="p-6">
                       <div className="h-6 bg-gray-200 rounded mb-4"></div>
@@ -432,8 +432,8 @@ const ProjectListing = () => {
         ) : (
           <div className="text-center py-16">
             <Zap className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">No Projects Found</h3>
-            <p className="text-gray-600 text-lg">Try changing filters or search keywords to find projects.</p>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">No Projects Found</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">Try changing filters or search keywords to find projects.</p>
           </div>
         )}
 

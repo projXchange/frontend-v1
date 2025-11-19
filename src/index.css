@@ -1,8 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 body, html {
-    background: linear-gradient(to bottom right, #eff6ff, #ffffff, #f0fdfa);
-    min-height: 100%;
-    overflow-x: hidden;
+  background: linear-gradient(to bottom right, #eff6ff, #ffffff, #f0fdfa);
+  min-height: 100%;
+  overflow-x: hidden;
+  transition: background-color 200ms ease-in-out;
+}
+
+.dark body,
+.dark html {
+  background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
+}

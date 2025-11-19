@@ -95,7 +95,7 @@ const HowItWorks = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
       {/* Hero Section */}
       <section className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-teal-600 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
@@ -126,10 +126,10 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               For Sellers: Monetize Your Work
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Turn your academic projects into a source of income in 4 simple steps
             </p>
           </motion.div>
@@ -144,7 +144,7 @@ const HowItWorks = () => {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full">
                   <div className="flex items-center justify-center mb-6">
                     <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center`}>
                       <step.icon className="w-8 h-8 text-white" />
@@ -153,10 +153,10 @@ const HowItWorks = () => {
                   <div className="absolute -top-4 left-6 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
                     {index + 1}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 text-center">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 text-center leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
                     {step.description}
                   </p>
                 </div>
@@ -188,7 +188,7 @@ const HowItWorks = () => {
       </section>
 
       {/* For Buyers Section */}
-      <section className="py-16 sm:py-20 bg-gray-50">
+      <section className="py-16 sm:py-20 bg-gray-50 dark:bg-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -197,10 +197,10 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               For Buyers: Find Quality Projects
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Discover and purchase academic projects that accelerate your learning
             </p>
           </motion.div>
@@ -215,7 +215,7 @@ const HowItWorks = () => {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full">
                   <div className="flex items-center justify-center mb-6">
                     <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center`}>
                       <step.icon className="w-8 h-8 text-white" />
@@ -224,10 +224,10 @@ const HowItWorks = () => {
                   <div className="absolute -top-4 left-6 w-10 h-10 bg-teal-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
                     {index + 1}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 text-center">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 text-center leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
                     {step.description}
                   </p>
                 </div>
@@ -268,10 +268,10 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Why Choose ProjXchange?
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               We provide a safe, reliable platform for academic project exchange
             </p>
           </motion.div>
@@ -284,17 +284,17 @@ const HowItWorks = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 text-center"
+                className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 text-center"
               >
                 <div className="flex items-center justify-center mb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-teal-100 rounded-2xl flex items-center justify-center">
                     <benefit.icon className="w-8 h-8 text-blue-600" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
                   {benefit.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   {benefit.description}
                 </p>
               </motion.div>
@@ -321,13 +321,13 @@ const HowItWorks = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/projects"
-                className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="inline-flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-blue-600 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 Browse Projects
               </Link>
               <Link
                 to="/upload"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105"
+                className="inline-flex items-center justify-center gap-2 border-2 border-white dark:border-slate-600 text-white hover:bg-white dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-gray-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105"
               >
                 Upload Your Project
               </Link>

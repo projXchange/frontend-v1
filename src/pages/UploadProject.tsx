@@ -615,7 +615,7 @@ const UploadProject = () => {
   }
 
   const ProjectPreview = () => (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-slate-700 transition-colors">
       <div className="relative">
         {previewImage ? (
           <img src={previewImage || "/placeholder.svg"} alt="Preview" className="w-full h-48 object-cover" />
@@ -641,8 +641,8 @@ const UploadProject = () => {
         </div>
       </div>
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{formData.title || "Your Project Title"}</h3>
-        <p className="text-gray-600 mb-4 line-clamp-2">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">{formData.title || "Your Project Title"}</h3>
+        <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-4 line-clamp-2">
           {formData.description || "Your project description will appear here..."}
         </p>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -657,9 +657,9 @@ const UploadProject = () => {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gray-900">₹{formData.price || "0"}</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{formData.price || "0"}</span>
             {formData.originalPrice && (
-              <span className="text-lg text-gray-500 line-through">₹{formData.originalPrice}</span>
+              <span className="text-lg text-gray-500 dark:text-gray-400 line-through">₹{formData.originalPrice}</span>
             )}
           </div>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">View Details</button>
@@ -676,7 +676,7 @@ const UploadProject = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-4 sm:py-6 md:py-8 lg:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-4 sm:py-6 md:py-8 lg:py-8 transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-10 md:mb-12 animate-slideInDown">
@@ -684,10 +684,10 @@ const UploadProject = () => {
             <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Share Your Amazing Project
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 text-balance">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 sm:mb-4 md:mb-6 text-balance">
             Upload Your Project
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-2 sm:px-4">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-3xl mx-auto px-2 sm:px-4">
             Share your work with the community and help fellow developers learn from your expertise
           </p>
         </div>
@@ -701,7 +701,7 @@ const UploadProject = () => {
                   <div
                     className={`flex items-center gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${currentStep >= step.id
                       ? "bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg scale-100 sm:scale-105"
-                      : "bg-white text-gray-600 shadow-md"
+                      : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 dark:text-gray-300 shadow-md"
                       }`}
                   >
                     <step.icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -722,19 +722,19 @@ const UploadProject = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 border border-white/20 animate-slideInLeft">
+            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 border border-white/20 dark:border-slate-700/30 animate-slideInLeft transition-colors">
               <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                 {/* Step 1: Basic Information */}
                 {currentStep === 1 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8 flex items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
                       <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                       Basic Information
                     </h2>
 
                     <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           Project Title *
                         </label>
                         <input
@@ -743,7 +743,7 @@ const UploadProject = () => {
                           value={formData.title}
                           onChange={handleInputChange}
                           placeholder="Enter an engaging project title"
-                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200 ${errors.title ? "border-red-300 bg-red-50" : "border-gray-300"
+                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 transition-all duration-200 ${errors.title ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                             }`}
                         />
                         {errors.title && (
@@ -756,14 +756,14 @@ const UploadProject = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Category *
                           </label>
                           <select
                             name="category"
                             value={formData.category}
                             onChange={handleInputChange}
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           >
                             <option value="">Select a category</option>
                             {categories.map((category) => (
@@ -775,14 +775,14 @@ const UploadProject = () => {
                         </div>
 
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Difficulty Level
                           </label>
                           <select
                             name="difficulty"
                             value={formData.difficulty}
                             onChange={handleInputChange}
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           >
                             {difficulties.map((difficulty) => (
                               <option key={difficulty} value={difficulty}>
@@ -795,7 +795,7 @@ const UploadProject = () => {
 
                       {/* Requirements: System Requirements */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
                           System Requirements
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -810,7 +810,7 @@ const UploadProject = () => {
                                 value={req}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "systemRequirements")}
                                 placeholder="e.g., Windows 10, 8GB RAM"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.systemRequirements.length > 1 && (
                                 <button
@@ -836,7 +836,7 @@ const UploadProject = () => {
 
                       {/* Requirements: Dependencies */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
                           Dependencies
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -851,7 +851,7 @@ const UploadProject = () => {
                                 value={dep}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "dependenciesArr")}
                                 placeholder="e.g., Node 18, MongoDB, Redis"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.dependenciesArr.length > 1 && (
                                 <button
@@ -877,7 +877,7 @@ const UploadProject = () => {
 
                       {/* Requirements: Installation Steps */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
                           Installation Steps
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -892,7 +892,7 @@ const UploadProject = () => {
                                 value={step}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "installationSteps")}
                                 placeholder="e.g., Clone repo, Install deps, Run app"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.installationSteps.length > 1 && (
                                 <button
@@ -917,9 +917,9 @@ const UploadProject = () => {
                       </div>
 
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           Project Description *
-                          <span className="text-gray-500 font-normal ml-2 text-xs sm:text-sm">
+                          <span className="text-gray-500 dark:text-gray-400 font-normal ml-2 text-xs sm:text-sm">
                             ({formData.description.length}/500 characters)
                           </span>
                         </label>
@@ -930,7 +930,7 @@ const UploadProject = () => {
                           rows={5}
                           maxLength={500}
                           placeholder="Describe your project, what it does, what makes it special, and what others can learn from it..."
-                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200 resize-none ${errors.description ? "border-red-300 bg-red-50" : "border-gray-300"
+                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 transition-all duration-200 resize-none ${errors.description ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                             }`}
                         />
                         {errors.description && (
@@ -947,7 +947,7 @@ const UploadProject = () => {
                 {/* Step 2: Features & Tech Stack */}
                 {currentStep === 2 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8 flex items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
                       <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                       Project Details
                     </h2>
@@ -955,7 +955,7 @@ const UploadProject = () => {
                     <div className="space-y-6 sm:space-y-8">
                       {/* Features */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
                           Key Features
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -970,7 +970,7 @@ const UploadProject = () => {
                                 value={feature}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "features")}
                                 placeholder="Enter a key feature"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.features.length > 1 && (
                                 <button
@@ -996,7 +996,7 @@ const UploadProject = () => {
 
                       {/* Tech Stack */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
                           Technology Stack
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -1011,7 +1011,7 @@ const UploadProject = () => {
                                 value={tech}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "techStack")}
                                 placeholder="e.g., React, Node.js, MongoDB"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.techStack.length > 1 && (
                                 <button
@@ -1038,7 +1038,7 @@ const UploadProject = () => {
                       {/* URLs */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             GitHub Repository URL
                           </label>
                           <input
@@ -1047,7 +1047,7 @@ const UploadProject = () => {
                             value={formData.githubUrl}
                             onChange={handleInputChange}
                             placeholder="https://github.com/username/repo"
-                            className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.githubUrl ? "border-red-300 bg-red-50" : "border-gray-300"
+                            className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 ${errors.githubUrl ? "border-red-300 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                               }`}
                           />
                           {errors.githubUrl && (
@@ -1056,7 +1056,7 @@ const UploadProject = () => {
                         </div>
 
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Live Demo URL
                           </label>
                           <input
@@ -1065,7 +1065,7 @@ const UploadProject = () => {
                             value={formData.liveDemo}
                             onChange={handleInputChange}
                             placeholder="https://your-demo.vercel.app"
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           />
                         </div>
                       </div>
@@ -1076,7 +1076,7 @@ const UploadProject = () => {
                 {/* Step 3: Media & Files */}
                 {currentStep === 3 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8 flex items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
                       <Video className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                       Media & Files
                     </h2>
@@ -1084,7 +1084,7 @@ const UploadProject = () => {
                     <div className="space-y-6 sm:space-y-8">
                       {/* 1. Thumbnail Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           Project Thumbnail * (Single Image)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
@@ -1110,7 +1110,7 @@ const UploadProject = () => {
                           ) : (
                             <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-blue-400 transition-colors">
                               <ImageIcon className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
-                              <p className="text-xs sm:text-base text-gray-600 mb-3 sm:mb-4">
+                              <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
                                 Upload a thumbnail for your project
                               </p>
                               <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1140,13 +1140,13 @@ const UploadProject = () => {
 
                       {/* 2. Multiple Images Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           Project Screenshots (Multiple Images)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-blue-400 transition-colors">
                             <ImageIcon className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
-                            <p className="text-xs sm:text-base text-gray-600 mb-3 sm:mb-4">
+                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
                               Upload multiple screenshots of your project
                             </p>
                             <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1175,7 +1175,7 @@ const UploadProject = () => {
                           {/* Display Selected Images */}
                           {uploadedFiles.filter((f) => f.type.startsWith("image/")).length > 0 && (
                             <div className="space-y-2 sm:space-y-3">
-                              <h4 className="font-semibold text-xs sm:text-base text-gray-900">
+                              <h4 className="font-semibold text-xs sm:text-base text-gray-900 dark:text-gray-100">
                                 Selected Images ({uploadedFiles.filter((f) => f.type.startsWith("image/")).length}):
                               </h4>
                               <div className="space-y-1.5 sm:space-y-2">
@@ -1185,14 +1185,14 @@ const UploadProject = () => {
                                   .map(({ file, index }) => (
                                     <div
                                       key={index}
-                                      className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl"
+                                      className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl"
                                     >
                                       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                                         <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex-shrink-0 flex items-center justify-center">
                                           <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                                         </div>
                                         <div className="min-w-0">
-                                          <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">
                                             {file.name}
                                           </p>
                                           <p className="text-xs text-gray-500">
@@ -1217,14 +1217,14 @@ const UploadProject = () => {
 
                       {/* 3. Source Files Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           Source Files (ZIP, RAR, etc.)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-purple-400 transition-colors">
                             <FileText className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
                             <p className="text-xs sm:text-base text-red-600 mb-2 sm:mb-4">a maximum size of 10 MB.</p>
-                            <p className="text-xs sm:text-base text-gray-600 mb-3 sm:mb-4">
+                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
                               Upload source code archives (.zip, .rar, .7z, .tar, .gz)
                             </p>
                             <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1260,7 +1260,7 @@ const UploadProject = () => {
                               f.name.endsWith(".gz"),
                           ).length > 0 && (
                               <div className="space-y-2 sm:space-y-3">
-                                <h4 className="font-semibold text-xs sm:text-base text-gray-900">
+                                <h4 className="font-semibold text-xs sm:text-base text-gray-900 dark:text-gray-100">
                                   Selected Source Files (
                                   {
                                     uploadedFiles.filter(
@@ -1295,7 +1295,7 @@ const UploadProject = () => {
                                             <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                                           </div>
                                           <div className="min-w-0">
-                                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">
                                               {file.name}
                                             </p>
                                             <p className="text-xs text-gray-500">
@@ -1320,14 +1320,14 @@ const UploadProject = () => {
 
                       {/* 4. Documentation Files Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           Documentation Files (PDF, MD, DOCX, etc.)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-green-400 transition-colors">
                             <FileText className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
                             <p className="text-xs sm:text-base text-red-600 mb-2 sm:mb-4">a maximum size of 10 MB.</p>
-                            <p className="text-xs sm:text-base text-gray-600 mb-3 sm:mb-4">
+                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
                               Upload documentation files (.pdf, .md, .txt, .docx, .doc)
                             </p>
                             <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1363,7 +1363,7 @@ const UploadProject = () => {
                               f.name.endsWith(".doc"),
                           ).length > 0 && (
                               <div className="space-y-2 sm:space-y-3">
-                                <h4 className="font-semibold text-xs sm:text-base text-gray-900">
+                                <h4 className="font-semibold text-xs sm:text-base text-gray-900 dark:text-gray-100">
                                   Selected Documentation Files (
                                   {
                                     uploadedFiles.filter(
@@ -1398,7 +1398,7 @@ const UploadProject = () => {
                                             <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                                           </div>
                                           <div className="min-w-0">
-                                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">
                                               {file.name}
                                             </p>
                                             <p className="text-xs text-gray-500">
@@ -1423,7 +1423,7 @@ const UploadProject = () => {
 
                       {/* YouTube URL */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                           YouTube Demo Video URL (Optional)
                         </label>
                         <input
@@ -1432,7 +1432,7 @@ const UploadProject = () => {
                           value={formData.youtubeUrl}
                           onChange={handleInputChange}
                           placeholder="https://youtube.com/watch?v=..."
-                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.youtubeUrl ? "border-red-300 bg-red-50" : "border-gray-300"
+                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 ${errors.youtubeUrl ? "border-red-300 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                             }`}
                         />
                         {errors.youtubeUrl && (
@@ -1446,7 +1446,7 @@ const UploadProject = () => {
                 {/* Step 4: Pricing */}
                 {currentStep === 4 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8 flex items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
                       <IndianRupee className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                       Pricing Strategy
                     </h2>
@@ -1454,11 +1454,11 @@ const UploadProject = () => {
                     <div className="space-y-4 sm:space-y-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Sale Price (INR) *
                           </label>
                           <div className="relative">
-                            <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
+                            <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">
                               ₹
                             </span>
                             <input
@@ -1469,7 +1469,7 @@ const UploadProject = () => {
                               min="10"
                               max="10000"
                               placeholder="500"
-                              className={`w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${errors.price ? "border-red-300 bg-red-50" : "border-gray-300"
+                              className={`w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 ${errors.price ? "border-red-300 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                                 }`}
                             />
                           </div>
@@ -1481,11 +1481,11 @@ const UploadProject = () => {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Original Price (INR)
                           </label>
                           <div className="relative">
-                            <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
+                            <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">
                               ₹
                             </span>
                             <input
@@ -1496,7 +1496,7 @@ const UploadProject = () => {
                               min="10"
                               max="20000"
                               placeholder="800"
-                              className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                              className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                             />
                           </div>
                         </div>
@@ -1504,21 +1504,21 @@ const UploadProject = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Currency
                           </label>
                           <select
                             name="currency"
                             value={formData.currency}
                             onChange={handleInputChange}
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           >
                             <option value="INR">INR</option>
                             <option value="USD">USD</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Delivery Time (days)
                           </label>
                           <input
@@ -1529,7 +1529,7 @@ const UploadProject = () => {
                             min="0"
                             max="365"
                             placeholder="1"
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           />
                         </div>
                       </div>
@@ -1563,12 +1563,12 @@ const UploadProject = () => {
                           </div>
                         )}
 
-                      <div className="p-3 sm:p-6 bg-blue-50 rounded-lg sm:rounded-xl border border-blue-200">
-                        <h4 className="font-bold text-xs sm:text-base text-blue-900 mb-2 sm:mb-3 flex items-center gap-2">
+                      <div className="p-3 sm:p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl border border-blue-200 dark:border-blue-800">
+                        <h4 className="font-bold text-xs sm:text-base text-blue-900 dark:text-blue-300 mb-2 sm:mb-3 flex items-center gap-2">
                           <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                           Pricing Tips
                         </h4>
-                        <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-blue-800">
+                        <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-blue-800 dark:text-blue-300">
                           <li>• Research similar projects to set competitive prices</li>
                           <li>• Consider the complexity and time invested in your project</li>
                           <li>• Higher original prices can make your discount more attractive</li>
@@ -1585,7 +1585,7 @@ const UploadProject = () => {
                     <button
                       type="button"
                       onClick={() => setCurrentStep((prev) => prev - 1)}
-                      className="px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 text-xs sm:text-base text-gray-700 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                      className="px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
                     >
                       Previous
                     </button>
@@ -1638,7 +1638,7 @@ const UploadProject = () => {
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             {/* Preview Card */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight">
+            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight">
               <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 Live Preview
@@ -1648,7 +1648,7 @@ const UploadProject = () => {
 
             {/* Benefits */}
             <div
-              className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight"
+              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight"
               style={{ animationDelay: "200ms" }}
             >
               <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6">Why Upload Your Project?</h3>
@@ -1657,36 +1657,36 @@ const UploadProject = () => {
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <IndianRupee className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 font-medium">Earn money from your work</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Earn money from your work</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 font-medium">Help other developers learn</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Help other developers learn</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 font-medium">Build your reputation</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Build your reputation</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 font-medium">Secure platform & payments</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Secure platform & payments</span>
                 </div>
               </div>
             </div>
 
             {/* Guidelines */}
             <div
-              className="bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight"
+              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 animate-slideInRight"
               style={{ animationDelay: "400ms" }}
             >
               <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6">Submission Guidelines</h3>
-              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-600">
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span>Ensure your project is original and functional</span>
@@ -1711,12 +1711,12 @@ const UploadProject = () => {
         {/* Preview Modal */}
         {showPreview && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50">
-            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className="text-lg sm:text-2xl font-bold text-gray-900">Project Preview</h3>
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Project Preview</h3>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
@@ -1747,29 +1747,29 @@ const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClos
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-slideInUp">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-slideInUp">
         {/* Success Icon */}
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
           <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-center mb-4">
           Project Submitted Successfully!
         </h2>
 
         {/* Description */}
-        <p className="text-gray-600 text-center mb-6 text-sm sm:text-base">
+        <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 text-center mb-6 text-sm sm:text-base">
           Your project has been created and saved as a <span className="font-semibold text-yellow-600">draft</span>.
         </p>
 
         {/* Next Steps */}
         <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
-          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 flex items-center gap-2">
             <Clock className="w-5 h-5 text-blue-600" />
             Next Steps:
           </h3>
-          <ol className="space-y-2 text-sm text-gray-700">
+          <ol className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
             <li className="flex items-start gap-2">
               <span className="font-bold text-blue-600 flex-shrink-0">1.</span>
               <span>Go to <span className="font-semibold">My Uploads</span> in your dashboard</span>
@@ -1800,7 +1800,7 @@ const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClos
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 dark:text-gray-300 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
           >
             Upload Another
           </button>

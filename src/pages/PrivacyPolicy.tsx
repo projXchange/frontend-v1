@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-teal-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -25,13 +25,13 @@ const PrivacyPolicy = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="bg-white rounded-2xl shadow-lg p-8 space-y-8">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-8 space-y-8">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Information We Collect</h2>
-                <p className="text-gray-600 leading-relaxed mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">1. Information We Collect</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                   We collect information that you provide directly to us, including:
                 </p>
-                <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-2">
                   <li>Name, email address, and contact information</li>
                   <li>Account credentials and profile information</li>
                   <li>Payment and billing information</li>
@@ -41,11 +41,11 @@ const PrivacyPolicy = () => {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">2. How We Use Your Information</h2>
-                <p className="text-gray-600 leading-relaxed mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">2. How We Use Your Information</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                   We use the information we collect to:
                 </p>
-                <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-2">
                   <li>Provide, maintain, and improve our services</li>
                   <li>Process transactions and send related information</li>
                   <li>Send technical notices and support messages</li>
@@ -56,25 +56,25 @@ const PrivacyPolicy = () => {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Information Sharing</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">3. Information Sharing</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   We do not sell your personal information. We may share your information only in the following circumstances: with your consent, to comply with laws, to protect rights and safety, and with service providers who assist us in operating our platform.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Data Security</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">4. Data Security</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   We implement appropriate technical and organizational measures to protect your personal information. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Your Rights</h2>
-                <p className="text-gray-600 leading-relaxed mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">5. Your Rights</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                   You have the right to:
                 </p>
-                <ul className="list-disc list-inside text-gray-600 space-y-2">
+                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-2">
                   <li>Access and receive a copy of your personal data</li>
                   <li>Rectify inaccurate personal data</li>
                   <li>Request deletion of your personal data</li>
@@ -85,29 +85,29 @@ const PrivacyPolicy = () => {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Cookies</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">6. Cookies</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   We use cookies and similar tracking technologies to track activity on our service and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Children's Privacy</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">7. Children's Privacy</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   Our service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Changes to This Policy</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">8. Changes to This Policy</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Contact Us</h2>
-                <p className="text-gray-600 leading-relaxed">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">9. Contact Us</h2>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   If you have any questions about this Privacy Policy, please contact us at privacy@projxchange.in
                 </p>
               </div>

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import {
   Star,
   Calendar,
-  Settings,
   ShoppingBag,
   Heart,
   Eye,
@@ -102,14 +101,14 @@ const StudentDashboard = () => {
   })
 
   const StatCard = ({ title, value, subtitle, icon: Icon, color, trend, isLoading }: any) => (
-    <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
+    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/30 dark:border-slate-700/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 font-medium mb-1">{title}</p>
           <LoadingNumber
             value={value}
             isLoading={isLoading}
-            className="text-3xl font-bold text-gray-900 mb-1"
+            className="text-3xl font-bold text-gray-900 dark:text-white mb-1"
           />
           <p className={`text-sm font-semibold ${color}`}>{subtitle}</p>
         </div>
@@ -592,7 +591,7 @@ const StudentDashboard = () => {
   if (!user) return <p>No profile data found</p>
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-8 sm:py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
@@ -677,7 +676,7 @@ const StudentDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 mb-8">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 dark:border-slate-700/30 mb-8 transition-colors">
           <div className="border-b border-gray-200">
             <nav className="flex overflow-x-auto sm:overflow-visible sm:overflow-y-hidden space-x-2 sm:space-x-8 px-4 sm:px-8 -mx-4 sm:mx-0">
               {[
@@ -693,7 +692,7 @@ const StudentDashboard = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1 sm:gap-3 py-3 sm:py-6 px-3 sm:px-2 border-b-2 font-semibold text-xs sm:text-sm whitespace-nowrap transition-all duration-300 ${activeTab === tab.id
                     ? "border-blue-500 text-blue-600 scale-105"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:scale-105"
                     }`}
                 >
                   <tab.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -712,57 +711,57 @@ const StudentDashboard = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8">Dashboard Overview</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">Dashboard Overview</h2>
 
                 <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
                   {/* Left section (main overview cards) */}
                   <div className="lg:col-span-2 space-y-6 sm:space-y-8">
                     {/* USER PERFORMANCE */}
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-lg">
-                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3">
-                        <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-slate-700 shadow-lg">
+                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
+                        <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                         User Performance
                       </h3>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
                         <div>
-                          <p className="text-gray-500 text-xs sm:text-sm">Projects Owned</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Projects Owned</p>
                           <LoadingNumber
                             value={dashboardStats?.user_performance?.projects_owned || 0}
                             isLoading={statsLoading}
-                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                            className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div>
-                          <p className="text-gray-500 text-xs sm:text-sm">Purchases</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Purchases</p>
                           <LoadingNumber
                             value={dashboardStats?.user_performance?.total_purchases || 0}
                             isLoading={statsLoading}
-                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                            className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div>
-                          <p className="text-gray-500 text-xs sm:text-sm">Wishlist</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Wishlist</p>
                           <LoadingNumber
                             value={dashboardStats?.user_performance?.wishlist_items || 0}
                             isLoading={statsLoading}
-                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                            className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div>
-                          <p className="text-gray-500 text-xs sm:text-sm">Avg. Rating</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Avg. Rating</p>
                           <LoadingNumber
                             value={dashboardStats?.user_performance?.average_rating || 0}
                             isLoading={statsLoading}
-                            className="text-xl sm:text-2xl font-bold text-gray-900"
+                            className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100"
                           />
                         </div>
                       </div>
                     </div>
 
                     {/* MONTHLY ACTIVITY */}
-                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-6 sm:p-8 border border-blue-100 shadow-lg">
-                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3">
-                        <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-2xl p-6 sm:p-8 border border-blue-100 dark:border-slate-700 shadow-lg">
+                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
+                        <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                         Monthly Activity
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center">
@@ -794,9 +793,9 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* REVENUE & FINANCIAL */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 sm:p-8 border border-green-100 shadow-lg">
-                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3">
-                        <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 sm:p-8 border border-green-100 dark:border-slate-700 shadow-lg">
+                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
+                        <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
                         Revenue & Financial
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center">
@@ -831,9 +830,9 @@ const StudentDashboard = () => {
                   {/* Right side (secondary cards) */}
                   <div className="space-y-4 sm:space-y-6">
                     {/* PROJECT PERFORMANCE */}
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 sm:p-6 border border-purple-100 shadow-lg">
-                      <h4 className="font-bold text-purple-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-700" />
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-4 sm:p-6 border border-purple-100 dark:border-slate-700 shadow-lg">
+                      <h4 className="font-bold text-purple-900 dark:text-purple-300 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-700 dark:text-purple-400" />
                         Project Performance
                       </h4>
                       <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
@@ -873,9 +872,9 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* ENGAGEMENT METRICS */}
-                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-4 sm:p-6 border border-yellow-100 shadow-lg">
-                      <h4 className="font-bold text-yellow-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                        <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-4 sm:p-6 border border-yellow-100 dark:border-slate-700 shadow-lg">
+                      <h4 className="font-bold text-yellow-900 dark:text-yellow-300 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                        <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 dark:text-yellow-400" />
                         Engagement Metrics
                       </h4>
                       <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
@@ -921,7 +920,7 @@ const StudentDashboard = () => {
             {activeTab === "my-projects" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">My Projects</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">My Projects</h2>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                     <div className="relative flex-1 sm:flex-none">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
@@ -930,75 +929,75 @@ const StudentDashboard = () => {
                         placeholder="Search projects..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full sm:w-auto pl-10 pr-3 sm:pr-4 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full sm:w-auto pl-10 pr-3 sm:pr-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                       />
                     </div>
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="px-3 sm:px-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     >
-                      <option value="all">All Status</option>
-                      <option value="completed">Completed</option>
-                      <option value="in-progress">In Progress</option>
+                      <option value="all" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">All Status</option>
+                      <option value="completed" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Completed</option>
+                      <option value="in-progress" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">In Progress</option>
                     </select>
                   </div>
                 </div>
                 {projectsLoading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading projects...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading projects...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Title
                             </th>
-                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Category
                             </th>
-                            <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Price
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Status
                             </th>
-                            <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Created
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {filteredProjects.map((project, index) => (
                             <tr
                               key={project.id}
-                              className="hover:bg-gray-50 transition-colors animate-slideInUp"
+                              className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors animate-slideInUp"
                               style={{ animationDelay: `${index * 100}ms` }}
                             >
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                <div className="font-semibold text-gray-900 text-xs sm:text-base">{project.title}</div>
+                                <div className="font-semibold text-gray-900 dark:text-white text-xs sm:text-base">{project.title}</div>
                               </td>
-                              <th className="hidden sm:table-cell px-6 py-4 text-sm text-gray-700 text-left font-normal">
+                              <th className="hidden sm:table-cell px-6 py-4 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-300 text-left font-normal">
                                 {project.category}
                               </th>
-                              <th className="hidden md:table-cell px-6 py-4 text-sm text-gray-700 font-semibold text-left">
+                              <th className="hidden md:table-cell px-6 py-4 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-300 font-semibold text-left">
                                 ₹{project.pricing?.sale_price || 0}
                               </th>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
                                 <span
-                                  className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === "approved" ? "bg-green-100 text-green-800" : project.status === "pending_review" || project.status === "draft" ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"}`}
+                                  className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === "approved" ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" : project.status === "pending_review" || project.status === "draft" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400" : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-300"}`}
                                 >
                                   {project.status}
                                 </span>
                               </td>
-                              <th className="hidden lg:table-cell px-6 py-4 text-sm text-gray-600 text-left font-normal">
+                              <th className="hidden lg:table-cell px-6 py-4 text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 text-left font-normal">
                                 {new Date(project.created_at).toLocaleDateString()}
                               </th>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1027,7 +1026,7 @@ const StudentDashboard = () => {
                           ))}
                           {filteredProjects.length === 0 && (
                             <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
                                 No projects found.
                               </td>
                             </tr>
@@ -1042,7 +1041,7 @@ const StudentDashboard = () => {
             {activeTab === 'purchased-projects' && (
               <div className="animate-slideInUp">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">My Purchases</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Purchases</h2>
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -1051,57 +1050,57 @@ const StudentDashboard = () => {
                         placeholder="Search purchased projects..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                       />
                     </div>
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     >
-                      <option value="all">All Status</option>
-                      <option value="completed">Completed</option>
-                      <option value="in-progress">In Progress</option>
+                      <option value="all" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">All Status</option>
+                      <option value="completed" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Completed</option>
+                      <option value="in-progress" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">In Progress</option>
                     </select>
                   </div>
                 </div>
 
                 {purchasedProjectsLoading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading purchased projects...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading purchased projects...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700">
                           <tr>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Title</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Purchased On</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">Title</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">Category</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">Purchased On</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {purchasedProjects.map((project, index) => (
-                            <tr key={project.id} className="hover:bg-gray-50 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+                            <tr key={project.id} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                               <td className="px-6 py-4">
-                                <div className="font-semibold text-gray-900">{project.title}</div>
+                                <div className="font-semibold text-gray-900 dark:text-gray-100">{project.title}</div>
                               </td>
-                              <td className="px-6 py-4 text-sm text-gray-700">{project.category}</td>
-                              <td className="px-6 py-4 text-sm text-gray-700 font-semibold">₹{project.pricing?.sale_price || 0}</td>
+                              <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{project.category}</td>
+                              <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-300 font-semibold">₹{project.pricing?.sale_price || 0}</td>
                               <td className="px-6 py-4">
-                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                  project.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                                    'bg-gray-100 text-gray-800'
+                                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full ${project.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
+                                  project.status === 'in-progress' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400' :
+                                    'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-300'
                                   }`}>
                                   {project.status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-sm text-gray-600">{new Date(project.created_at).toLocaleDateString()}</td>
+                              <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{new Date(project.created_at).toLocaleDateString()}</td>
                               <td className="px-6 py-4">
                                 <Link
                                   to={`/project/${project.id}`}
@@ -1114,7 +1113,7 @@ const StudentDashboard = () => {
                           ))}
                           {purchasedProjects.length === 0 && (
                             <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">No purchased projects found.</td>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">No purchased projects found.</td>
                             </tr>
                           )}
                         </tbody>
@@ -1129,8 +1128,8 @@ const StudentDashboard = () => {
             {activeTab === "wishlist" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Wishlist</h2>
-                  <div className="text-xs sm:text-sm text-gray-600">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Wishlist</h2>
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     <span className="font-semibold">{wishlist.length}</span> items saved
                   </div>
                 </div>
@@ -1140,8 +1139,8 @@ const StudentDashboard = () => {
                       <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
                         <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                       </div>
-                      <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">No items in wishlist</h3>
-                      <p className="text-xs sm:text-base text-gray-600 mb-6 sm:mb-8">
+                      <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">No items in wishlist</h3>
+                      <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-6 sm:mb-8">
                         Start exploring projects and add them to your wishlist!
                       </p>
                       <Link
@@ -1156,7 +1155,7 @@ const StudentDashboard = () => {
                     wishlist.map((item, index) => (
                       <div
                         key={item.id}
-                        className="bg-gradient-to-br from-white to-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-gray-100 group animate-slideInUp"
+                        className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-gray-100 dark:border-slate-700 group animate-slideInUp"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="relative">
@@ -1166,12 +1165,12 @@ const StudentDashboard = () => {
                             className="w-full h-32 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                           />
                           <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
-                            <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                            <span className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold">
                               {item.project.category}
                             </span>
                           </div>
                           <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                            <button className="w-8 h-8 sm:w-10 sm:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg">
+                            <button className="w-8 h-8 sm:w-10 sm:h-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white dark:hover:bg-slate-800 hover:scale-110 transition-all duration-300 shadow-lg">
                               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 fill-current" />
                             </button>
                           </div>
@@ -1180,16 +1179,16 @@ const StudentDashboard = () => {
                           <div className="flex items-center justify-between mb-2 sm:mb-3">
                             <div className="flex items-center">
                               <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
-                              <span className="ml-1 text-xs sm:text-sm font-semibold">4.8</span>
+                              <span className="ml-1 text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">4.8</span>
                             </div>
-                            <span className="text-xs sm:text-sm text-gray-600">
+                            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                               {item.project.purchase_count || 0} sales
                             </span>
                           </div>
-                          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                             {item.project.title}
                           </h3>
-                          <div className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+                          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
                             <div className="flex items-center justify-between">
                               <span>Added:</span>
                               <span className="font-semibold">{new Date(item.added_at).toLocaleDateString()}</span>
@@ -1197,12 +1196,12 @@ const StudentDashboard = () => {
                           </div>
                           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
                             <div className="flex items-center gap-2">
-                              <span className="text-lg sm:text-2xl font-bold text-gray-900">
+                              <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 ₹{item.project.pricing?.sale_price || 0}
                               </span>
                               {item.project.pricing &&
                                 item.project.pricing.original_price > item.project.pricing.sale_price && (
-                                  <span className="text-sm sm:text-lg text-gray-500 line-through">
+                                  <span className="text-sm sm:text-lg text-gray-500 dark:text-gray-400 line-through">
                                     ₹{item.project.pricing.original_price}
                                   </span>
                                 )}
@@ -1221,7 +1220,7 @@ const StudentDashboard = () => {
                             >
                               View Details
                             </Link>
-                            <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:scale-105 transition-all duration-200">
+                            <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-xl text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-900 hover:scale-105 transition-all duration-200">
                               <Eye className="w-4 h-4 mx-auto" />
                             </button>
                           </div>
@@ -1236,7 +1235,7 @@ const StudentDashboard = () => {
             {activeTab === "reviews" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                     <MessageSquare className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
                     My Reviews
                   </h2>
@@ -1248,67 +1247,67 @@ const StudentDashboard = () => {
                         placeholder="Search reviews..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full sm:w-auto pl-10 pr-3 sm:pr-4 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full sm:w-auto pl-10 pr-3 sm:pr-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                       />
                     </div>
                     <select
                       value={reviewFilterStatus}
                       onChange={(e) => setReviewFilterStatus(e.target.value)}
-                      className="px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="px-3 sm:px-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     >
-                      <option value="all">All Reviews</option>
-                      <option value="approved">Approved</option>
-                      <option value="pending">Pending</option>
+                      <option value="all" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">All Reviews</option>
+                      <option value="approved" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Approved</option>
+                      <option value="pending" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Pending</option>
                     </select>
                   </div>
                 </div>
 
                 {loading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading reviews...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading reviews...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Review
                             </th>
-                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Project Name
                             </th>
-                            <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Rating
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Status
                             </th>
-                            <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Date
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {filteredReviews.map((review, index) => (
                             <tr
                               key={review.id}
-                              className="hover:bg-gray-50 transition-colors animate-slideInUp"
+                              className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors animate-slideInUp"
                               style={{ animationDelay: `${index * 100}ms` }}
                             >
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
                                 <div className="max-w-xs">
-                                  <p className="text-xs sm:text-sm text-gray-900 font-medium line-clamp-2">
+                                  <p className="text-xs sm:text-sm text-gray-900 dark:text-white font-medium line-clamp-2">
                                     {review.review_text}
                                   </p>
                                 </div>
                               </td>
-                              <th className="hidden sm:table-cell px-6 py-4 text-sm text-gray-600 font-medium text-left">
+                              <th className="hidden sm:table-cell px-6 py-4 text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 font-medium text-left">
                                 {review.project.title}
                               </th>
                               <th className="hidden md:table-cell px-6 py-4 text-left font-normal">
@@ -1320,7 +1319,7 @@ const StudentDashboard = () => {
                                         }`}
                                     />
                                   ))}
-                                  <span className="ml-2 text-xs sm:text-sm font-semibold text-gray-700">
+                                  <span className="ml-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                                     {review.rating}/5
                                   </span>
                                 </div>
@@ -1333,7 +1332,7 @@ const StudentDashboard = () => {
                                   {review.is_approved ? "Approved" : "Pending"}
                                 </span>
                               </td>
-                              <th className="hidden lg:table-cell px-6 py-4 text-sm text-gray-600 font-medium text-left">
+                              <th className="hidden lg:table-cell px-6 py-4 text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 font-medium text-left">
                                 {new Date(review.created_at).toLocaleDateString()}
                               </th>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1363,7 +1362,7 @@ const StudentDashboard = () => {
                           ))}
                           {filteredReviews.length === 0 && (
                             <tr>
-                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
                                 {reviews.length === 0 ? "No reviews found." : "No reviews match your filters."}
                               </td>
                             </tr>
@@ -1379,58 +1378,58 @@ const StudentDashboard = () => {
             {activeTab === "transactions" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                     <Clock className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
                     Transactions
                   </h2>
                 </div>
                 {transactionsLoading ? (
-                  <div className="bg-white rounded-2xl p-8 text-center">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading transactions...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading transactions...</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs sm:text-sm">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700">
                           <tr>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Txn ID
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Project
                             </th>
-                            <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Amount
                             </th>
-                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Type
                             </th>
-                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Status
                             </th>
-                            <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Method
                             </th>
-                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                            <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 dark:text-gray-400 uppercase tracking-wider">
                               Date
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {transactions.map((txn, index) => (
                             <tr
                               key={txn.id}
-                              className="hover:bg-gray-50 transition-colors animate-slideInUp"
+                              className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors animate-slideInUp"
                               style={{ animationDelay: `${index * 100}ms` }}
                             >
-                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-gray-900">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">
                                 {txn.transaction_id}
                               </td>
-                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-700">
+                              <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                                 <div className="flex items-center gap-2 sm:gap-3">
-                                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+                                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 dark:bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
                                     {txn.project?.thumbnail ? (
                                       <img
                                         src={txn.project.thumbnail || "/placeholder.svg"}
@@ -1442,17 +1441,17 @@ const StudentDashboard = () => {
                                     )}
                                   </div>
                                   <div className="min-w-0">
-                                    <div className="font-semibold text-gray-900 truncate">
+                                    <div className="font-semibold text-gray-900 dark:text-white truncate">
                                       {txn.project?.title || "-"}
                                     </div>
-                                    <div className="text-xs text-gray-500 hidden sm:block">{txn.project?.id}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">{txn.project?.id}</div>
                                   </div>
                                 </div>
                               </td>
-                              <th className="hidden md:table-cell px-6 py-4 text-xs sm:text-sm text-gray-700 font-semibold text-left">
+                              <th className="hidden md:table-cell px-6 py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300 dark:text-gray-300 font-semibold text-left">
                                 {txn.amount} {txn.currency}
                               </th>
-                              <th className="hidden sm:table-cell px-6 py-4 text-xs sm:text-sm text-gray-700 text-left font-normal">
+                              <th className="hidden sm:table-cell px-6 py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300 dark:text-gray-300 text-left font-normal">
                                 {txn.type}
                               </th>
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1467,17 +1466,17 @@ const StudentDashboard = () => {
                                   {txn.status}
                                 </span>
                               </td>
-                              <th className="hidden lg:table-cell px-6 py-4 text-xs sm:text-sm text-gray-700 text-left font-normal">
+                              <th className="hidden lg:table-cell px-6 py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300 dark:text-gray-300 text-left font-normal">
                                 {txn.payment_method}
                               </th>
-                              <th className="hidden sm:table-cell px-6 py-4 text-xs sm:text-sm text-gray-600 text-left font-normal">
+                              <th className="hidden sm:table-cell px-6 py-4 text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 text-left font-normal">
                                 {new Date(txn.processed_at || txn.created_at).toLocaleDateString()}
                               </th>
                             </tr>
                           ))}
                           {transactions.length === 0 && (
                             <tr>
-                              <td colSpan={7} className="px-6 py-8 text-center text-gray-600">
+                              <td colSpan={7} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
                                 No transactions found.
                               </td>
                             </tr>
@@ -1505,16 +1504,16 @@ const StudentDashboard = () => {
                 {isLoading && (
                   <div className="flex items-center justify-center py-8">
                     <Loader className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600" />
-                    <span className="ml-2 text-sm sm:text-base text-gray-600">Loading profile...</span>
+                    <span className="ml-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading profile...</span>
                   </div>
                 )}
 
                 {/* Profile Header */}
-                <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
+                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-8">
                     <div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Profile Settings</h2>
-                      <p className="text-sm sm:text-base text-gray-600">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">Profile Settings</h2>
+                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                         Manage your account information and preferences
                       </p>
                     </div>
@@ -1568,7 +1567,7 @@ const StudentDashboard = () => {
                       />
                       {isEditingProfile && (
                         <div className="mt-4 w-full">
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">Profile Picture</label>
+                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">Profile Picture</label>
                           <input
                             type="file"
                             accept="image/*"
@@ -1582,14 +1581,14 @@ const StudentDashboard = () => {
                               }
                               reader.readAsDataURL(file)
                             }}
-                            className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                            className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                           />
                           {(avatarPreview || profileForm.avatar) && (
                             <div className="flex items-center gap-3 mt-3">
                               <button
                                 type="button"
                                 onClick={handleAvatarClear}
-                                className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-100 rounded-lg hover:bg-gray-200"
+                                className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200"
                               >
                                 Remove
                               </button>
@@ -1599,9 +1598,9 @@ const StudentDashboard = () => {
                       )}
                     </div>
                     <div className="flex-1 text-center sm:text-left">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">{user?.full_name}</h2>
-                      <p className="text-gray-600 mb-4 text-sm">{user?.email}</p>
-                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">{user?.full_name}</h2>
+                      <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-4 text-sm">{user?.email}</p>
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <div className="flex items-center gap-2">
                           <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
                           <span className="font-semibold">
@@ -1629,10 +1628,10 @@ const StudentDashboard = () => {
                   <div className="mt-8 space-y-6 sm:space-y-8">
                     {/* Basic Information */}
                     <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Basic Information</h3>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Basic Information</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Bio
                           </label>
                           <textarea
@@ -1641,12 +1640,12 @@ const StudentDashboard = () => {
                             onChange={(e) => handleInputChange("bio", e.target.value)}
                             disabled={!isEditingProfile}
                             placeholder="Tell us about yourself..."
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                           />
                         </div>
                         <div className="space-y-4 sm:space-y-6">
                           <div>
-                            <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                               Location
                             </label>
                             <div className="relative">
@@ -1657,12 +1656,12 @@ const StudentDashboard = () => {
                                 onChange={(e) => handleInputChange("location", e.target.value)}
                                 disabled={!isEditingProfile}
                                 placeholder="Your location"
-                                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                               />
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                               Website
                             </label>
                             <div className="relative">
@@ -1673,7 +1672,7 @@ const StudentDashboard = () => {
                                 onChange={(e) => handleInputChange("website", e.target.value)}
                                 disabled={!isEditingProfile}
                                 placeholder="https://yourwebsite.com"
-                                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                               />
                             </div>
                           </div>
@@ -1683,38 +1682,38 @@ const StudentDashboard = () => {
 
                     {/* Professional Information */}
                     <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
                         Professional Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Experience Level
                           </label>
                           <select
                             value={profileForm.experience_level}
                             onChange={(e) => handleInputChange("experience_level", e.target.value)}
                             disabled={!isEditingProfile}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                           >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                            <option value="expert">Expert</option>
+                            <option value="beginner" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Beginner</option>
+                            <option value="intermediate" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Intermediate</option>
+                            <option value="advanced" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Advanced</option>
+                            <option value="expert" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Expert</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
                             Account Status
                           </label>
                           <select
                             value={profileForm.status}
                             onChange={(e) => handleInputChange("status", e.target.value)}
                             disabled={!isEditingProfile}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                           >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                            <option value="active" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Active</option>
+                            <option value="inactive" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Inactive</option>
                           </select>
                         </div>
                       </div>
@@ -1722,7 +1721,7 @@ const StudentDashboard = () => {
 
                     {/* Skills */}
                     <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Skills</h3>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Skills</h3>
                       <div className="space-y-3 sm:space-y-4">
                         <div className="flex flex-wrap gap-2">
                           {profileForm.skills.map((skill, index) => (
@@ -1750,7 +1749,7 @@ const StudentDashboard = () => {
                               value={newSkill}
                               onChange={(e) => setNewSkill(e.target.value)}
                               placeholder="Add a skill"
-                              className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                              className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                   e.preventDefault()
@@ -1772,17 +1771,17 @@ const StudentDashboard = () => {
 
                     {/* Social Links */}
                     <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Social Links</h3>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Social Links</h3>
                       <div className="space-y-3 sm:space-y-4">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                          <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 mt-2.5 sm:mt-0 flex-shrink-0" />
+                          <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300 dark:text-gray-300 mt-2.5 sm:mt-0 flex-shrink-0" />
                           <input
                             type="url"
                             value={profileForm.social_links.github}
                             onChange={(e) => handleSocialLinkChange("github", e.target.value)}
                             disabled={!isEditingProfile}
                             placeholder="https://github.com/username"
-                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                           />
                         </div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
@@ -1793,7 +1792,7 @@ const StudentDashboard = () => {
                             onChange={(e) => handleSocialLinkChange("linkedin", e.target.value)}
                             disabled={!isEditingProfile}
                             placeholder="https://linkedin.com/in/username"
-                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                           />
                         </div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
@@ -1804,7 +1803,7 @@ const StudentDashboard = () => {
                             onChange={(e) => handleSocialLinkChange("twitter", e.target.value)}
                             disabled={!isEditingProfile}
                             placeholder="https://twitter.com/username"
-                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50"
+                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
                           />
                         </div>
                       </div>
@@ -1813,8 +1812,8 @@ const StudentDashboard = () => {
                 </div>
 
                 {/* Statistics */}
-                <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Account Statistics</h3>
+                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Account Statistics</h3>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 sm:p-6 text-center">
                       <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2">

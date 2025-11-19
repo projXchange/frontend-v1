@@ -50,7 +50,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
     >
       <Link
         to={`/project/${project.id}`}
-        className="group bg-white/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative flex flex-col w-full h-full min-h-[500px]"
+        className="group bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl overflow-hidden shadow-md hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 border border-gray-100 dark:border-slate-700 relative flex flex-col w-full h-full min-h-[500px]"
       >
         {/* Image */}
         <div className="relative overflow-hidden">
@@ -87,7 +87,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInWishlist(project.id) ? "hover:bg-red-100 text-red-500" : "hover:bg-pink-100 text-pink-500"
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInWishlist(project.id) ? "hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400" : "hover:bg-pink-100 dark:hover:bg-pink-900/30 text-pink-500 dark:text-pink-400"
               }`}
             title={isInWishlist(project.id) ? "Remove from wishlist" : "Add to wishlist"}
             type="button"
@@ -115,7 +115,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInCart(project.id) ? "hover:bg-green-100 text-green-500" : "hover:bg-blue-100 text-blue-500"
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInCart(project.id) ? "hover:bg-green-100 dark:hover:bg-green-900/30 text-green-500 dark:text-green-400" : "hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500 dark:text-blue-400"
               }`}
             title={isInCart(project.id) ? "Remove from cart" : "Add to cart"}
             type="button"
@@ -148,32 +148,32 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
           viewport={{ once: true }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium w-fit">
+            <span className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium w-fit">
               {project.category}
             </span>
             <div className="flex items-center text-xs sm:text-sm">
               <Star className="w-3 sm:w-4 h-3 sm:h-4 text-yellow-400 fill-yellow-400" />
-              <span className="ml-1 font-semibold text-gray-800">{project.rating?.average_rating || 0.0}</span>
-              <span className="ml-1 text-gray-500">
+              <span className="ml-1 font-semibold text-gray-800 dark:text-gray-200">{project.rating?.average_rating || 0.0}</span>
+              <span className="ml-1 text-gray-500 dark:text-gray-400">
                 ({project.rating?.total_ratings || 0} {(project.rating?.total_ratings || 0) === 1 ? 'review' : 'reviews'})
               </span>
             </div>
           </div>
 
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition line-clamp-2">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-2">
             {project.title}
           </h3>
           <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
             {project.tech_stack.slice(0, 3).map((tech: string, i: number) => (
               <span
                 key={i}
-                className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-medium"
+                className="flex items-center gap-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium"
               >
                 <Tag className="w-3 h-3" /> <span className="hidden sm:inline">{tech}</span>
               </span>
             ))}
             {project.tech_stack.length > 3 && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+              <span className="px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 rounded-full text-xs">
                 +{project.tech_stack.length - 3}
               </span>
             )}
@@ -181,21 +181,21 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
             <div className="flex items-center space-x-2">
-              <span className="text-base sm:text-lg font-bold text-gray-900">₹{project.pricing?.sale_price || 0}</span>
+              <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">₹{project.pricing?.sale_price || 0}</span>
               {discount && project.pricing?.original_price && (
-                <span className="text-xs sm:text-sm text-gray-500 line-through">₹{project.pricing.original_price}</span>
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-through">₹{project.pricing.original_price}</span>
               )}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600">{project.purchase_count} sales</div>
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{project.purchase_count} sales</div>
           </div>
-          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
+          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
             {project.description.length > 100 ? `${project.description.substring(0, 100)}...` : project.description}
           </p>
           <div className="text-center">
 
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white rounded-full text-sm sm:text-base font-semibold shadow"
+              className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-teal-500 dark:from-blue-500 dark:to-teal-400 hover:from-blue-700 hover:to-teal-600 dark:hover:from-blue-600 dark:hover:to-teal-500 text-white rounded-full text-sm sm:text-base font-semibold shadow"
             >
               View Details
             </motion.div>

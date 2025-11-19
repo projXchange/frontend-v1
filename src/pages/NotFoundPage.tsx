@@ -53,7 +53,7 @@ export default function NotFoundPage() {
         >
           <button
             onClick={() => navigate("/")}
-            className="group inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 rounded-xl font-semibold text-lg hover:bg-blue-100 shadow-md transition transform hover:scale-105"
+            className="group inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-slate-800 text-blue-900 dark:text-gray-100 rounded-xl font-semibold text-lg hover:bg-blue-100 dark:hover:bg-slate-700 shadow-md transition transform hover:scale-105"
           >
             <Home className="mr-2 w-5 h-5 transition-transform group-hover:-translate-x-1" />
             Back to Home
@@ -61,7 +61,7 @@ export default function NotFoundPage() {
 
           <Link
             to="/projects"
-            className="group inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-900 transition transform hover:scale-105"
+            className="group inline-flex items-center justify-center px-8 py-4 border-2 border-white dark:border-slate-600 text-white rounded-xl font-semibold text-lg hover:bg-white dark:hover:bg-slate-800 hover:text-blue-900 dark:hover:text-gray-100 transition transform hover:scale-105"
           >
             <Compass className="mr-2 w-5 h-5 transition-transform group-hover:rotate-12" />
             Explore Projects

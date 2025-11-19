@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -28,11 +29,12 @@ import EmailVerification from './pages/EmailVerification';
 
 function App() {
   return (
-    <AuthProvider>
-      <Toaster position="top-right" reverseOrder={false} />
-      <Router>
-        <ScrollToTop />
-        <Layout>
+    <ThemeProvider>
+      <AuthProvider>
+        <Toaster position="top-right" reverseOrder={false} />
+        <Router>
+          <ScrollToTop />
+          <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
@@ -87,7 +89,8 @@ function App() {
           </Routes>
         </Layout>
       </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

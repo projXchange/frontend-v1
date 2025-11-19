@@ -411,10 +411,10 @@ const ProjectDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-3 sm:px-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center px-3 sm:px-4 transition-colors">
         <div className="text-center">
           <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 text-base sm:text-lg">Loading project details...</p>
+          <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 text-base sm:text-lg">Loading project details...</p>
         </div>
       </div>
     )
@@ -422,13 +422,13 @@ const ProjectDetail = () => {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-3 sm:px-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center px-3 sm:px-4 transition-colors">
         <div className="text-center max-w-md">
           <div className="w-14 h-14 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-red-500 text-xl sm:text-2xl">!</span>
           </div>
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Project Not Found</h2>
-          <p className="text-gray-600 mb-4 text-center text-sm sm:text-base">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">Project Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-4 text-center text-sm sm:text-base">
             {error || "The project you are looking for does not exist."}
           </p>
           <Link
@@ -496,11 +496,11 @@ const ProjectDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 py-3 sm:py-6 lg:py-8 animate-fadeIn">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-3 sm:py-6 lg:py-8 animate-fadeIn transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Breadcrumb - improved mobile padding */}
         <div className="mb-3 sm:mb-6 animate-slideInDown">
-          <nav className="flex flex-wrap text-xs sm:text-sm text-gray-500 gap-1">
+          <nav className="flex flex-wrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 gap-1">
             <Link to="/" className="hover:text-blue-600 transition-colors duration-200 whitespace-nowrap">
               Home
             </Link>
@@ -509,7 +509,7 @@ const ProjectDetail = () => {
               Projects
             </Link>
             <span className="mx-1">/</span>
-            <span className="text-gray-900 font-medium truncate">{project.title}</span>
+            <span className="text-gray-900 dark:text-gray-100 dark:text-gray-100 font-medium truncate">{project.title}</span>
           </nav>
         </div>
 
@@ -517,7 +517,7 @@ const ProjectDetail = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 order-1 lg:order-1">
             {/* Project Header */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl mb-4 sm:mb-6 lg:mb-10 border border-white/30 animate-slideInLeft">
+            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl mb-4 sm:mb-6 lg:mb-10 border border-white/30 dark:border-slate-700/30 animate-slideInLeft transition-colors">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2 sm:gap-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-3 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-700 rounded-full text-xs sm:text-sm font-bold shadow-sm animate-slideInUp">
@@ -542,14 +542,14 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-1 sm:gap-4 justify-start">
                   <button
                     onClick={handleToggleWishlist}
-                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
                     style={{ animationDelay: "200ms" }}
                   >
                     <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistStatus ? "text-red-500 fill-current" : ""}`} />
                     <span className="font-medium sm:inline">{wishlistStatus ? "Wishlisted" : "Wishlist"}</span>
                   </button>
                   <button
-                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
                     style={{ animationDelay: "300ms" }}
                   >
                     <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -558,13 +558,13 @@ const ProjectDetail = () => {
                 </div>
               </div>
               <h1
-                className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-6 animate-slideInUp leading-tight"
+                className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 sm:mb-6 animate-slideInUp leading-tight"
                 style={{ animationDelay: "400ms" }}
               >
                 {project.title}
               </h1>
               <div
-                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 mb-4 sm:mb-8 animate-slideInUp"
+                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-4 sm:mb-8 animate-slideInUp"
                 style={{ animationDelay: "500ms" }}
               >
                 <div className="flex items-center gap-2">
@@ -663,7 +663,7 @@ const ProjectDetail = () => {
                   {/* Content - Shows on hover/touch */}
                   <div className="absolute inset-0 flex items-center justify-center text-center z-10 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div>
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-md rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-white/30 animate-pulse">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 dark:bg-slate-800/40 backdrop-blur-md rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-white/30 dark:border-slate-600/30 animate-pulse">
                         <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
                       <h4 className="text-base sm:text-lg font-bold text-white mb-2">Video Tutorial Available</h4>
@@ -717,7 +717,7 @@ const ProjectDetail = () => {
                   <button
                     onClick={handleToggleCart}
                     disabled={actionLoading}
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 rounded-xl border-2 border-dashed border-gray-300 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-700 text-gray-600 dark:text-gray-300 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
                   >
                     <Lock className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
                     <span>GitHub Code</span>
@@ -739,7 +739,7 @@ const ProjectDetail = () => {
                   <button
                     onClick={handleToggleCart}
                     disabled={actionLoading}
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 rounded-xl border-2 border-dashed border-gray-300 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 transition-all"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-700 text-gray-600 dark:text-gray-300 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
                   >
                     <Lock className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
                     <span>Video Tutorial</span>
@@ -749,7 +749,7 @@ const ProjectDetail = () => {
 
               {/* Tabs - improved responsive tab navigation */}
               <div
-                className="border-b border-gray-200 mb-4 sm:mb-2 animate-slideInUp overflow-x-auto scrollbar-hide px-2"
+                className="border-b border-gray-200 dark:border-slate-700 mb-4 sm:mb-2 animate-slideInUp overflow-x-auto scrollbar-hide px-2"
                 style={{ animationDelay: "700ms" }}
               >
                 <nav className="flex gap-3 sm:gap-4 lg:gap-8 min-w-max">
@@ -759,7 +759,7 @@ const ProjectDetail = () => {
                       onClick={() => setActiveTab(tab)}
                       className={`py-2 sm:py-3 lg:py-4 px-3 border-b-2 font-semibold text-sm transition-all duration-200 whitespace-nowrap ${activeTab === tab
                         ? "border-blue-500 text-blue-600 scale-105"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:scale-105"
+                        : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:scale-105"
                         }`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -779,15 +779,15 @@ const ProjectDetail = () => {
               <div className="min-h-[250px] sm:min-h-[350px] animate-slideInUp" style={{ animationDelay: "800ms" }}>
                 {activeTab === "description" && (
                   <div>
-                    <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6 animate-slideInUp">About This Project</h3>
+                    <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6 animate-slideInUp text-gray-900 dark:text-white">About This Project</h3>
                     <p
-                      className="text-gray-700 leading-relaxed mb-4 sm:mb-8 text-sm sm:text-base animate-slideInUp"
+                      className="text-gray-700 dark:text-gray-300 dark:text-gray-300 leading-relaxed mb-4 sm:mb-8 text-sm sm:text-base animate-slideInUp"
                       style={{ animationDelay: "100ms" }}
                     >
                       {project.description}
                     </p>
                     <h4
-                      className="text-base sm:text-xl font-bold mb-2 sm:mb-4 animate-slideInUp"
+                      className="text-base sm:text-xl font-bold mb-2 sm:mb-4 animate-slideInUp text-gray-900 dark:text-white"
                       style={{ animationDelay: "200ms" }}
                     >
                       Tech Stack
@@ -796,7 +796,7 @@ const ProjectDetail = () => {
                       {Array.isArray(project.tech_stack) && project.tech_stack.map((tech, index) => (
                         <span
                           key={index}
-                          className="px-2 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-800 rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
+                          className="px-2 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-blue-100 to-teal-100 dark:from-blue-900/30 dark:to-teal-900/30 text-blue-800 dark:text-blue-300 rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
                           style={{ animationDelay: `${300 + index * 80}ms` }}
                         >
                           {tech}
@@ -806,7 +806,7 @@ const ProjectDetail = () => {
                     {project?.tech_stack && project.tech_stack.length > 0 && (
                       <>
                         <h4
-                          className="text-base sm:text-xl font-bold mb-2 sm:mb-4 mt-4 sm:mt-8 animate-slideInUp"
+                          className="text-base sm:text-xl font-bold mb-2 sm:mb-4 mt-4 sm:mt-8 animate-slideInUp text-gray-900 dark:text-white"
                           style={{ animationDelay: "400ms" }}
                         >
                           Tags
@@ -815,7 +815,7 @@ const ProjectDetail = () => {
                           {project.tech_stack.map((tag, index) => (
                             <span
                               key={index}
-                              className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs sm:text-sm animate-slideInUp"
+                              className="px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 dark:text-gray-300 rounded-lg text-xs sm:text-sm animate-slideInUp"
                               style={{ animationDelay: `${500 + index * 50}ms` }}
                             >
                               #{tag}
@@ -829,24 +829,24 @@ const ProjectDetail = () => {
 
                 {activeTab === "features" && (
                   <div>
-                    <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6 animate-slideInUp">Key Features</h3>
+                    <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6 animate-slideInUp text-gray-900 dark:text-white">Key Features</h3>
                     {project?.key_features && project.key_features.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                         {project.key_features &&
                           project.key_features.split(",").map((feature: string, index: number) => (
                             <div
                               key={index}
-                              className="flex items-center gap-2 sm:gap-4 p-2 sm:p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl border border-blue-100 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
+                              className="flex items-center gap-2 sm:gap-4 p-2 sm:p-4 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-xl border border-blue-100 dark:border-slate-700 hover:shadow-md hover:scale-105 transition-all duration-200 animate-slideInUp"
                               style={{ animationDelay: `${100 + index * 80}ms` }}
                             >
                               <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full animate-pulse flex-shrink-0" />
-                              <span className="text-gray-800 font-medium text-xs sm:text-base">{feature.trim()}</span>
+                              <span className="text-gray-800 dark:text-gray-200 font-medium text-xs sm:text-base">{feature.trim()}</span>
                             </div>
                           ))}
                       </div>
                     ) : (
                       <div className="text-center py-6 sm:py-8">
-                        <p className="text-gray-500 text-xs sm:text-base">Features information not available.</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-base">Features information not available.</p>
                       </div>
                     )}
                   </div>
@@ -855,9 +855,9 @@ const ProjectDetail = () => {
                 {activeTab === "instructions" && (
                   <div>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-6 gap-2">
-                      <h3 className="text-lg sm:text-2xl font-bold animate-slideInUp">Setup Instructions</h3>
+                      <h3 className="text-lg sm:text-2xl font-bold animate-slideInUp text-gray-900 dark:text-white">Setup Instructions</h3>
                       {!isPurchased && (
-                        <div className="flex items-center gap-2 text-orange-600 bg-orange-50 px-2 sm:px-4 py-2 rounded-xl animate-slideInUp text-xs sm:text-sm border border-orange-200">
+                        <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 sm:px-4 py-2 rounded-xl animate-slideInUp text-xs sm:text-sm border border-orange-200 dark:border-orange-800">
                           <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                           <span className="font-semibold">Purchase to unlock full details</span>
                         </div>
@@ -869,7 +869,7 @@ const ProjectDetail = () => {
                       {project?.requirements?.system_requirements &&
                         project.requirements.system_requirements.length > 0 && (
                           <div>
-                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 flex items-center gap-2">
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center gap-2">
                               <Shield className="w-4 h-4" />
                               System Requirements
                               <span className="text-xs text-green-600 font-normal">(Public)</span>
@@ -878,7 +878,7 @@ const ProjectDetail = () => {
                               {project.requirements.system_requirements.map((req, index) => (
                                 <li
                                   key={index}
-                                  className="flex items-start gap-2 text-gray-700 text-xs sm:text-base"
+                                  className="flex items-start gap-2 text-gray-700 dark:text-gray-300 dark:text-gray-300 text-xs sm:text-base"
                                 >
                                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
                                   {req}
@@ -892,14 +892,14 @@ const ProjectDetail = () => {
                       {isPurchased ? (
                         project?.requirements?.dependencies && project.requirements.dependencies.length > 0 && (
                           <div>
-                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-gray-200">
                               Dependencies
                             </h4>
                             <ul className="space-y-2">
                               {project.requirements.dependencies.map((dep, index) => (
-                                <li key={index} className="flex items-start gap-2 text-gray-700 text-xs sm:text-base">
+                                <li key={index} className="flex items-start gap-2 text-gray-700 dark:text-gray-300 dark:text-gray-300 text-xs sm:text-base">
                                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                  <span className="text-gray-700">{dep}</span>
+                                  <span className="text-gray-700 dark:text-gray-300">{dep}</span>
                                 </li>
                               ))}
                             </ul>
@@ -908,12 +908,12 @@ const ProjectDetail = () => {
                       ) : (
                         <div
                           onClick={handleToggleCart}
-                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
-                            <Lock className="w-5 h-5 text-gray-400" />
+                            <Lock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                           </div>
-                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400 flex items-center gap-2">
+                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400 dark:text-gray-500 flex items-center gap-2">
                             <CheckCircle className="w-4 h-4" />
                             Dependencies
                           </h4>
@@ -929,7 +929,7 @@ const ProjectDetail = () => {
                         project?.requirements?.installation_steps &&
                         project.requirements.installation_steps.length > 0 && (
                           <div>
-                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-gray-200">
                               Installation Steps
                             </h4>
                             <ol className="space-y-2 sm:space-y-3">
@@ -938,7 +938,7 @@ const ProjectDetail = () => {
                                   <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold">
                                     {index + 1}
                                   </span>
-                                  <span className="text-gray-700 text-xs sm:text-base">{step}</span>
+                                  <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300 text-xs sm:text-base">{step}</span>
                                 </li>
                               ))}
                             </ol>
@@ -947,14 +947,14 @@ const ProjectDetail = () => {
                       ) : (
                         <div
                           onClick={handleToggleCart}
-                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
                             <Lock className="w-5 h-5 text-gray-400" />
                           </div>
-                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400">Installation Steps</h4>
+                          <h4 className="text-sm sm:text-lg font-semibold mb-3 text-gray-400 dark:text-gray-500">Installation Steps</h4>
                           <div className="flex gap-3">
-                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs text-gray-500 font-bold flex-shrink-0">
+                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 font-bold flex-shrink-0">
                               1
                             </div>
                             <div className="h-4 bg-gray-300 rounded w-full animate-pulse" />
@@ -966,7 +966,7 @@ const ProjectDetail = () => {
                       {isPurchased ? (
                         project?.files?.source_files && project.files.source_files.length > 0 && (
                           <div>
-                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 flex items-center gap-2">
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center gap-2">
                               <Download className="w-4 h-4" />
                               Source Files
                             </h4>
@@ -975,10 +975,10 @@ const ProjectDetail = () => {
                                 <button
                                   key={index}
                                   onClick={() => handleDownloadFile(file, `source-code-${index + 1}.zip`)}
-                                  className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
+                                  className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
                                 >
-                                  <Download className="w-4 h-4 text-green-600 flex-shrink-0" />
-                                  <span className="text-gray-700 font-medium">Download Source Code {index + 1}</span>
+                                  <Download className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                  <span className="text-gray-700 dark:text-gray-300 font-medium">Download Source Code {index + 1}</span>
                                 </button>
                               ))}
                             </div>
@@ -987,7 +987,7 @@ const ProjectDetail = () => {
                       ) : (
                         <div
                           onClick={handleToggleCart}
-                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
                             <Lock className="w-5 h-5 text-gray-400" />
@@ -1007,7 +1007,7 @@ const ProjectDetail = () => {
                       {isPurchased ? (
                         project?.files?.documentation_files && project.files.documentation_files.length > 0 && (
                           <div>
-                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 flex items-center gap-2">
+                            <h4 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center gap-2">
                               <Download className="w-4 h-4" />
                               Documentation Files
                             </h4>
@@ -1019,7 +1019,7 @@ const ProjectDetail = () => {
                                   className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
                                 >
                                   <Download className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                                  <span className="text-gray-700 font-medium">Download Documentation {index + 1}</span>
+                                  <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Download Documentation {index + 1}</span>
                                 </button>
                               ))}
                             </div>
@@ -1028,7 +1028,7 @@ const ProjectDetail = () => {
                       ) : (
                         <div
                           onClick={handleToggleCart}
-                          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all"
+                          className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
                             <Lock className="w-5 h-5 text-gray-400" />
@@ -1051,7 +1051,7 @@ const ProjectDetail = () => {
 
                 {activeTab === "screenshots" && (
                   <div>
-                    <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6 animate-slideInUp">
+                    <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6 animate-slideInUp text-gray-900 dark:text-white">
                       Project Screenshots
                     </h3>
                     {project?.images && project.images.length > 0 ? (
@@ -1059,7 +1059,7 @@ const ProjectDetail = () => {
                         {project.images.map((image, index) => (
                           <div
                             key={index}
-                            className="aspect-video bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-slideInUp"
+                            className="aspect-video bg-gray-100 dark:bg-slate-800 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-slideInUp"
                             style={{ animationDelay: `${100 + index * 100}ms` }}
                           >
                             <img
@@ -1072,7 +1072,7 @@ const ProjectDetail = () => {
                       </div>
                     ) : (
                       <div className="text-center py-6 sm:py-8">
-                        <p className="text-gray-500 text-xs sm:text-base">Screenshots not available.</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-base">Screenshots not available.</p>
                       </div>
                     )}
                   </div>
@@ -1081,8 +1081,8 @@ const ProjectDetail = () => {
                 {activeTab === "reviews" && (
                   <div>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-6 gap-2">
-                      <h3 className="text-lg sm:text-2xl font-bold animate-slideInUp">Reviews</h3>
-                      <div className="text-sm sm:text-lg text-gray-600">
+                      <h3 className="text-lg sm:text-2xl font-bold animate-slideInUp text-gray-900 dark:text-white">Reviews</h3>
+                      <div className="text-sm sm:text-lg text-gray-600 dark:text-gray-400 dark:text-gray-500">
                         <span className="font-semibold">{approvedReviews.length + pendingReviews.length}</span> total
                         {pendingReviews.length > 0 && (
                           <span className="ml-2 text-xs sm:text-sm text-orange-600">
@@ -1097,7 +1097,7 @@ const ProjectDetail = () => {
 
                     {/* Review Form - improved responsive form layout */}
                     {isAuthenticated && (
-                      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-teal-50 rounded-2xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-8 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-slideInUp">
+                      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-teal-50 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-teal-900/20 rounded-2xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-8 border border-blue-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300 animate-slideInUp">
                         {hasUserReviewed ? (
                           <div>
                             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
@@ -1105,11 +1105,11 @@ const ProjectDetail = () => {
                                 <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                               </div>
                               <div>
-                                <h4 className="text-base sm:text-xl font-bold text-gray-900">Your Review</h4>
-                                <p className="text-xs sm:text-sm text-gray-600">Manage your review for this project</p>
+                                <h4 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">Your Review</h4>
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Manage your review for this project</p>
                               </div>
                             </div>
-                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/50 shadow-lg">
+                            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/50 dark:border-slate-700/50 shadow-lg transition-colors">
                               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                                   <div className="flex items-center gap-1">
@@ -1152,8 +1152,8 @@ const ProjectDetail = () => {
                               </div>
                               {editingReviewId === userReview?.id ? (
                                 <div className="space-y-4 sm:space-y-6">
-                                  <div className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl p-3 sm:p-4 border border-blue-100">
-                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
+                                  <div className="bg-gradient-to-r from-blue-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 rounded-xl p-3 sm:p-4 border border-blue-100 dark:border-slate-600">
+                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
                                       ⭐ Your Rating
                                     </label>
                                     <div className="flex gap-1 mb-2 sm:mb-4">
@@ -1170,7 +1170,7 @@ const ProjectDetail = () => {
                                         </button>
                                       ))}
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-600">
+                                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
                                       {editReviewRating === 0 && "Click a star to rate"}
                                       {editReviewRating === 1 && "⭐ Poor"}
                                       {editReviewRating === 2 && "⭐⭐ Fair"}
@@ -1180,7 +1180,7 @@ const ProjectDetail = () => {
                                     </div>
                                   </div>
                                   <div>
-                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
+                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
                                       💬 Your Feedback
                                     </label>
                                     <textarea
@@ -1188,10 +1188,10 @@ const ProjectDetail = () => {
                                       onChange={(e) => setEditReviewText(e.target.value)}
                                       placeholder="Share your experience..."
                                       rows={4}
-                                      className="w-full px-2 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-xs sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                                      className="w-full px-2 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-xs sm:text-base transition-all duration-200 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                                       required
                                     />
-                                    <div className="text-xs text-gray-500 mt-2">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                       {editReviewText.length}/500 characters
                                     </div>
                                   </div>
@@ -1219,8 +1219,8 @@ const ProjectDetail = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-3 sm:p-4 border border-gray-100">
-                                  <p className="text-gray-700 text-xs sm:text-base leading-relaxed">
+                                <div className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-xl p-3 sm:p-4 border border-gray-100 dark:border-slate-600">
+                                  <p className="text-gray-700 dark:text-gray-300 text-xs sm:text-base leading-relaxed">
                                     {userReview?.review_text}
                                   </p>
                                 </div>
@@ -1234,13 +1234,13 @@ const ProjectDetail = () => {
                                 <Star className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                               </div>
                               <div>
-                                <h4 className="text-base sm:text-xl font-bold text-gray-900">Write a Review</h4>
-                                <p className="text-xs sm:text-sm text-gray-600">Share your experience</p>
+                                <h4 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">Write a Review</h4>
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">Share your experience</p>
                               </div>
                             </div>
                             <form onSubmit={handleSubmitReview} className="space-y-4 sm:space-y-6">
-                              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-3 sm:p-6 border border-yellow-200">
-                                <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-4">
+                              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-slate-800 dark:to-slate-700 rounded-xl p-3 sm:p-6 border border-yellow-200 dark:border-slate-600">
+                                <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-4">
                                   ⭐ Rate this Project
                                 </label>
                                 <div className="flex gap-1 mb-2 sm:mb-4">
@@ -1257,7 +1257,7 @@ const ProjectDetail = () => {
                                     </button>
                                   ))}
                                 </div>
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium">
+                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 font-medium">
                                   {formRating === 0 && "Click a star to rate"}
                                   {formRating === 1 && "⭐ Poor - Not recommended"}
                                   {formRating === 2 && "⭐⭐ Fair - Below expectations"}
@@ -1267,8 +1267,8 @@ const ProjectDetail = () => {
                                 </div>
                               </div>
 
-                              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-6 border border-blue-200">
-                                <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-4">
+                              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-700 rounded-xl p-3 sm:p-6 border border-blue-200 dark:border-slate-600">
+                                <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-4">
                                   💬 Share Your Experience
                                 </label>
                                 <textarea
@@ -1276,7 +1276,7 @@ const ProjectDetail = () => {
                                   onChange={(e) => setReviewText(e.target.value)}
                                   placeholder="Tell others about your experience..."
                                   rows={5}
-                                  className="w-full px-2 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-xs sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                                  className="w-full px-2 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-xs sm:text-base transition-all duration-200 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                                   required
                                 />
                                 <div className="flex justify-between items-center mt-2">
@@ -1313,8 +1313,8 @@ const ProjectDetail = () => {
                         .length === 0 ? (
                         <div className="text-center py-6 sm:py-12">
                           <MessageSquare className="w-10 h-10 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-                          <h4 className="text-sm sm:text-lg font-semibold text-gray-600 mb-2">No reviews yet</h4>
-                          <p className="text-gray-500 text-xs sm:text-base">Be the first to review!</p>
+                          <h4 className="text-sm sm:text-lg font-semibold text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-2">No reviews yet</h4>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-base">Be the first to review!</p>
                         </div>
                       ) : (
                         [...pendingReviews, ...approvedReviews]
@@ -1322,7 +1322,7 @@ const ProjectDetail = () => {
                           .map((review, index) => (
                             <div
                               key={review.id}
-                              className={`bg-white/90 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl border transition-all duration-300 ${review.is_approved ? "border-gray-200 hover:border-blue-200" : "border-orange-200 bg-orange-50/50 hover:border-orange-300"} animate-slideInUp`}
+                              className={`bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl border transition-all duration-300 ${review.is_approved ? "border-gray-200 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-800" : "border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-900/20 hover:border-orange-300 dark:hover:border-orange-700"} animate-slideInUp`}
                               style={{ animationDelay: `${index * 100}ms` }}
                             >
                               <div className="flex flex-col sm:flex-row items-start justify-between mb-4 sm:mb-6 gap-3">
@@ -1333,20 +1333,20 @@ const ProjectDetail = () => {
                                     <span className="text-white font-bold">{review.user.full_name.charAt(0)}</span>
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <h5 className="font-bold text-gray-900 text-sm sm:text-lg truncate">
+                                    <h5 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-sm sm:text-lg truncate">
                                       {review.user.full_name}
                                     </h5>
-                                    <p className="text-xs sm:text-sm text-gray-500 mb-1">
+                                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
                                       {new Date(review.created_at).toLocaleDateString()}
                                     </p>
                                     <div className="flex flex-wrap gap-1 sm:gap-2">
                                       <span
-                                        className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}
+                                        className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_verified_purchase ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : "bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400"}`}
                                       >
                                         {review.is_verified_purchase ? "✓ Verified Buyer" : "✗ Not Verified Buyer"}
                                       </span>
                                       <span
-                                        className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}
+                                        className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400"}`}
                                       >
                                         {review.is_approved ? "✓ Verified Review" : "⏳ Yet to Verify"}
                                       </span>
@@ -1365,14 +1365,14 @@ const ProjectDetail = () => {
                                       <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                   )}
-                                  <div className="flex items-center gap-1 bg-yellow-50 px-2 sm:px-3 py-1 sm:py-2 rounded-xl border border-yellow-200">
+                                  <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/20 px-2 sm:px-3 py-1 sm:py-2 rounded-xl border border-yellow-200 dark:border-yellow-800">
                                     {[...Array(5)].map((_, i) => (
                                       <Star
                                         key={i}
-                                        className={`w-3 h-3 sm:w-4 sm:h-4 ${i < review.rating ? "text-yellow-400 fill-current drop-shadow-sm" : "text-gray-300"}`}
+                                        className={`w-3 h-3 sm:w-4 sm:h-4 ${i < review.rating ? "text-yellow-400 fill-current drop-shadow-sm" : "text-gray-300 dark:text-gray-600"}`}
                                       />
                                     ))}
-                                    <span className="ml-1 sm:ml-2 text-xs sm:text-sm font-semibold text-gray-700">
+                                    <span className="ml-1 sm:ml-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                                       {review.rating}/5
                                     </span>
                                   </div>
@@ -1382,7 +1382,7 @@ const ProjectDetail = () => {
                               {editingReviewId === review.id ? (
                                 <div className="space-y-4 sm:space-y-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-6 border border-blue-200">
                                   <div>
-                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
+                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-2 sm:mb-3">
                                       ⭐ Update Your Rating
                                     </label>
                                     <div className="flex gap-1 mb-2 sm:mb-4">
@@ -1401,7 +1401,7 @@ const ProjectDetail = () => {
                                     </div>
                                   </div>
                                   <div>
-                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3">
+                                    <label className="block text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 mb-2 sm:mb-3">
                                       💬 Update Feedback
                                     </label>
                                     <textarea
@@ -1409,7 +1409,7 @@ const ProjectDetail = () => {
                                       onChange={(e) => setEditReviewText(e.target.value)}
                                       placeholder="Share your detailed experience..."
                                       rows={4}
-                                      className="w-full px-2 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-xs sm:text-base transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                                      className="w-full px-2 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-xs sm:text-base transition-all duration-200 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                                       required
                                     />
                                   </div>
@@ -1437,8 +1437,8 @@ const ProjectDetail = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-3 sm:p-4 border border-gray-100">
-                                  <p className="text-gray-700 leading-relaxed text-xs sm:text-base">
+                                <div className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 rounded-xl p-3 sm:p-4 border border-gray-100 dark:border-slate-600">
+                                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-xs sm:text-base">
                                     {review.review_text}
                                   </p>
                                 </div>
@@ -1456,16 +1456,16 @@ const ProjectDetail = () => {
           {/* Sidebar - improved responsive sidebar with better mobile layout */}
           <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-2 lg:order-2">
             {/* Purchase Card */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 animate-slideInRight">
+            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors">
               {/* Pricing */}
               <div className="text-center mb-4 sm:mb-8">
                 <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4 animate-slideInUp">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
                     ₹{project.pricing?.sale_price || 0}
                   </div>
                   {project.pricing?.original_price &&
                     project.pricing.original_price > (project.pricing?.sale_price || 0) && (
-                      <div className="text-lg sm:text-xl text-gray-500 line-through">
+                      <div className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 line-through">
                         ₹{project.pricing.original_price}
                       </div>
                     )}
@@ -1483,14 +1483,14 @@ const ProjectDetail = () => {
                 style={{ animationDelay: "200ms" }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 flex items-center gap-1 sm:gap-2">
+                  <span className="text-gray-600 dark:text-gray-300 dark:text-gray-400 flex items-center gap-1 sm:gap-2">
                     <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" /> Delivery
                   </span>
-                  <span className="font-semibold text-gray-900">{project.delivery_time} days</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{project.delivery_time} days</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Total Sales</span>
-                  <span className="font-semibold text-gray-900">{project.purchase_count || 0}</span>
+                  <span className="text-gray-600 dark:text-gray-400 dark:text-gray-500">Total Sales</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{project.purchase_count || 0}</span>
                 </div>
               </div>
 
@@ -1534,7 +1534,7 @@ const ProjectDetail = () => {
                   {/* Wishlist Button */}
                   <button
                     onClick={handleToggleWishlist}
-                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 text-gray-800 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base"
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 dark:text-gray-200 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base"
                     style={{ animationDelay: "350ms" }}
                   >
                     <Heart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -1548,7 +1548,7 @@ const ProjectDetail = () => {
                       else addToCart(project);
                     }}
                     disabled={!isAuthenticated || loading}
-                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 text-gray-800 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 dark:text-gray-200 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ animationDelay: "380ms" }}
                   >
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -1570,7 +1570,7 @@ const ProjectDetail = () => {
 
               {/* Features */}
               <div
-                className="space-y-1 sm:space-y-2 text-center text-xs text-gray-600 animate-slideInUp"
+                className="space-y-1 sm:space-y-2 text-center text-xs text-gray-600 dark:text-gray-300 dark:text-gray-400 animate-slideInUp"
                 style={{ animationDelay: "400ms" }}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -1594,10 +1594,10 @@ const ProjectDetail = () => {
 
             {/* Author Details */}
             <div
-              className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 animate-slideInRight"
+              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors"
               style={{ animationDelay: "400ms" }}
             >
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6">About the Author</h3>
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900 dark:text-white">About the Author</h3>
               <div className="text-center mb-4 sm:mb-6">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 mx-auto bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mb-2 sm:mb-4 shadow-lg overflow-hidden flex-shrink-0">
                   {authorDetails?.avatar ? (
@@ -1613,37 +1613,37 @@ const ProjectDetail = () => {
                   )}
                 </div>
 
-                <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">
+                <h4 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-1 sm:mb-2">
                   {authorDetails?.full_name || "Author"}
                 </h4>
                 {authorDetails?.email && (
-                  <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 break-all">{authorDetails.email}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4 break-all">{authorDetails.email}</p>
                 )}
               </div>
 
               <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm mb-4 sm:mb-6">
-                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
-                  <span className="text-gray-600 flex items-center gap-2">
+                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-xl">
+                  <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     Projects
                   </span>
-                  <span className="font-semibold text-gray-900">{authorDetails?.total_projects || 0}</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{authorDetails?.total_projects || 0}</span>
                 </div>
 
-                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
-                  <span className="text-gray-600 flex items-center gap-2">
+                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-xl">
+                  <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
                     <Star className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     Rating
                   </span>
-                  <span className="font-semibold text-gray-900">{authorDetails?.rating || 0}</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{authorDetails?.rating || 0}</span>
                 </div>
 
-                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-xl">
-                  <span className="text-gray-600 flex items-center gap-2">
+                <div className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-xl">
+                  <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
                     <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     Total Sales
                   </span>
-                  <span className="font-semibold text-gray-900">{authorDetails?.total_sales || 0}</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{authorDetails?.total_sales || 0}</span>
                 </div>
               </div>
             </div>
@@ -1652,17 +1652,17 @@ const ProjectDetail = () => {
 
         {/* Related Projects - improved responsive grid and card layout */}
         <div
-          className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 animate-slideInRight mt-4 sm:mt-6 lg:mt-8"
+          className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight mt-4 sm:mt-6 lg:mt-8 transition-colors"
           style={{ animationDelay: "400ms" }}
         >
-          <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900">Related Projects</h3>
+          <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900 dark:text-white">Related Projects</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {relatedProjects?.map((relatedProject, idx) => (
               <Link
                 key={relatedProject.id}
                 to={`/project/${relatedProject.id}`}
-                className="group p-3 sm:p-4 bg-gradient-to-br from-white to-blue-50 rounded-2xl border border-gray-100 shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-slideInUp flex flex-col"
+                className="group p-3 sm:p-4 bg-gradient-to-br from-white to-blue-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-slideInUp flex flex-col"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="relative mb-2 sm:mb-3 overflow-hidden rounded-xl">
@@ -1671,29 +1671,29 @@ const ProjectDetail = () => {
                     alt={relatedProject.title}
                     className="w-full h-24 sm:h-32 lg:h-36 object-cover rounded-xl group-hover:scale-110 transition-transform duration-500"
                   />
-                  <span className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white/90 text-blue-600 text-xs font-medium px-2 py-1 rounded-md shadow">
+                  <span className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 text-xs font-medium px-2 py-1 rounded-md shadow">
                     {relatedProject.category || "General"}
                   </span>
                 </div>
 
-                <h4 className="font-semibold text-gray-900 text-xs sm:text-sm lg:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-xs sm:text-sm lg:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
                   {relatedProject.title}
                 </h4>
 
-                <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-2 line-clamp-2">
                   {relatedProject.description || "A creative and well-built project."}
                 </p>
 
                 <div className="flex items-center justify-between text-xs sm:text-sm mt-auto mb-2">
-                  <div className="flex items-center gap-1 text-gray-600">
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400 dark:text-gray-500">
                     <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current flex-shrink-0" />
                     <span>{relatedProject.rating?.average_rating?.toFixed(1) || "0.0"}</span>
                   </div>
 
                   <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="font-semibold text-gray-900">₹{relatedProject.pricing?.sale_price || 0}</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">₹{relatedProject.pricing?.sale_price || 0}</span>
                     {relatedProject.pricing?.original_price && (
-                      <span className="text-xs text-gray-500 line-through hidden sm:inline">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 line-through hidden sm:inline">
                         ₹{relatedProject.pricing.original_price}
                       </span>
                     )}
