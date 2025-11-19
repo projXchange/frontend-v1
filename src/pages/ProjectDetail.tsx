@@ -1488,7 +1488,7 @@ const ProjectDetail = () => {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-300 dark:text-gray-400 flex items-center gap-1 sm:gap-2">
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" /> Delivery
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" /> Expected Timeline
                   </span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">{project.delivery_time} days</span>
                 </div>

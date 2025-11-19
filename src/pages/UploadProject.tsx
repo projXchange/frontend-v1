@@ -1543,8 +1543,8 @@ const UploadProject = () => {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                            Delivery Time (days)
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                            Expected Timeline (days)
                           </label>
                           <input
                             type="number"
@@ -1554,7 +1554,7 @@ const UploadProject = () => {
                             min="0"
                             max="365"
                             placeholder="1"
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           />
                         </div>
                       </div>
