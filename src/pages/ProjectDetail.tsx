@@ -495,6 +495,17 @@ const ProjectDetail = () => {
     }
   }
 
+  const handleShare = async () => {
+    const currentUrl = window.location.href
+    try {
+      await navigator.clipboard.writeText(currentUrl)
+      toast.success("Link copied to clipboard!")
+    } catch (error) {
+      console.error("Failed to copy:", error)
+      toast.error("Failed to copy link")
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-3 sm:py-6 lg:py-8 animate-fadeIn transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
@@ -549,6 +560,7 @@ const ProjectDetail = () => {
                     <span className="font-medium sm:inline">{wishlistStatus ? "Wishlisted" : "Wishlist"}</span>
                   </button>
                   <button
+                    onClick={handleShare}
                     className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:text-blue-500 transition-all duration-200 rounded-xl hover:bg-blue-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
                     style={{ animationDelay: "300ms" }}
                   >
