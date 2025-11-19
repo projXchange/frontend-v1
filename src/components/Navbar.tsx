@@ -304,8 +304,7 @@ const Navbar = () => {
               </Link>
 
               {/* Theme Toggle Mobile */}
-              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-slate-700">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+              <div className="flex items-center justify-center px-4 py-3 border-t border-gray-200 dark:border-slate-700">
                 <ThemeToggle />
               </div>
 
