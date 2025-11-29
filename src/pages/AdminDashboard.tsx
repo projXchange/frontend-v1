@@ -30,6 +30,7 @@ import toast from "react-hot-toast"
 import TransactionDetailsModal from "../components/TransactionDetailsModal"
 import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import LoadingNumber from "../components/LoadingNumber"
+import { getApiUrl } from '../config/api'
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
@@ -65,6 +66,7 @@ const AdminDashboard = () => {
   const [updatingReview, setUpdatingReview] = useState<string | null>(null)
   const [deletingReview, setDeletingReview] = useState<string | null>(null)
 
+
   const fetchAllStats = async () => {
     setLoading(true)
     setError("")
@@ -73,16 +75,16 @@ const AdminDashboard = () => {
     try {
       // Fetch in parallel for efficiency
       const [usersRes, projectsRes, transactionsRes, pendingProjectsRes] = await Promise.all([
-        fetch("https://projxchange-backend-v1.vercel.app/admin/users", {
+        fetch(getApiUrl('/admin/users'), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch("https://projxchange-backend-v1.vercel.app/projects", {
+        fetch(getApiUrl('/projects'), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch("https://projxchange-backend-v1.vercel.app/admin/transactions/recent", {
+        fetch(getApiUrl('/admin/transactions/recent'), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch("https://projxchange-backend-v1.vercel.app/projects?status=pending", {
+        fetch(getApiUrl('/projects?status=pending'), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
       ])
@@ -185,7 +187,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/admin/users", {
+      const res = await fetch(getApiUrl("/admin/users"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -210,7 +212,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/projects", {
+      const res = await fetch(getApiUrl("/projects"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -235,7 +237,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/projects?status=pending", {
+      const res = await fetch(getApiUrl("/projects?status=pending"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -260,7 +262,7 @@ const AdminDashboard = () => {
     setUpdatingProject(projectId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/projects/${projectId}/status`, {
+      const response = await fetch(getApiUrl(`/admin/projects/${projectId}/status`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -299,7 +301,7 @@ const AdminDashboard = () => {
     setUpdatingUser(userId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}/status`, {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}/status`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -338,7 +340,7 @@ const AdminDashboard = () => {
 
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}`, {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -365,7 +367,7 @@ const AdminDashboard = () => {
     setFetchingUserDetails(true)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/users/${userId}`, {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}`), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -402,7 +404,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/admin/transactions/recent", {
+      const res = await fetch(getApiUrl("/admin/transactions/recent"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -439,8 +441,7 @@ const AdminDashboard = () => {
       if (paymentGatewayResponse) requestBody.payment_gateway_response = paymentGatewayResponse
       if (metadata) requestBody.metadata = metadata
 
-      const response = await fetch(
-        `https://projxchange-backend-v1.vercel.app/admin/transactions/${transactionId}/status`,
+      const response = await fetch(getApiUrl(`/admin/transactions/${transactionId}/status`),
         {
           method: "PATCH", // or PATCH depending on your API
           headers: {
@@ -480,7 +481,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/admin/reviews", {
+      const res = await fetch(getApiUrl("/admin/reviews"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -505,7 +506,7 @@ const AdminDashboard = () => {
     const token = localStorage.getItem("token")
 
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/admin/reviews/approve`, {
+      const response = await fetch(getApiUrl(`/admin/reviews/approve`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -540,7 +541,7 @@ const AdminDashboard = () => {
     setDeletingReview(reviewId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -596,8 +597,7 @@ const AdminDashboard = () => {
       console.log("Request body:", requestBody)
       console.log("Request body JSON:", JSON.stringify(requestBody))
 
-      const response = await fetch(
-        `https://projxchange-backend-v1.vercel.app/admin/projects/${selectedProject.id}/status`,
+      const response = await fetch(getApiUrl(`/admin/projects/${selectedProject.id}/status`),
         {
           method: "PATCH",
           headers: {
@@ -661,7 +661,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const projectResponse = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${projectId}`, {
+      const projectResponse = await fetch(getApiUrl(`/projects/${projectId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
