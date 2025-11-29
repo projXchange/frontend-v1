@@ -37,6 +37,7 @@ import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import toast from "react-hot-toast"
 import LoadingNumber from "../components/LoadingNumber"
+import { getApiUrl } from '../config/api'
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
@@ -132,7 +133,7 @@ const StudentDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/reviews/my", {
+      const res = await fetch(getApiUrl("/reviews/my"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -157,7 +158,7 @@ const StudentDashboard = () => {
     setPurchasedProjectsLoading(true)
 
     try {
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/my`, {
+      const res = await fetch(getApiUrl(`/projects/my`), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -194,7 +195,7 @@ const StudentDashboard = () => {
   const fetchMyTransactions = async () => {
     setTransactionsLoading(true)
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/transactions/my", {
+      const res = await fetch(getApiUrl("/transactions/my"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -215,7 +216,7 @@ const StudentDashboard = () => {
   const fetchDashboardStats = async () => {
     setStatsLoading(true)
     try {
-      const res = await fetch("https://projxchange-backend-v1.vercel.app/dashboard/stats", {
+      const res = await fetch(getApiUrl("/dashboard/stats"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -237,7 +238,7 @@ const StudentDashboard = () => {
     setIsLoading(true)
     setError("")
     try {
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/users/profile/me`, {
+      const res = await fetch(getApiUrl(`/users/profile/me`), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -350,7 +351,7 @@ const StudentDashboard = () => {
             projectEditData?.files?.documentation_files || selectedProject.files?.documentation_files || [],
         }
       }
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${selectedProject.id}`, {
+      const res = await fetch(getApiUrl(`/projects/${selectedProject.id}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -384,7 +385,7 @@ const StudentDashboard = () => {
   const handleSendForApproval = async (project: Project) => {
     try {
       setUpdatingProjectId(project.id)
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${project.id}`, {
+      const res = await fetch(getApiUrl(`/projects/${project.id}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -411,7 +412,7 @@ const StudentDashboard = () => {
     setError("")
     try {
       const method = "PATCH"
-      const url = `https://projxchange-backend-v1.vercel.app/users/profile/${profileForm.id || user?.id}`
+      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const payload = {
         rating: profileForm.rating,
         total_sales: profileForm.total_sales,
@@ -497,7 +498,7 @@ const StudentDashboard = () => {
     setUpdatingReview(reviewId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -526,7 +527,7 @@ const StudentDashboard = () => {
     setUpdatingReview(reviewId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

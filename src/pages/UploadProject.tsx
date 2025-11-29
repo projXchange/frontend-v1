@@ -21,6 +21,7 @@ import {
   ArrowRight,
 } from "lucide-react"
 import toast from "react-hot-toast"
+import { getApiUrl } from '../config/api'
 
 const UploadProject = () => {
   const [formData, setFormData] = useState({
@@ -69,8 +70,9 @@ const UploadProject = () => {
   const [createdProjectId, setCreatedProjectId] = useState<string | null>(null)
 
   // Cloudinary configuration
-  const CLOUDINARY_CLOUD_NAME = "dmfh4f4yg" // Replace with your cloud name
-  const CLOUDINARY_UPLOAD_PRESET = "projectXchange" //
+  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  
 
   const categories = [
     { label: "Web Development", value: "web_development" },
@@ -418,7 +420,7 @@ const UploadProject = () => {
 
         console.log("Creating project...")
 
-        const projectResponse = await fetch("https://projxchange-backend-v1.vercel.app/projects", {
+        const projectResponse = await fetch(getApiUrl("/projects"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -548,7 +550,7 @@ const UploadProject = () => {
         }
 
         try {
-          const updateResponse = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${backendProjectId}`, {
+          const updateResponse = await fetch(getApiUrl(`/projects/${backendProjectId}`), {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",

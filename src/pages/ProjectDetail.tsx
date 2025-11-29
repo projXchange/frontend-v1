@@ -10,6 +10,7 @@ import type { Transaction } from "../types/Transaction"
 import toast from "react-hot-toast"
 import type { User } from "../types/User"
 import { DownloadFilesModal } from "../components/DownloadFilesModal"
+import { getApiUrl } from '../config/api'
 
 interface UserStatus {
   has_purchased: boolean
@@ -83,7 +84,7 @@ const ProjectDetail = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}`, {
+      const res = await fetch(getApiUrl(`/projects/${id}`), {
         method: "GET",
         headers,
       })
@@ -125,7 +126,7 @@ const ProjectDetail = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/reviews`, {
+      const response = await fetch(getApiUrl(`/projects/${id}/reviews`), {
         method: "GET",
         headers,
       })
@@ -157,7 +158,7 @@ const ProjectDetail = () => {
 
     setSubmittingReview(true);
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews`, {
+      const response = await fetch(getApiUrl(`/reviews`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -262,7 +263,7 @@ const ProjectDetail = () => {
 
     setUpdatingReview(true)
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${editingReviewId}`, {
+      const response = await fetch(getApiUrl(`/reviews/${editingReviewId}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -324,7 +325,7 @@ const ProjectDetail = () => {
     if (!confirmDelete) return
 
     try {
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/reviews/${reviewId}`, {
+      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -361,7 +362,7 @@ const ProjectDetail = () => {
       toast.loading("Preparing download...", { id: "download" });
 
       // Use backend proxy endpoint for authenticated downloads
-      const response = await fetch(`https://projxchange-backend-v1.vercel.app/projects/${id}/download`, {
+      const response = await fetch(getApiUrl(`/projects/${id}/download`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

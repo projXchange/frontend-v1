@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Filter, ChevronDown, Zap } from 'lucide-react';
 import { Project } from '../types/Project';
 import { ProjectCard } from '../components/ProjectCard';
+import { getApiUrl } from '../config/api'
 
 const ProjectListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,7 +125,7 @@ const ProjectListing = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/projects?${params.toString()}`, {
+      const res = await fetch(getApiUrl(`/projects?${params.toString()}`), {
         method: 'GET',
         headers,
       });

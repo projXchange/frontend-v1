@@ -18,6 +18,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { motion } from "framer-motion"
 import type { ProfileForm, SocialLinks } from "../types/ProfileForm"
 import toast from "react-hot-toast"
+import { getApiUrl } from '../config/api'
 
 const ProfilePage = () => {
   const { user } = useAuth()
@@ -49,7 +50,7 @@ const ProfilePage = () => {
     setIsLoading(true)
     setError("")
     try {
-      const res = await fetch(`https://projxchange-backend-v1.vercel.app/users/profile/me`, {
+      const res = await fetch(getApiUrl(`/users/profile/me`), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -90,7 +91,7 @@ const ProfilePage = () => {
     setError("")
     try {
       const method = "PATCH"
-      const url = `https://projxchange-backend-v1.vercel.app/users/profile/${profileForm.id || user?.id}`
+      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const payload = {
         rating: profileForm.rating,
         total_sales: profileForm.total_sales,
