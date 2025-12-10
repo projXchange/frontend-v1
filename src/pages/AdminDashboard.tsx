@@ -44,7 +44,7 @@ const AdminDashboard = () => {
   const [updatingUser, setUpdatingUser] = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
-  const [fetchingUserDetails, setFetchingUserDetails] = useState(false)
+  const [fetchingUserDetails, setFetchingUserDetails] = useState<string | null>(null)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
   const navigate = useNavigate()
@@ -364,7 +364,7 @@ const AdminDashboard = () => {
 
   // API function to fetch user details
   const fetchUserDetails = async (userId: string) => {
-    setFetchingUserDetails(true)
+    setFetchingUserDetails(userId)
     const token = localStorage.getItem("token")
     try {
       const response = await fetch(getApiUrl(`/admin/users/${userId}`), {
@@ -386,7 +386,7 @@ const AdminDashboard = () => {
       console.error("Error fetching user details:", error)
       toast.error("Failed to fetch user details. Please try again.")
     } finally {
-      setFetchingUserDetails(false)
+      setFetchingUserDetails(null)
     }
   }
 
@@ -1398,10 +1398,10 @@ const AdminDashboard = () => {
                                 <div className="flex space-x-1 sm:space-x-2">
                                   <button
                                     onClick={() => fetchUserDetails(user.id)}
-                                    disabled={fetchingUserDetails}
+                                    disabled={fetchingUserDetails === user.id}
                                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
                                   >
-                                    {fetchingUserDetails ? (
+                                    {fetchingUserDetails === user.id ? (
                                       <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
                                       <Eye className="w-4 h-4" />
