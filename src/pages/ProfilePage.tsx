@@ -93,7 +93,6 @@ const ProfilePage = () => {
     try {
       const method = "PATCH"
       const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
-      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const payload = {
         rating: profileForm.rating,
         total_sales: profileForm.total_sales,

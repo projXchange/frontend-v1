@@ -39,7 +39,6 @@ import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import toast from "react-hot-toast"
 import LoadingNumber from "../components/LoadingNumber"
-import { getApiUrl } from '../config/api'
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
@@ -414,7 +413,6 @@ const StudentDashboard = () => {
     setError("")
     try {
       const method = "PATCH"
-      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const payload = {
         rating: profileForm.rating,
