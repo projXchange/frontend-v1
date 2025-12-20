@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit, CheckCircle, DollarSign, Calendar, User, FileText, CreditCard } from 'lucide-react';
+import { X, Edit, DollarSign, User, CreditCard } from 'lucide-react';
 import { Transaction } from '../types/Transaction';
 interface TransactionDetailsModalProps {
     isOpen: boolean;
@@ -251,8 +251,8 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Type</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl transition-colors">
                                             <span className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${getTypeColor(transaction.type)}`}>
                                                 {transaction.type}
                                             </span>
@@ -260,8 +260,8 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl transition-colors">
                                             <span className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${getStatusColor(transaction.status)}`}>
                                                 {transaction.status}
                                             </span>
@@ -269,75 +269,79 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl flex items-center gap-2">
-                                            <CreditCard className="w-4 h-4 text-gray-600" />
-                                            <span className="font-medium text-gray-900 text-sm sm:text-base">{transaction.payment_method}</span>
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Payment Method</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl flex items-center gap-2 transition-colors">
+                                            <CreditCard className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                            <span className="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base">{transaction.payment_method}</span>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Amount</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 font-semibold text-base sm:text-lg">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 font-semibold text-base sm:text-lg transition-colors">
                                             {transaction.amount} {transaction.currency}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Commission Amount</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 font-semibold text-sm sm:text-base">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Commission Amount</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 font-semibold text-sm sm:text-base transition-colors">
                                             {transaction.commission_amount} {transaction.currency}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Seller Amount</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 font-semibold text-sm sm:text-base">
-                                            {transaction.seller_amount} {transaction.currency}
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Author Amount</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 font-semibold text-sm sm:text-base transition-colors">
+                                            {transaction.author_amount} {transaction.currency}
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Project</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl flex items-center gap-2 sm:gap-3">
-                                            <img
-                                                src={transaction.project.thumbnail}
-                                                alt={transaction.project.title}
-                                                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover flex-shrink-0"
-                                            />
-                                            <div className="min-w-0 flex-1">
-                                                <div className="font-semibold text-gray-900 text-sm sm:text-base truncate">{transaction.project.title}</div>
-                                                <div className="text-xs text-gray-500 font-mono truncate">ID: {transaction.project.id}</div>
+                                    {transaction.project && (
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Project</label>
+                                            <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl flex items-center gap-2 sm:gap-3 transition-colors">
+                                                {transaction.project.thumbnail && (
+                                                    <img
+                                                        src={transaction.project.thumbnail}
+                                                        alt={transaction.project.title}
+                                                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover flex-shrink-0"
+                                                    />
+                                                )}
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base truncate">{transaction.project.title}</div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">ID: {transaction.project.id}</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Buyer</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Buyer</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl transition-colors">
                                             <div className="flex items-center gap-2 sm:gap-3">
                                                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
                                                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="font-semibold text-gray-900 text-sm sm:text-base truncate">{transaction.buyer.full_name}</div>
-                                                    <div className="text-xs sm:text-sm text-gray-600 truncate">{transaction.buyer.email}</div>
+                                                    <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base truncate">{transaction.buyer?.full_name || 'N/A'}</div>
+                                                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">{transaction.buyer?.email || 'N/A'}</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Created At</label>
-                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 text-sm sm:text-base">
+                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Created At</label>
+                                        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 text-sm sm:text-base transition-colors">
                                             {new Date(transaction.created_at).toLocaleString()}
                                         </div>
                                     </div>
 
                                     {transaction.processed_at && (
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Processed At</label>
-                                            <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 text-sm sm:text-base">
+                                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Processed At</label>
+                                            <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 text-sm sm:text-base transition-colors">
                                                 {new Date(transaction.processed_at).toLocaleString()}
                                             </div>
                                         </div>
@@ -361,8 +365,8 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
                     </div>
                 ) : (
                     <div className="text-center py-6 sm:py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-3 sm:mt-4 text-gray-600 text-sm sm:text-base">Loading transaction details...</p>
+                        <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:h-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+                        <p className="mt-3 sm:mt-4 text-gray-600 dark:text-gray-400 text-sm sm:text-base">Loading transaction details...</p>
                     </div>
                 )}
             </div>

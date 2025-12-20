@@ -30,4 +30,9 @@ export interface Transaction {
     title: string;
     thumbnail?: string;
   };
+  buyer?: {
+    id: string;
+    full_name: string;
+    email: string;
+  };
 }

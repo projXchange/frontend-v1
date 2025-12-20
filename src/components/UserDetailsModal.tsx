@@ -179,8 +179,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">User Type</label>
-                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">User Type</label>
+                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl transition-colors">
                       <span className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
                         user.user_type === 'admin' ? 'bg-red-100 text-red-800' :
                         user.user_type === 'manager' ? 'bg-purple-100 text-purple-800' :
@@ -193,8 +193,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Verification Status</label>
-                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Verification Status</label>
+                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl transition-colors">
                       <span className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
                         user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
                         user.verification_status === 'rejected' ? 'bg-red-100 text-red-800' :
@@ -206,8 +206,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Email Verified</label>
-                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email Verified</label>
+                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl transition-colors">
                       <span className={`px-2 sm:px-3 py-1 inline-flex text-xs font-bold rounded-full ${
                         user.email_verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
@@ -217,15 +217,15 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Created At</label>
-                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 text-sm sm:text-base">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Created At</label>
+                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 text-sm sm:text-base transition-colors">
                       {new Date(user.created_at).toLocaleString()}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Last Updated</label>
-                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-900 text-sm sm:text-base">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Last Updated</label>
+                    <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 rounded-lg sm:rounded-xl text-gray-900 dark:text-gray-100 text-sm sm:text-base transition-colors">
                       {new Date(user.updated_at).toLocaleString()}
                     </div>
                   </div>
@@ -248,8 +248,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
           </div>
         ) : (
           <div className="text-center py-6 sm:py-8">
-            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-3 sm:mt-4 text-gray-600 text-sm sm:text-base">Loading user details...</p>
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+            <p className="mt-3 sm:mt-4 text-gray-600 dark:text-gray-400 text-sm sm:text-base">Loading user details...</p>
           </div>
         )}
       </div>

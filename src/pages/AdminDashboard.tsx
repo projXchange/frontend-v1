@@ -1163,7 +1163,7 @@ const AdminDashboard = () => {
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 transition-colors">
                           <tr>
                             <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Project
@@ -1188,7 +1188,7 @@ const AdminDashboard = () => {
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {projects
                             .filter((p) => filterStatus === "all" || p.status === filterStatus)
                             .filter(
@@ -1325,7 +1325,7 @@ const AdminDashboard = () => {
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 transition-colors">
                           <tr>
                             <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               User
@@ -1344,7 +1344,7 @@ const AdminDashboard = () => {
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {users.map((user, index) => (
                             <tr
                               key={user.id}
@@ -1447,10 +1447,10 @@ const AdminDashboard = () => {
                     <p className="mt-4 text-gray-600 dark:text-gray-300 text-sm sm:text-base">Loading pending projects...</p>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700 transition-colors">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-orange-50 to-yellow-50">
+                        <thead className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 transition-colors">
                           <tr>
                             <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Project
@@ -1472,11 +1472,11 @@ const AdminDashboard = () => {
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {pendingProjects.map((project, index) => (
                             <tr
                               key={project.id}
-                              className="hover:bg-orange-50 transition-colors animate-slideInUp text-xs sm:text-sm"
+                              className="hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors animate-slideInUp text-xs sm:text-sm"
                               style={{ animationDelay: `${index * 100}ms` }}
                             >
                               <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -1522,7 +1522,7 @@ const AdminDashboard = () => {
                                 <div className="flex space-x-1 sm:space-x-2">
                                   <button
                                     onClick={() => openProjectModal(project)}
-                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                    className="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                                   >
                                     <Eye className="w-4 h-4" />
                                   </button>
@@ -1530,10 +1530,10 @@ const AdminDashboard = () => {
                                   <button
                                     onClick={() => handleReject(project.id)}
                                     disabled={updatingProject === project.id}
-                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+                                    className="p-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                                   >
                                     {updatingProject === project.id ? (
-                                      <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                                      <div className="w-4 h-4 border-2 border-red-600 dark:border-red-400 border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
                                       <X className="w-4 h-4" />
                                     )}
@@ -1574,8 +1574,8 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-x-auto">
-                    <table className="min-w-full text-left text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400">
-                      <thead className="bg-gray-50 dark:bg-slate-800 dark:bg-slate-800 text-gray-700 dark:text-gray-300 dark:text-gray-300 font-semibold">
+                    <table className="min-w-full text-left text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                      <thead className="bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-semibold transition-colors">
                         <tr>
                           <th className="px-3 sm:px-6 py-3 sm:py-4">Transaction ID</th>
                           <th className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">Project</th>
@@ -1684,7 +1684,7 @@ const AdminDashboard = () => {
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 transition-colors">
                           <tr>
                             <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                               Review
@@ -1709,7 +1709,7 @@ const AdminDashboard = () => {
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                           {reviews
                             .filter(
                               (review) =>

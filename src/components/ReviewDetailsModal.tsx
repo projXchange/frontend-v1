@@ -104,7 +104,7 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* User Information */}
-          <div className="bg-gray-50 rounded-xl p-4">
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 transition-colors">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-lg">
@@ -112,11 +112,11 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
                 </span>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                   {review.user?.full_name || 'Unknown User'}
                 </h3>
-                <p className="text-sm text-gray-600">{review.user?.email || 'No email'}</p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{review.user?.email || 'No email'}</p>
+                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     <span>{new Date(review.created_at).toLocaleDateString()}</span>
@@ -131,34 +131,34 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
           </div>
 
           {/* Project Information */}
-          <div className="bg-blue-50 rounded-xl p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">Project Information</h4>
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 transition-colors">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Project Information</h4>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">P</span>
               </div>
               <div>
-                <p className="font-medium text-blue-900">Project ID: {review.project_id}</p>
-                <p className="text-sm text-blue-700">Review for project</p>
+                <p className="font-medium text-blue-900 dark:text-blue-200">Project ID: {review.project_id}</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">Review for project</p>
               </div>
             </div>
           </div>
 
           {/* Rating */}
-          <div className="bg-yellow-50 rounded-xl p-4">
-            <h4 className="font-semibold text-yellow-900 mb-3">Rating</h4>
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 transition-colors">
+            <h4 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-3">Rating</h4>
             {isEditing ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-yellow-700">Rating:</span>
+                  <span className="text-sm text-yellow-700 dark:text-yellow-300">Rating:</span>
                   {renderStars(editedRating, true, setEditedRating)}
-                  <span className="text-sm text-yellow-700 ml-2">({editedRating}/5)</span>
+                  <span className="text-sm text-yellow-700 dark:text-yellow-300 ml-2">({editedRating}/5)</span>
                 </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 {renderStars(review.rating)}
-                <span className="text-lg font-semibold text-yellow-900 ml-2">
+                <span className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 ml-2">
                   {review.rating}/5
                 </span>
               </div>
@@ -166,13 +166,13 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
           </div>
 
           {/* Review Text */}
-          <div className="bg-gray-50 rounded-xl p-4">
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 transition-colors">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-gray-900">Review Text</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100">Review Text</h4>
               {!isAdmin && !isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/60 transition-colors"
                 >
                   <Edit3 className="w-3 h-3" />
                   Edit
@@ -185,7 +185,7 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
                   value={editedText}
                   onChange={(e) => setEditedText(e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none transition-colors"
                   placeholder="Write your review..."
                 />
                 <div className="flex gap-2">
@@ -199,20 +199,20 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                    className="px-4 py-2 bg-gray-500 dark:bg-slate-600 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-slate-700 transition-colors"
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-700 leading-relaxed">{review.review_text}</p>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{review.review_text}</p>
             )}
           </div>
 
           {/* Status */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h4 className="font-semibold text-gray-900 mb-3">Status</h4>
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 transition-colors">
+            <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Status</h4>
             <div className="flex items-center gap-3">
               <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                 review.is_approved 
@@ -231,7 +231,7 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 transition-colors">
           <div className="flex items-center gap-2">
             {isAdmin && (
               <>
@@ -270,7 +270,7 @@ const ReviewDetailsModal: React.FC<ReviewDetailsModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              className="px-4 py-2 bg-gray-500 dark:bg-slate-600 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-slate-700 transition-colors"
             >
               Close
             </button>

@@ -168,32 +168,32 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
               {/* Description */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Description *</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Description *</label>
                 <textarea
                   rows={4}
                   value={currentData.description || ''}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 resize-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 resize-none transition-colors"
                 />
               </div>
 
               {/* Key Features */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Key Features</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Key Features</label>
                 <textarea
                   rows={3}
                   value={currentData.key_features || ''}
                   onChange={(e) => handleInputChange('key_features', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                 />
               </div>
 
               {/* Category and Difficulty */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Category *</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Category *</label>
                   <select
                     value={currentData.category || 'web_development'}
                     onChange={(e) => handleInputChange('category', e.target.value)}
@@ -211,7 +211,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Difficulty *</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Difficulty *</label>
                   <select
                     value={currentData.difficulty_level || 'beginner'}
                     onChange={(e) => handleInputChange('difficulty_level', e.target.value)}
@@ -229,19 +229,19 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               {/* Delivery Time and Author */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Delivery Time (days)</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Delivery Time (days)</label>
                   <input
                     type="number"
                     min="0"
                     value={currentData.delivery_time || 0}
                     onChange={(e) => handleInputChange('delivery_time', Number(e.target.value))}
                     disabled={!canEditAll}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5" />
                     Author ID
                   </label>
@@ -249,21 +249,21 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                     type="text"
                     value={project.author_id || ''}
                     disabled
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-500 font-mono"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-mono"
                   />
                 </div>
               </div>
 
               {/* Compact Pricing Section */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4 border border-green-200">
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-3 sm:p-4 border border-green-200 dark:border-green-800 transition-colors">
+                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   💰 Pricing
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Sale Price *</label>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Sale Price *</label>
                     <div className="relative">
-                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm">
                         {currentData.pricing?.currency === 'USD' ? '$' : '₹'}
                       </span>
                       <input
@@ -272,14 +272,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         value={currentData.pricing?.sale_price || 0}
                         onChange={(e) => handleNestedChange('pricing', 'sale_price', Number(e.target.value))}
                         disabled={!canEditAll}
-                        className="w-full pl-7 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-50"
+                        className="w-full pl-7 pr-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Original Price *</label>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Original Price *</label>
                     <div className="relative">
-                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm">
                         {currentData.pricing?.currency === 'USD' ? '$' : '₹'}
                       </span>
                       <input
@@ -288,12 +288,12 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         value={currentData.pricing?.original_price || 0}
                         onChange={(e) => handleNestedChange('pricing', 'original_price', Number(e.target.value))}
                         disabled={!canEditAll}
-                        className="w-full pl-7 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-50"
+                        className="w-full pl-7 pr-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Currency</label>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Currency</label>
                     <select
                       value={currentData.pricing?.currency || 'INR'}
                       onChange={(e) => handleNestedChange('pricing', 'currency', e.target.value)}
@@ -319,15 +319,15 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
               {/* Status Update Section */}
               {!canEditAll && (
-                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl p-3 sm:p-4 border border-yellow-200">
-                  <h4 className="text-sm sm:text-base font-bold text-yellow-900 mb-3 flex items-center gap-2">
+                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-xl p-3 sm:p-4 border border-yellow-200 dark:border-yellow-800 transition-colors">
+                  <h4 className="text-sm sm:text-base font-bold text-yellow-900 dark:text-yellow-200 mb-3 flex items-center gap-2">
                     <Edit className="w-4 h-4" />
                     Update Status
                   </h4>
 
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-semibold text-yellow-800 mb-1.5">Project Status</label>
+                      <label className="block text-xs font-semibold text-yellow-800 dark:text-yellow-300 mb-1.5">Project Status</label>
                       <select
                         value={projectUpdateData.status}
                         onChange={(e) => onUpdateDataChange({ ...projectUpdateData, status: e.target.value })}
@@ -341,14 +341,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       </select>
                     </div>
 
-                    <label className="flex items-center gap-2 p-2.5 bg-white/70 dark:bg-slate-800/70 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-800">
+                    <label className="flex items-center gap-2 p-2.5 bg-white/70 dark:bg-slate-800/70 rounded-lg cursor-pointer hover:bg-white dark:hover:bg-slate-800 transition-colors">
                       <input
                         type="checkbox"
                         checked={projectUpdateData.is_featured}
                         onChange={(e) => onUpdateDataChange({ ...projectUpdateData, is_featured: e.target.checked })}
                         className="w-4 h-4 text-yellow-600 rounded focus:ring-yellow-500"
                       />
-                      <span className="text-xs sm:text-sm font-semibold text-yellow-800">Mark as Featured ⭐</span>
+                      <span className="text-xs sm:text-sm font-semibold text-yellow-800 dark:text-yellow-300">Mark as Featured ⭐</span>
                     </label>
                   </div>
                 </div>
@@ -360,14 +360,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <div className="space-y-4 max-w-4xl mx-auto">
               {/* Tech Stack */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Technology Stack</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Technology Stack</label>
                 <input
                   type="text"
                   placeholder="React, Node.js, MongoDB (comma separated)"
                   value={currentData.tech_stack?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('tech_stack', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                 />
                 {currentData.tech_stack && currentData.tech_stack.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
@@ -381,14 +381,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               </div>
 
               {/* Requirements Section */}
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-3 sm:p-4 border border-purple-200">
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-3 sm:p-4 border border-purple-200 dark:border-purple-800 transition-colors">
+                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   📋 Requirements
                 </h3>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                       System Requirements
                       <span className="ml-2 text-xs text-green-600">(Public - Visible to all)</span>
                     </label>
@@ -401,12 +401,12 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         handleNestedChange('requirements', 'system_requirements', arr);
                       }}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                       Dependencies
                       {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
                     </label>
@@ -419,12 +419,12 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         handleNestedChange('requirements', 'dependencies', arr);
                       }}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                       Installation Steps
                       {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
                     </label>
@@ -437,7 +437,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         handleNestedChange('requirements', 'installation_steps', arr);
                       }}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50 resize-none"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 resize-none transition-colors"
                     />
                   </div>
                 </div>
@@ -448,14 +448,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           {activeTab === 'media' && (
             <div className="space-y-4 max-w-4xl mx-auto">
               {/* URLs Section */}
-              <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl p-3 sm:p-4 border border-cyan-200">
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl p-3 sm:p-4 border border-cyan-200 dark:border-cyan-800 transition-colors">
+                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   🔗 Project Links
                 </h3>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                       GitHub Repository
                       {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
                     </label>
@@ -465,12 +465,12 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       value={currentData.github_url || ''}
                       onChange={(e) => handleInputChange('github_url', e.target.value)}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-50"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                       Live Demo
                       <span className="ml-2 text-xs text-green-600">(Public - Visible to all)</span>
                     </label>
@@ -480,12 +480,12 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       value={currentData.demo_url || ''}
                       onChange={(e) => handleInputChange('demo_url', e.target.value)}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-50"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                       YouTube Video
                       {!canEditAll && <span className="ml-2 text-xs text-orange-600">(Sensitive - Hidden from non-purchasers)</span>}
                     </label>
@@ -495,7 +495,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                       value={currentData.youtube_url || ''}
                       onChange={(e) => handleInputChange('youtube_url', e.target.value)}
                       disabled={!canEditAll}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-50"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                     />
                   </div>
                 </div>
@@ -503,21 +503,21 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
               {/* Thumbnail */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">🖼️ Project Thumbnail</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">🖼️ Project Thumbnail</label>
                 <input
                   type="text"
                   placeholder="https://example.com/thumbnail.jpg"
                   value={currentData.thumbnail || ''}
                   onChange={(e) => handleInputChange('thumbnail', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                 />
                 {currentData.thumbnail && (
                   <div className="mt-3">
                     <img
                       src={currentData.thumbnail}
                       alt="Thumbnail preview"
-                      className="w-full max-w-lg h-40 sm:h-48 object-cover rounded-lg border border-gray-200"
+                      className="w-full max-w-lg h-40 sm:h-48 object-cover rounded-lg border border-gray-200 dark:border-slate-700"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=Invalid+Image';
                       }}
@@ -528,14 +528,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
               {/* Images */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">📷 Gallery</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">📷 Gallery</label>
                 <textarea
                   rows={2}
                   placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
                   value={currentData.images?.join(', ') || ''}
                   onChange={(e) => handleArrayChange('images', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 resize-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 resize-none transition-colors"
                 />
                 {currentData.images && currentData.images.length > 0 && (
                   <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -544,7 +544,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                         <img
                           src={img}
                           alt={`Gallery ${idx + 1}`}
-                          className="w-full h-24 sm:h-28 object-cover rounded-lg border border-gray-200"
+                          className="w-full h-24 sm:h-28 object-cover rounded-lg border border-gray-200 dark:border-slate-700"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Invalid';
                           }}
@@ -562,8 +562,8 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         </div>
 
         {/* Compact Footer */}
-        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 flex-shrink-0">
-          <div className="text-xs text-gray-600 text-center sm:text-left">
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 flex-shrink-0 transition-colors">
+          <div className="text-xs text-gray-600 dark:text-gray-400 text-center sm:text-left">
             <span className="font-semibold">Updated:</span> {new Date(project.updated_at).toLocaleDateString()}
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -596,7 +596,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-gray-700 transition-all"
+              className="px-3 sm:px-4 py-2 bg-gray-600 dark:bg-slate-700 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-gray-700 dark:hover:bg-slate-600 transition-all"
             >
               Close
             </button>
