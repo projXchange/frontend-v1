@@ -9,6 +9,7 @@ import {
   PaymentFailedRequest,
 } from '../types/Order';
 import { API_CONFIG, getApiUrl } from '../config/api';
+import { apiClient } from '../utils/apiClient';
 
 // Razorpay script loading
 export const loadRazorpayScript = (): Promise<boolean> => {
@@ -32,7 +33,7 @@ export const createOrder = async (
   orderData: CreateOrderRequest,
   token: string
 ): Promise<CreateOrderResponse> => {
-  const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CREATE_ORDER), {
+  const response = await apiClient(getApiUrl(API_CONFIG.ENDPOINTS.CREATE_ORDER), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ export const verifyPayment = async (
   paymentData: VerifyPaymentRequest,
   token: string
 ): Promise<VerifyPaymentResponse> => {
-  const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.VERIFY_PAYMENT), {
+  const response = await apiClient(getApiUrl(API_CONFIG.ENDPOINTS.VERIFY_PAYMENT), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ export const reportPaymentFailure = async (
   failureData: PaymentFailedRequest,
   token: string
 ): Promise<void> => {
-  const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT_FAILED), {
+  const response = await apiClient(getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT_FAILED), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

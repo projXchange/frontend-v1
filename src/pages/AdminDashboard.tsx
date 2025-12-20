@@ -30,7 +30,8 @@ import toast from "react-hot-toast"
 import TransactionDetailsModal from "../components/TransactionDetailsModal"
 import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import LoadingNumber from "../components/LoadingNumber"
-import { getApiUrl } from '../config/api'
+import { apiClient } from "../utils/apiClient"
+import { getApiUrl } from "../config/api"
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
@@ -75,16 +76,16 @@ const AdminDashboard = () => {
     try {
       // Fetch in parallel for efficiency
       const [usersRes, projectsRes, transactionsRes, pendingProjectsRes] = await Promise.all([
-        fetch(getApiUrl('/admin/users'), {
+        apiClient(getApiUrl("/admin/users"), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch(getApiUrl('/projects'), {
+        apiClient(getApiUrl("/projects"), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch(getApiUrl('/admin/transactions/recent'), {
+        apiClient(getApiUrl("/admin/transactions/recent"), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
-        fetch(getApiUrl('/projects?status=pending'), {
+        apiClient(getApiUrl("/projects?status=pending"), {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         }),
       ])
@@ -187,7 +188,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch(getApiUrl("/admin/users"), {
+      const res = await apiClient(getApiUrl("/admin/users"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -212,7 +213,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch(getApiUrl("/projects"), {
+      const res = await apiClient(getApiUrl("/projects"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -237,7 +238,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch(getApiUrl("/projects?status=pending"), {
+      const res = await apiClient(getApiUrl("/projects?status=pending"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -262,7 +263,7 @@ const AdminDashboard = () => {
     setUpdatingProject(projectId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/admin/projects/${projectId}/status`), {
+      const response = await apiClient(getApiUrl(`/admin/projects/${projectId}/status`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -301,7 +302,7 @@ const AdminDashboard = () => {
     setUpdatingUser(userId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/admin/users/${userId}/status`), {
+      const response = await apiClient(getApiUrl(`/admin/users/${userId}/status`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -340,7 +341,7 @@ const AdminDashboard = () => {
 
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/admin/users/${userId}`), {
+      const response = await apiClient(getApiUrl(`/admin/users/${userId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -367,7 +368,7 @@ const AdminDashboard = () => {
     setFetchingUserDetails(userId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/admin/users/${userId}`), {
+      const response = await apiClient(getApiUrl(`/admin/users/${userId}`), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -404,7 +405,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch(getApiUrl("/admin/transactions/recent"), {
+      const res = await apiClient(getApiUrl("/admin/transactions/recent"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -441,7 +442,8 @@ const AdminDashboard = () => {
       if (paymentGatewayResponse) requestBody.payment_gateway_response = paymentGatewayResponse
       if (metadata) requestBody.metadata = metadata
 
-      const response = await fetch(getApiUrl(`/admin/transactions/${transactionId}/status`),
+      const response = await apiClient(
+        getApiUrl(`/admin/transactions/${transactionId}/status`),
         {
           method: "PATCH", // or PATCH depending on your API
           headers: {
@@ -481,7 +483,7 @@ const AdminDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch(getApiUrl("/admin/reviews"), {
+      const res = await apiClient(getApiUrl("/admin/reviews"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -506,7 +508,7 @@ const AdminDashboard = () => {
     const token = localStorage.getItem("token")
 
     try {
-      const response = await fetch(getApiUrl(`/admin/reviews/approve`), {
+      const response = await apiClient(getApiUrl(`/admin/reviews/approve`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -541,7 +543,7 @@ const AdminDashboard = () => {
     setDeletingReview(reviewId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
+      const response = await apiClient(getApiUrl(`/reviews/${reviewId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -597,7 +599,8 @@ const AdminDashboard = () => {
       console.log("Request body:", requestBody)
       console.log("Request body JSON:", JSON.stringify(requestBody))
 
-      const response = await fetch(getApiUrl(`/admin/projects/${selectedProject.id}/status`),
+      const response = await apiClient(
+        getApiUrl(`/admin/projects/${selectedProject.id}/status`),
         {
           method: "PATCH",
           headers: {
@@ -661,7 +664,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const projectResponse = await fetch(getApiUrl(`/projects/${projectId}`), {
+      const projectResponse = await apiClient(getApiUrl(`/projects/${projectId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

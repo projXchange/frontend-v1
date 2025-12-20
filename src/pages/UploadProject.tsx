@@ -21,7 +21,8 @@ import {
   ArrowRight,
 } from "lucide-react"
 import toast from "react-hot-toast"
-import { getApiUrl } from '../config/api'
+import { apiClient } from "../utils/apiClient"
+import { getApiUrl } from "../config/api"
 
 const UploadProject = () => {
   const [formData, setFormData] = useState({
@@ -420,7 +421,7 @@ const UploadProject = () => {
 
         console.log("Creating project...")
 
-        const projectResponse = await fetch(getApiUrl("/projects"), {
+        const projectResponse = await apiClient(getApiUrl("/projects"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -550,7 +551,7 @@ const UploadProject = () => {
         }
 
         try {
-          const updateResponse = await fetch(getApiUrl(`/projects/${backendProjectId}`), {
+          const updateResponse = await apiClient(getApiUrl(`/projects/${backendProjectId}`), {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",

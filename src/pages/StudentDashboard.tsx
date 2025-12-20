@@ -28,6 +28,8 @@ import {
   DollarSign,
 } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
+import { apiClient } from "../utils/apiClient"
+import { getApiUrl } from "../config/api"
 import { useWishlist } from "../contexts/WishlistContext"
 import { motion } from "framer-motion"
 import type { ProfileForm, SocialLinks } from "../types/ProfileForm"
@@ -133,7 +135,7 @@ const StudentDashboard = () => {
     setError("")
     const token = localStorage.getItem("token")
     try {
-      const res = await fetch(getApiUrl("/reviews/my"), {
+      const res = await apiClient(getApiUrl("/reviews/my"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +160,7 @@ const StudentDashboard = () => {
     setPurchasedProjectsLoading(true)
 
     try {
-      const res = await fetch(getApiUrl(`/projects/my`), {
+      const res = await apiClient(getApiUrl(`/projects/my`), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -195,7 +197,7 @@ const StudentDashboard = () => {
   const fetchMyTransactions = async () => {
     setTransactionsLoading(true)
     try {
-      const res = await fetch(getApiUrl("/transactions/my"), {
+      const res = await apiClient(getApiUrl("/transactions/my"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -216,7 +218,7 @@ const StudentDashboard = () => {
   const fetchDashboardStats = async () => {
     setStatsLoading(true)
     try {
-      const res = await fetch(getApiUrl("/dashboard/stats"), {
+      const res = await apiClient(getApiUrl("/dashboard/stats"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -238,7 +240,7 @@ const StudentDashboard = () => {
     setIsLoading(true)
     setError("")
     try {
-      const res = await fetch(getApiUrl(`/users/profile/me`), {
+      const res = await apiClient(getApiUrl(`/users/profile/me`), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -351,7 +353,7 @@ const StudentDashboard = () => {
             projectEditData?.files?.documentation_files || selectedProject.files?.documentation_files || [],
         }
       }
-      const res = await fetch(getApiUrl(`/projects/${selectedProject.id}`), {
+      const res = await apiClient(getApiUrl(`/projects/${selectedProject.id}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -385,7 +387,7 @@ const StudentDashboard = () => {
   const handleSendForApproval = async (project: Project) => {
     try {
       setUpdatingProjectId(project.id)
-      const res = await fetch(getApiUrl(`/projects/${project.id}`), {
+      const res = await apiClient(getApiUrl(`/projects/${project.id}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -413,6 +415,7 @@ const StudentDashboard = () => {
     try {
       const method = "PATCH"
       const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
+      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const payload = {
         rating: profileForm.rating,
         total_sales: profileForm.total_sales,
@@ -425,7 +428,7 @@ const StudentDashboard = () => {
         social_links: Object.fromEntries(Object.entries(profileForm.social_links || {}).map(([k, v]) => [k, v ?? ""])),
         skills: profileForm.skills || [],
       }
-      const res = await fetch(url, {
+      const res = await apiClient(url, {
         method,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -498,7 +501,7 @@ const StudentDashboard = () => {
     setUpdatingReview(reviewId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
+      const response = await apiClient(getApiUrl(`/reviews/${reviewId}`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -527,7 +530,7 @@ const StudentDashboard = () => {
     setUpdatingReview(reviewId)
     const token = localStorage.getItem("token")
     try {
-      const response = await fetch(getApiUrl(`/reviews/${reviewId}`), {
+      const response = await apiClient(getApiUrl(`/reviews/${reviewId}`), {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

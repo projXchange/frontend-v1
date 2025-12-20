@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { AuthResult, User } from '../types/User';
-import { getApiUrl } from '../config/api'
+import { getApiUrl } from '../config/api';
+import { registerTokenExpirationHandler } from '../utils/apiClient';
 
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
   confirmResetPassword: (token: string, password: string) => Promise<boolean>;
   verifyEmail: (token: string) => Promise<{ success: boolean; message?: string }>;
   resendVerificationEmail: (email: string) => Promise<void>;
+  handleTokenExpiration: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStudent: boolean;
@@ -42,6 +44,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(parsedUser);
     }
     setLoading(false);
+  }, []);
+
+  // Handle token expiration - called by API client when token expires
+  const handleTokenExpiration = () => {
+    // Get current user ID before clearing
+    const currentUserId = user?.id;
+
+    // Clear user state
+    setUser(null);
+
+    // Clear localStorage
+    localStorage.removeItem('studystack_user');
+    localStorage.removeItem('token');
+
+    // Clear user-specific data
+    if (currentUserId) {
+      localStorage.removeItem(`wishlist_${currentUserId}`);
+      localStorage.removeItem(`cart_${currentUserId}`);
+    }
+
+    // Show notification
+    toast.error('Your session has expired. Please log in again.');
+
+    // Open login modal
+    openAuthModal(true);
+  };
+
+  // Register the token expiration handler with apiClient
+  useEffect(() => {
+    registerTokenExpirationHandler(handleTokenExpiration);
   }, []);
   
 
@@ -257,6 +289,7 @@ const resendVerificationEmail = async (email: string): Promise<void> => {
     confirmResetPassword,
     verifyEmail,
     resendVerificationEmail,
+    handleTokenExpiration,
     isAuthenticated: !!user,
     isAdmin: user?.user_type === 'admin',
     isStudent: user?.user_type === 'student',

@@ -5,7 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { ProjectCard } from '../components/ProjectCard';
 import { Project } from '../types/Project';
-import { getApiUrl } from '../config/api'
+import { apiClient } from '../utils/apiClient';
+import { getApiUrl } from '../config/api';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,7 +37,7 @@ const Home = () => {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(getApiUrl('/projects/home'), {
+        const response = await apiClient(getApiUrl('/projects/home'), {
           method: 'GET',
           headers,
         });

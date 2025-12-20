@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { WishlistItem, Project } from '../types/Project';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
-import { getApiUrl } from '../config/api'
+import { getApiUrl } from '../config/api';
+import { apiClient } from '../utils/apiClient';
 
 interface WishlistContextType {
   wishlist: WishlistItem[];
@@ -35,7 +36,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setLoading(true);
     try {
-      const response = await fetch(getApiUrl('/wishlist'), {
+      const response = await apiClient(getApiUrl('/wishlist'), {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       // Try to save to backend first
-      const response = await fetch(getApiUrl('/wishlist'), {
+      const response = await apiClient(getApiUrl('/wishlist'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -133,7 +134,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       if (wishlistItem) {
         // Try to remove from backend first
-        const response = await fetch(getApiUrl(`/wishlist/${wishlistItem.project_id}`), {
+        const response = await apiClient(getApiUrl(`/wishlist/${wishlistItem.project_id}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,

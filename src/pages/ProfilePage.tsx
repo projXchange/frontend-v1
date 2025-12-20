@@ -18,7 +18,8 @@ import { useAuth } from "../contexts/AuthContext"
 import { motion } from "framer-motion"
 import type { ProfileForm, SocialLinks } from "../types/ProfileForm"
 import toast from "react-hot-toast"
-import { getApiUrl } from '../config/api'
+import { apiClient } from "../utils/apiClient"
+import { getApiUrl } from "../config/api"
 
 const ProfilePage = () => {
   const { user } = useAuth()
@@ -50,7 +51,7 @@ const ProfilePage = () => {
     setIsLoading(true)
     setError("")
     try {
-      const res = await fetch(getApiUrl(`/users/profile/me`), {
+      const res = await apiClient(getApiUrl(`/users/profile/me`), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
@@ -92,6 +93,7 @@ const ProfilePage = () => {
     try {
       const method = "PATCH"
       const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
+      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
       const payload = {
         rating: profileForm.rating,
         total_sales: profileForm.total_sales,
@@ -104,7 +106,7 @@ const ProfilePage = () => {
         social_links: Object.fromEntries(Object.entries(profileForm.social_links || {}).map(([k, v]) => [k, v ?? ""])),
         skills: profileForm.skills || [],
       }
-      const res = await fetch(url, {
+      const res = await apiClient(url, {
         method,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
