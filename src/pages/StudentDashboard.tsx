@@ -178,10 +178,6 @@ const StudentDashboard = () => {
       setMyProjects(uploaded)
       setPurchasedProjects(purchased)
 
-      // Log the fresh data directly instead of relying on state
-      console.log("Uploaded projects:", uploaded)
-      console.log("Purchased projects:", purchased)
-
     } catch (err) {
       console.error("Error fetching projects:", err)
       setMyProjects([])

@@ -596,9 +596,6 @@ const AdminDashboard = () => {
         is_featured: projectUpdateData.is_featured,
       }
 
-      console.log("Request body:", requestBody)
-      console.log("Request body JSON:", JSON.stringify(requestBody))
-
       const response = await apiClient(
         getApiUrl(`/admin/projects/${selectedProject.id}/status`),
         {
@@ -610,8 +607,6 @@ const AdminDashboard = () => {
           body: JSON.stringify(requestBody),
         },
       )
-
-      console.log("Response status:", response.status)
 
       if (!response.ok) {
         const errorText = await response.text()

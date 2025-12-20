@@ -419,8 +419,6 @@ const UploadProject = () => {
           },
         }
 
-        console.log("Creating project...")
-
         const projectResponse = await apiClient(getApiUrl("/projects"), {
           method: "POST",
           headers: {
@@ -431,8 +429,6 @@ const UploadProject = () => {
           body: JSON.stringify(initialProjectData),
         })
 
-        console.log("Project response status:", projectResponse.status)
-
         if (!projectResponse.ok) {
           const errorData = await projectResponse.json()
           console.error("Project creation error:", errorData)
@@ -440,7 +436,6 @@ const UploadProject = () => {
         }
 
         const projectResult = await projectResponse.json()
-        console.log("Project creation response:", projectResult)
 
         // Get the project ID from backend response
         const backendProjectId =
@@ -453,8 +448,6 @@ const UploadProject = () => {
           throw new Error("Project ID not found in response")
         }
 
-        console.log("Project created with ID:", backendProjectId)
-
         // Step 2: Upload all files to Cloudinary with project ID as folder
         const projectFolder = `projects/${backendProjectId}`
 
@@ -466,13 +459,11 @@ const UploadProject = () => {
         // 2.1 Upload Thumbnail
         if (thumbnailFile || (formData.thumbnailUrl && formData.thumbnailUrl !== "TEMP_FILE")) {
           try {
-            console.log("Uploading thumbnail...")
             if (thumbnailFile) {
               finalThumbnailUrl = await uploadToCloudinary(thumbnailFile, `${projectFolder}/thumbnail`, "image")
             } else if (formData.thumbnailUrl && formData.thumbnailUrl !== "TEMP_FILE") {
               finalThumbnailUrl = formData.thumbnailUrl
             }
-            console.log("Thumbnail uploaded:", finalThumbnailUrl)
           } catch (error) {
             console.error("Thumbnail upload failed:", error)
           }
@@ -483,12 +474,10 @@ const UploadProject = () => {
 
         if (imageFiles.length > 0) {
           try {
-            console.log(`Uploading ${imageFiles.length} images...`)
             const imageUploadPromises = imageFiles.map((file, index) =>
               uploadToCloudinary(file, `${projectFolder}/images`, "image"),
             )
             finalImageUrls = await Promise.all(imageUploadPromises)
-            console.log(`${finalImageUrls.length} images uploaded`)
           } catch (error) {
             console.error("Images upload failed:", error)
           }
@@ -506,12 +495,10 @@ const UploadProject = () => {
 
         if (sourceFiles.length > 0) {
           try {
-            console.log(`Uploading ${sourceFiles.length} source files...`)
             const sourceUploadPromises = sourceFiles.map((file) =>
               uploadToCloudinary(file, `${projectFolder}/source`, "raw"),
             )
             finalSourceFileUrls = await Promise.all(sourceUploadPromises)
-            console.log(`${finalSourceFileUrls.length} source files uploaded`)
           } catch (error) {
             console.error("Source files upload failed:", error)
           }
@@ -529,18 +516,14 @@ const UploadProject = () => {
 
         if (docFiles.length > 0) {
           try {
-            console.log(`Uploading ${docFiles.length} documentation files...`)
             const docUploadPromises = docFiles.map((file) => uploadToCloudinary(file, `${projectFolder}/docs`, "raw"))
             finalDocFileUrls = await Promise.all(docUploadPromises)
-            console.log(`${finalDocFileUrls.length} documentation files uploaded`)
           } catch (error) {
             console.error("Documentation files upload failed:", error)
           }
         }
 
         // Step 3: Update project with all Cloudinary URLs
-        console.log("Updating project with file URLs...")
-
         const updateData = {
           thumbnail: finalThumbnailUrl,
           images: finalImageUrls,
@@ -562,7 +545,7 @@ const UploadProject = () => {
           })
 
           if (updateResponse.ok) {
-            console.log("Project updated with all files successfully")
+            // Project updated successfully
           } else {
             const errorData = await updateResponse.json()
             console.error("Failed to update project with files:", errorData)

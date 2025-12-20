@@ -46,8 +46,6 @@ const Home = () => {
         setProjects(data.featured_projects || []);
         setTopProjects(data.top_rated_projects)
 
-        console.log('Home data:', data);
-
         // Process categories from API
         const categoryIcons = {
           'Java': Code,

@@ -211,7 +211,6 @@ const ProjectDetail = () => {
           in_wishlist: prev?.in_wishlist || false,
           in_cart: prev?.in_cart || false,
         }));
-        console.log('User has purchased the project');
       }
     } catch (err) {
       console.error('Error checking purchase status:', err);

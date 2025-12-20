@@ -93,7 +93,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const loggedInUser = data.user;
-      console.log(loggedInUser)
       setUser(loggedInUser);
       localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
       localStorage.setItem('token', data.refreshToken);
@@ -135,7 +134,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // setUser(newUser);
       // localStorage.setItem('studystack_user', JSON.stringify(newUser));
       // localStorage.setItem('token', data.accessToken);
-      // console.log("signup user response - ",newUser)
 
       toast.success('Account created! Please check your email to verify.');
       return { success: true, message: "Account created! Please check your email to verify." };
