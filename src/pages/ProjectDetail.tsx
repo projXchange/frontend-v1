@@ -488,6 +488,24 @@ const ProjectDetail = () => {
     }
   }
 
+  const handleUnlockContent = () => {
+    if (!project) return;
+
+    // Prevent unlock actions on demo projects
+    if (project.isDemo) {
+      toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase real projects!");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error("Please login to purchase and unlock this content")
+      return
+    }
+
+    // If authenticated, proceed with adding to cart
+    handleToggleCart()
+  }
+
   const handleToggleCart = async () => {
     if (!project) return;
 
@@ -682,7 +700,7 @@ const ProjectDetail = () => {
                 <div
                   className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp relative group cursor-pointer"
                   style={{ animationDelay: "600ms" }}
-                  onClick={handleToggleCart}
+                  onClick={handleUnlockContent}
                 >
                   {/* Project Thumbnail - Always visible */}
                   {project.thumbnail && (
@@ -714,7 +732,7 @@ const ProjectDetail = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleToggleCart();
+                          handleUnlockContent();
                         }}
                         disabled={actionLoading}
                         className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all duration-200 text-xs sm:text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50"
@@ -758,7 +776,7 @@ const ProjectDetail = () => {
                   </a>
                 ) : !isPurchased ? (
                   <button
-                    onClick={handleToggleCart}
+                    onClick={handleUnlockContent}
                     disabled={actionLoading}
                     className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-700 text-gray-600 dark:text-gray-300 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
                   >
@@ -780,7 +798,7 @@ const ProjectDetail = () => {
                   </a>
                 ) : !isPurchased ? (
                   <button
-                    onClick={handleToggleCart}
+                    onClick={handleUnlockContent}
                     disabled={actionLoading}
                     className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-700 text-gray-600 dark:text-gray-300 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden text-xs sm:text-sm font-medium hover:from-gray-200 hover:to-gray-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
                   >
@@ -959,7 +977,7 @@ const ProjectDetail = () => {
                         )
                       ) : (
                         <div
-                          onClick={handleToggleCart}
+                          onClick={handleUnlockContent}
                           className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
@@ -998,7 +1016,7 @@ const ProjectDetail = () => {
                         )
                       ) : (
                         <div
-                          onClick={handleToggleCart}
+                          onClick={handleUnlockContent}
                           className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
@@ -1038,7 +1056,7 @@ const ProjectDetail = () => {
                         )
                       ) : (
                         <div
-                          onClick={handleToggleCart}
+                          onClick={handleUnlockContent}
                           className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
@@ -1079,7 +1097,7 @@ const ProjectDetail = () => {
                         )
                       ) : (
                         <div
-                          onClick={handleToggleCart}
+                          onClick={handleUnlockContent}
                           className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 sm:p-6 border-2 border-dashed border-gray-300 dark:border-slate-600 relative overflow-hidden cursor-pointer hover:from-gray-100 hover:to-gray-200 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:border-gray-400 dark:hover:border-slate-500 transition-all"
                         >
                           <div className="absolute top-2 right-2">
