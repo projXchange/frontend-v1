@@ -20,6 +20,7 @@ export interface Project {
   status: string;
   is_featured: boolean;
   isPurchased?: boolean;
+  isDemo?: boolean;
   created_at: string;
   updated_at: string;
   discount_percentage?: number;

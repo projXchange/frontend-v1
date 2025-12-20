@@ -4,6 +4,7 @@ import { Project } from '../types/Project';
 import { ProjectCard } from '../components/ProjectCard';
 import { apiClient } from '../utils/apiClient';
 import { getApiUrl } from '../config/api';
+import { DEMO_PROJECTS } from '../constants/demoProjects';
 
 const ProjectListing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -134,7 +135,14 @@ const ProjectListing = () => {
       const data = await res.json();
 
       const newProjects = data.data || data || [];
-      setProjects(prev => append ? [...prev, ...newProjects] : newProjects);
+      
+      // Only add demo projects on page 1 and when not appending
+      let projectsToDisplay = newProjects;
+      if (page === 1 && !append) {
+        projectsToDisplay = [...DEMO_PROJECTS, ...newProjects];
+      }
+      
+      setProjects(prev => append ? [...prev, ...newProjects] : projectsToDisplay);
 
       // Use pagination data from API response
       const pagination = data.pagination || {};

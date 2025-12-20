@@ -6,12 +6,12 @@ import { useAuth } from "../contexts/AuthContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
 import type { Project, Review } from "../types/Project"
-import type { Transaction } from "../types/Transaction"
 import toast from "react-hot-toast"
 import type { User } from "../types/User"
 import { DownloadFilesModal } from "../components/DownloadFilesModal"
 import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
+import { DEMO_PROJECTS } from "../constants/demoProjects"
 
 interface UserStatus {
   has_purchased: boolean
@@ -75,6 +75,18 @@ const ProjectDetail = () => {
     setLoading(true)
     setError(null)
     try {
+      // Check if this is a demo project first
+      const demoProject = DEMO_PROJECTS.find(p => p.id === id);
+      if (demoProject) {
+        // Handle demo project - use local data
+        setProject(demoProject);
+        setUserStatus({ has_purchased: false, in_wishlist: false, in_cart: false });
+        setAuthorDetails(demoProject.author_details || null);
+        // Set empty related projects for demo
+        setRelatedProjects([]);
+        setLoading(false);
+        return;
+      }
 
       const token = localStorage.getItem('token');
       const headers: HeadersInit = {
@@ -117,6 +129,15 @@ const ProjectDetail = () => {
 
   const fetchReviews = async () => {
     if (!id) return;
+
+    // Demo projects don't have backend reviews
+    const isDemoProject = DEMO_PROJECTS.some(p => p.id === id);
+    if (isDemoProject) {
+      setApprovedReviews([]);
+      setPendingReviews([]);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const headers: HeadersInit = {
@@ -156,6 +177,12 @@ const ProjectDetail = () => {
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewText.trim() || !project || formRating === 0) return;
+
+    // Prevent reviews on demo projects
+    if (project.isDemo) {
+      toast.error("Reviews are not available for demo projects");
+      return;
+    }
 
     setSubmittingReview(true);
     try {
@@ -436,7 +463,15 @@ const ProjectDetail = () => {
   const cartStatus = project ? userStatus?.in_cart || isInCart(project.id) : false
 
   const handleToggleWishlist = async () => {
-    if (!isAuthenticated || !project) {
+    if (!project) return;
+
+    // Prevent wishlist actions on demo projects
+    if (project.isDemo) {
+      toast.error("🎁 Demo projects are for preview only. Browse our full catalog to add projects to your wishlist!");
+      return;
+    }
+
+    if (!isAuthenticated) {
       toast.error("Please login to manage wishlist.")
       return
     }
@@ -454,7 +489,15 @@ const ProjectDetail = () => {
   }
 
   const handleToggleCart = async () => {
-    if (!isAuthenticated || !project) {
+    if (!project) return;
+
+    // Prevent cart actions on demo projects
+    if (project.isDemo) {
+      toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase real projects!");
+      return;
+    }
+
+    if (!isAuthenticated) {
       toast.error("Please login to manage your cart")
       return
     }
@@ -537,10 +580,14 @@ const ProjectDetail = () => {
                 <div className="flex items-center gap-1 sm:gap-4 justify-start">
                   <button
                     onClick={handleToggleWishlist}
-                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:text-red-500 transition-all duration-200 rounded-xl hover:bg-red-50 hover:scale-105 animate-slideInUp text-xs sm:text-sm"
+                    disabled={project.isDemo}
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 transition-all duration-200 rounded-xl animate-slideInUp text-xs sm:text-sm ${project.isDemo
+                      ? "text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
+                      : "text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 hover:scale-105"
+                      }`}
                     style={{ animationDelay: "200ms" }}
                   >
-                    <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistStatus ? "text-red-500 fill-current" : ""}`} />
+                    <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistStatus && !project.isDemo ? "text-red-500 fill-current" : ""}`} />
                     <span className="font-medium sm:inline">{wishlistStatus ? "Wishlisted" : "Wishlist"}</span>
                   </button>
                   <button
@@ -1021,10 +1068,10 @@ const ProjectDetail = () => {
                                 <button
                                   key={index}
                                   onClick={() => handleDownloadFile(file, `documentation-${index + 1}.pdf`)}
-                                  className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
+                                  className="w-full flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200 dark:border-blue-700 hover:shadow-md hover:scale-102 transition-all text-xs sm:text-sm"
                                 >
-                                  <Download className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                                  <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Download Documentation {index + 1}</span>
+                                  <Download className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                                  <span className="text-gray-700 dark:text-gray-300 font-medium">Download Documentation {index + 1}</span>
                                 </button>
                               ))}
                             </div>
@@ -1539,7 +1586,11 @@ const ProjectDetail = () => {
                   {/* Wishlist Button */}
                   <button
                     onClick={handleToggleWishlist}
-                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 dark:text-gray-200 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base"
+                    disabled={project.isDemo}
+                    className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
+                      ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                      : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105"
+                      }`}
                     style={{ animationDelay: "350ms" }}
                   >
                     <Heart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -1549,11 +1600,18 @@ const ProjectDetail = () => {
                   {/* Add/Remove Cart Button */}
                   <button
                     onClick={() => {
+                      if (project.isDemo) {
+                        toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase!");
+                        return;
+                      }
                       if (cartStatus) removeFromCart(project.id);
                       else addToCart(project);
                     }}
-                    disabled={!isAuthenticated || loading}
-                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 dark:text-gray-200 py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 hover:scale-105 transition-all duration-200 animate-slideInUp text-xs sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!isAuthenticated || loading || project.isDemo}
+                    className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
+                      ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                      : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      }`}
                     style={{ animationDelay: "380ms" }}
                   >
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />

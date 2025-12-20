@@ -1,11 +1,12 @@
 
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
-import { Star, Tag, Flame, Heart, ShoppingCart } from "lucide-react"
+import { Star, Tag, Flame, Heart, ShoppingCart, Sparkles } from "lucide-react"
 import type { Project } from "../types/Project"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
 import { useAuth } from "../contexts/AuthContext"
+import toast from "react-hot-toast"
 
 interface ProjectCardProps {
   project: Project
@@ -64,6 +65,14 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             viewport={{ once: true }}
           />
 
+          {/* Demo Badge */}
+          {project.isDemo && (
+            <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
+              <Sparkles className="w-3 h-3" />
+              DEMO
+            </div>
+          )}
+
           {/* Discount Badge */}
           {discount && (
             <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
@@ -85,14 +94,27 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             whileInView={{ scale: 1, opacity: 1 }}
             transition={{ delay: index * 0.15 + 0.4, duration: 0.3 }}
             viewport={{ once: true }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInWishlist(project.id) ? "hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400" : "hover:bg-pink-100 dark:hover:bg-pink-900/30 text-pink-500 dark:text-pink-400"
-              }`}
-            title={isInWishlist(project.id) ? "Remove from wishlist" : "Add to wishlist"}
+            whileHover={{ scale: project.isDemo ? 1 : 1.1 }}
+            whileTap={{ scale: project.isDemo ? 1 : 0.95 }}
+            disabled={project.isDemo}
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${
+              project.isDemo 
+                ? "opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-500" 
+                : isInWishlist(project.id) 
+                  ? "hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400" 
+                  : "hover:bg-pink-100 dark:hover:bg-pink-900/30 text-pink-500 dark:text-pink-400"
+            }`}
+            title={project.isDemo ? "Demo project - view only" : (isInWishlist(project.id) ? "Remove from wishlist" : "Add to wishlist")}
             type="button"
             onClick={(e) => {
               e.preventDefault()
+              
+              // Prevent actions on demo projects
+              if (project.isDemo) {
+                toast.error("🎁 Demo projects are for preview only. Browse our full catalog!")
+                return
+              }
+              
               if (!isAuthenticated) {
                 openAuthModal(true)
                 return
@@ -104,7 +126,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
               }
             }}
           >
-            <Heart className={`w-4 sm:w-5 h-4 sm:h-5 ${isInWishlist(project.id) ? "fill-current" : ""}`} />
+            <Heart className={`w-4 sm:w-5 h-4 sm:h-5 ${isInWishlist(project.id) && !project.isDemo ? "fill-current" : ""}`} />
           </motion.button>
 
           {/* Cart Button */}
@@ -113,14 +135,27 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             whileInView={{ scale: 1, opacity: 1 }}
             transition={{ delay: index * 0.15 + 0.5, duration: 0.3 }}
             viewport={{ once: true }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${isInCart(project.id) ? "hover:bg-green-100 dark:hover:bg-green-900/30 text-green-500 dark:text-green-400" : "hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500 dark:text-blue-400"
-              }`}
-            title={isInCart(project.id) ? "Remove from cart" : "Add to cart"}
+            whileHover={{ scale: project.isDemo ? 1 : 1.1 }}
+            whileTap={{ scale: project.isDemo ? 1 : 0.95 }}
+            disabled={project.isDemo}
+            className={`absolute bottom-2 sm:bottom-3 md:bottom-4 right-14 sm:right-16 md:right-16 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full p-1.5 sm:p-2 transition z-20 shadow ${
+              project.isDemo 
+                ? "opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-500" 
+                : isInCart(project.id) 
+                  ? "hover:bg-green-100 dark:hover:bg-green-900/30 text-green-500 dark:text-green-400" 
+                  : "hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500 dark:text-blue-400"
+            }`}
+            title={project.isDemo ? "Demo project - view only" : (isInCart(project.id) ? "Remove from cart" : "Add to cart")}
             type="button"
             onClick={(e) => {
               e.preventDefault()
+              
+              // Prevent actions on demo projects
+              if (project.isDemo) {
+                toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase!")
+                return
+              }
+              
               if (!isAuthenticated) {
                 openAuthModal(true)
                 return
@@ -133,7 +168,7 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
               }
             }}
           >
-            <ShoppingCart className={`w-4 sm:w-5 h-4 sm:h-5 ${isInCart(project.id) ? "fill-current" : ""}`} />
+            <ShoppingCart className={`w-4 sm:w-5 h-4 sm:h-5 ${isInCart(project.id) && !project.isDemo ? "fill-current" : ""}`} />
           </motion.button>
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
