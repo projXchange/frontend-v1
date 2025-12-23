@@ -31,7 +31,7 @@ const ProjectDetail = () => {
   const [reviewText, setReviewText] = useState("")
   const [submittingReview, setSubmittingReview] = useState(false)
   const [isPurchasing, setIsPurchasing] = useState(false)
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, openAuthModal } = useAuth()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { addToCart, removeFromCart, isInCart } = useCart()
   const [formRating, setFormRating] = useState(0)
@@ -1579,7 +1579,7 @@ const ProjectDetail = () => {
                   <button
                     onClick={async () => {
                       if (!isAuthenticated) {
-                        toast.error('Please login to proceed');
+                        openAuthModal(true);
                         return;
                       }
 
@@ -1632,10 +1632,14 @@ const ProjectDetail = () => {
                         toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase!");
                         return;
                       }
+                      if (!isAuthenticated) {
+                        toast.error("Please login to manage your cart");
+                        return;
+                      }
                       if (cartStatus) removeFromCart(project.id);
                       else addToCart(project);
                     }}
-                    disabled={!isAuthenticated || loading || project.isDemo}
+                    disabled={loading}
                     className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
                       ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
                       : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
