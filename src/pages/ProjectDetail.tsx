@@ -1767,62 +1767,64 @@ const ProjectDetail = () => {
         </div>
 
         {/* Related Projects - improved responsive grid and card layout */}
-        <div
-          className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors"
-          style={{ animationDelay: "400ms" }}
-        >
-          <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900 dark:text-white">Related Projects</h3>
+        {!project.isDemo && relatedProjects && relatedProjects.length > 0 && (
+          <div
+            className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors"
+            style={{ animationDelay: "400ms" }}
+          >
+            <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900 dark:text-white">Related Projects</h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            {relatedProjects?.map((relatedProject, idx) => (
-              <Link
-                key={relatedProject.id}
-                to={`/project/${relatedProject.id}`}
-                className="group p-3 sm:p-4 bg-gradient-to-br from-white to-blue-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-slideInUp flex flex-col"
-                style={{ animationDelay: `${idx * 100}ms` }}
-              >
-                <div className="relative mb-2 sm:mb-3 overflow-hidden rounded-xl">
-                  <img
-                    src={relatedProject.thumbnail || "/placeholder.svg"}
-                    alt={relatedProject.title}
-                    className="w-full h-24 sm:h-32 lg:h-36 object-cover rounded-xl group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <span className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 text-xs font-medium px-2 py-1 rounded-md shadow">
-                    {relatedProject.category || "General"}
-                  </span>
-                </div>
-
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-xs sm:text-sm lg:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {relatedProject.title}
-                </h4>
-
-                <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-2 line-clamp-2">
-                  {relatedProject.description || "A creative and well-built project."}
-                </p>
-
-                <div className="flex items-center justify-between text-xs sm:text-sm mt-auto mb-2">
-                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400 dark:text-gray-500">
-                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current flex-shrink-0" />
-                    <span>{relatedProject.rating?.average_rating?.toFixed(1) || "0.0"}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              {relatedProjects.map((relatedProject, idx) => (
+                <Link
+                  key={relatedProject.id}
+                  to={`/project/${relatedProject.id}`}
+                  className="group p-3 sm:p-4 bg-gradient-to-br from-white to-blue-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-slideInUp flex flex-col"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <div className="relative mb-2 sm:mb-3 overflow-hidden rounded-xl">
+                    <img
+                      src={relatedProject.thumbnail || "/placeholder.svg"}
+                      alt={relatedProject.title}
+                      className="w-full h-24 sm:h-32 lg:h-36 object-cover rounded-xl group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <span className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white/90 dark:bg-slate-800/90 text-blue-600 dark:text-blue-400 text-xs font-medium px-2 py-1 rounded-md shadow">
+                      {relatedProject.category || "General"}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">₹{relatedProject.pricing?.sale_price || 0}</span>
-                    {relatedProject.pricing?.original_price && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400 line-through hidden sm:inline">
-                        ₹{relatedProject.pricing.original_price}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-xs sm:text-sm lg:text-base mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {relatedProject.title}
+                  </h4>
 
-                <div className="text-center">
-                  <span className="text-xs text-blue-600 font-medium group-hover:underline">View Details →</span>
-                </div>
-              </Link>
-            ))}
+                  <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-2 line-clamp-2">
+                    {relatedProject.description || "A creative and well-built project."}
+                  </p>
+
+                  <div className="flex items-center justify-between text-xs sm:text-sm mt-auto mb-2">
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400 dark:text-gray-500">
+                      <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current flex-shrink-0" />
+                      <span>{relatedProject.rating?.average_rating?.toFixed(1) || "0.0"}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">₹{relatedProject.pricing?.sale_price || 0}</span>
+                      {relatedProject.pricing?.original_price && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 line-through hidden sm:inline">
+                          ₹{relatedProject.pricing.original_price}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <span className="text-xs text-blue-600 font-medium group-hover:underline">View Details →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modals */}
