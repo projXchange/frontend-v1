@@ -7,6 +7,7 @@ import { ProjectCard } from '../components/ProjectCard';
 import { Project } from '../types/Project';
 import { apiClient } from '../utils/apiClient';
 import { getApiUrl } from '../config/api';
+import heroVideo from "../asset/Hero.mp4";
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -209,11 +210,11 @@ const Home = () => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="https://fiverr-res.cloudinary.com/video/upload/f_auto:video,q_auto:best/v1/video-attachments/generic_asset/asset/18ad23debdc5ce914d67939eceb5fc27-1738830703211/Desktop%20Header%20new%20version" type="video/mp4" />
+          <source src={heroVideo} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/10" />
+         <div className="absolute inset-0 bg-black/60"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
 
@@ -439,19 +440,19 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-16 lg:mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 sm:mb-4">
               Start Exploring & Building
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-300 max-w-3xl mx-auto px-4">
               Discover trending technologies and real-world projects to level up your skills
             </p>
           </motion.div>
 
           {/* Technologies Grid */}
-          <div className="mb-20">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
+          <div className="mb-12 sm:mb-16 lg:mb-20">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
               {loading ? (
                 Array.from({ length: 6 }).map((_, idx) => (
                   <div
@@ -514,17 +515,17 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-center mb-14"
+            className="text-center mb-8 sm:mb-12 lg:mb-14"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 sm:mb-4">
               Featured Projects
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-2xl mx-auto px-4">
               Hand-picked projects to inspire your next build
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {loading ? (
               // Loading skeleton
               Array.from({ length: 3 }).map((_, idx) => (
@@ -560,17 +561,17 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-center mb-14 mt-24"
+            className="text-center mb-8 sm:mb-12 lg:mb-14 mt-12 sm:mt-16 lg:mt-24"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 sm:mb-4">
               Top Rated Projects
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-2xl mx-auto px-4">
               Projects that received the highest ratings from our community
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {loading ? (
               // Loading skeleton
               Array.from({ length: 3 }).map((_, idx) => (
@@ -627,20 +628,20 @@ const Home = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
 
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 lg:mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100">What Students Say</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 mt-3 max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">What Students Say</h2>
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 dark:text-gray-400 mt-2 sm:mt-3 max-w-2xl mx-auto px-4">
               Trusted by thousands of learners to showcase real, impactful project experience.
             </p>
           </motion.div>
 
           {/* Testimonials */}
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={i}
-                className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300"
+                className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg transition-all duration-300"
                 custom={i}
                 variants={cardVariants}
                 initial="hidden"
@@ -648,11 +649,11 @@ const Home = () => {
                 viewport={{ once: true }}
               >
                 {/* Stars */}
-                <div className="flex mb-4">
+                <div className="flex mb-3 sm:mb-4">
                   {[...Array(5)].map((_, idx) => (
                     <Star
                       key={idx}
-                      className={`w-4 h-4 mr-1 ${idx < testimonial.rating
+                      className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 ${idx < testimonial.rating
                         ? 'text-yellow-400 fill-yellow-400'
                         : 'text-gray-300'
                         }`}
@@ -661,8 +662,8 @@ const Home = () => {
                 </div>
 
                 {/* Testimonial Text */}
-                <p className="text-gray-700 dark:text-gray-300 dark:text-gray-300 italic leading-relaxed mb-6">
-                  “{testimonial.text}”
+                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 italic leading-relaxed mb-4 sm:mb-6">
+                  "{testimonial.text}"
                 </p>
 
                 {/* Student Info */}
@@ -670,18 +671,18 @@ const Home = () => {
                   <img
                     src={testimonial.avatar}
                     alt={testimonial.name}
-                    className="w-12 h-12 rounded-full border border-gray-200 shadow-sm mr-4 object-cover"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-gray-200 shadow-sm mr-3 sm:mr-4 object-cover flex-shrink-0"
                   />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
-                    <p className="text-sm text-blue-600">{testimonial.university}</p>
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">{testimonial.name}</h4>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">{testimonial.role}</p>
+                    <p className="text-xs sm:text-sm text-blue-600 truncate">{testimonial.university}</p>
                   </div>
                 </div>
 
                 {/* Project Info */}
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-sm text-gray-500">
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     Worked on:{' '}
                     <span className="text-gray-800 dark:text-gray-200 dark:text-gray-200 font-medium">
                       {testimonial.project}
@@ -759,9 +760,8 @@ const Home = () => {
             className="mt-16 sm:mt-20 text-center"
           >
             <button
-
               onClick={handleJoinClick}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition duration-300"
             >
               🚀 Join Projxchange Now
             </button>
@@ -778,13 +778,13 @@ const Home = () => {
 
         {/* Card Container */}
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-teal-700 text-white rounded-3xl shadow-2xl px-8 sm:px-16 py-20 border border-blue-700">
+          <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-teal-700 text-white rounded-2xl sm:rounded-3xl shadow-2xl px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 lg:py-20 border border-blue-700">
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
-              className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 text-center leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold mb-4 sm:mb-6 text-center leading-tight"
             >
               🚀 Start Your Journey <br className="hidden sm:block" />
               <span className="bg-gradient-to-r from-teal-300 via-blue-300 to-indigo-400 text-transparent bg-clip-text">
@@ -797,7 +797,7 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto text-center leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-blue-100 mb-6 sm:mb-8 lg:mb-10 max-w-2xl mx-auto text-center leading-relaxed px-4"
             >
               Join thousands of students transforming their future with&nbsp;
               <strong className="text-white font-semibold">projXchange</strong> — one project at a time.
@@ -809,18 +809,18 @@ const Home = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
               viewport={{ once: true }}
-              className="flex flex-col sm:flex-row justify-center gap-5 mb-14"
+              className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 lg:gap-5 mb-8 sm:mb-12 lg:mb-14"
             >
               <button
                 onClick={() => openAuthModal(false)}
-                className="group inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-slate-800 text-blue-900 dark:text-gray-100 rounded-xl font-semibold text-lg hover:bg-blue-100 dark:hover:bg-slate-700 shadow-md transition transform hover:scale-105"
+                className="group inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white dark:bg-slate-800 text-blue-900 dark:text-gray-100 rounded-xl font-semibold text-base sm:text-lg hover:bg-blue-100 dark:hover:bg-slate-700 shadow-md transition transform hover:scale-105"
               >
                 Get Started Today
-                <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
               </button>
               <Link
                 to="/projects"
-                className="inline-flex items-center justify-center px-8 py-4 border-2 border-white dark:border-slate-600 text-white rounded-xl font-semibold text-lg hover:bg-white dark:hover:bg-slate-800 hover:text-blue-900 dark:hover:text-gray-100 transition"
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white dark:border-slate-600 text-white rounded-xl font-semibold text-base sm:text-lg hover:bg-white dark:hover:bg-slate-800 hover:text-blue-900 dark:hover:text-gray-100 transition"
               >
                 Browse Projects
               </Link>
@@ -832,7 +832,7 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.5 }}
               viewport={{ once: true }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-4xl mx-auto text-center"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto text-center"
             >
               {[
                 { label: '24/7', sub: 'Expert Support' },
@@ -841,8 +841,8 @@ const Home = () => {
                 { label: '10K+', sub: 'Happy Learners' },
               ].map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center">
-                  <div className="text-3xl font-bold text-white">{item.label}</div>
-                  <div className="text-sm text-blue-100 mt-1">{item.sub}</div>
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">{item.label}</div>
+                  <div className="text-xs sm:text-sm text-blue-100 mt-1">{item.sub}</div>
                 </div>
               ))}
             </motion.div>

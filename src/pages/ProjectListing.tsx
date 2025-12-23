@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, ChevronDown, Zap } from 'lucide-react';
 import { Project } from '../types/Project';
 import { ProjectCard } from '../components/ProjectCard';
@@ -7,6 +8,8 @@ import { getApiUrl } from '../config/api';
 import { DEMO_PROJECTS } from '../constants/demoProjects';
 
 const ProjectListing = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -24,7 +27,30 @@ const ProjectListing = () => {
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [techDropdownOpen, setTechDropdownOpen] = useState(false);
   const [techSearchTerm, setTechSearchTerm] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Initialize from URL params on first load
+  useEffect(() => {
+    if (isInitialized) return;
+    
+    const categoryParam = searchParams.get('category');
+    const searchParam = searchParams.get('search');
+    const sortParam = searchParams.get('sort');
+    
+    if (categoryParam) {
+      setSelectedCategory(categoryParam.toLowerCase());
+    }
+    if (searchParam) {
+      setSearchTerm(searchParam);
+      setDebouncedSearchTerm(searchParam);
+    }
+    if (sortParam) {
+      setSortBy(sortParam);
+    }
+    
+    setIsInitialized(true);
+  }, [searchParams, isInitialized]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -63,7 +89,7 @@ const ProjectListing = () => {
     if (!projects || projects.length === 0) return;
 
     // --- Categories ---
-    const categoryMap: { [key: string]: string } = {}; // key = lowercase, value = original
+    const categoryMap: { [key: string]: string } = {};
     projects.forEach(p => {
       if (p.category) {
         const key = p.category.toLowerCase();
@@ -85,7 +111,6 @@ const ProjectListing = () => {
     setAvailableTags(Object.values(tagMap));
 
   }, [projects]);
-
 
   // Fetch projects
   const fetchProjects = async (page = 1, append = false) => {
@@ -136,7 +161,6 @@ const ProjectListing = () => {
 
       const newProjects = data.data || data || [];
       
-      // Only add demo projects on page 1 and when not appending
       let projectsToDisplay = newProjects;
       if (page === 1 && !append) {
         projectsToDisplay = [...DEMO_PROJECTS, ...newProjects];
@@ -144,7 +168,6 @@ const ProjectListing = () => {
       
       setProjects(prev => append ? [...prev, ...newProjects] : projectsToDisplay);
 
-      // Use pagination data from API response
       const pagination = data.pagination || {};
       setTotalPages(pagination.pages || 1);
       setCurrentPage(pagination.page || page);
@@ -157,10 +180,13 @@ const ProjectListing = () => {
     }
   };
 
+  // Fetch projects when filters change (only after initialization)
   useEffect(() => {
+    if (!isInitialized) return;
+    
     setCurrentPage(1);
     fetchProjects(1, false);
-  }, [debouncedSearchTerm, selectedCategory, sortBy, debouncedPriceRange, selectedTags]);
+  }, [debouncedSearchTerm, selectedCategory, sortBy, debouncedPriceRange, selectedTags, isInitialized]);
 
   const loadMore = () => {
     if (currentPage < totalPages) {
@@ -179,12 +205,18 @@ const ProjectListing = () => {
       'data_science': 'Data Science',
       'machine_learning': 'Machine Learning',
       'api_backend': 'API & Backend',
-      'other': 'Other'
+      'other': 'Other',
+      // Add mappings for home page categories
+      'java': 'Java',
+      'python': 'Python',
+      'php': 'PHP',
+      'react': 'React',
+      'node.js': 'Node.js',
+      'mobile': 'Mobile'
     };
-    return map[category] || category;
+    return map[category] || category.charAt(0).toUpperCase() + category.slice(1);
   };
 
-  // Remove client-side filtering since API already handles it
   const filteredProjects = projects;
 
   const toggleTag = (tag: string) => {
@@ -193,7 +225,6 @@ const ProjectListing = () => {
     setTechSearchTerm('');
   };
 
-  // Filter and sort technologies for dropdown
   const filteredTechnologies = availableTags
     .filter(tag => tag.toLowerCase().includes(techSearchTerm.toLowerCase()))
     .sort((a, b) => a.localeCompare(b));
@@ -219,9 +250,10 @@ const ProjectListing = () => {
               placeholder="Search projects, technologies, or keywords..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl text-gray-900 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-300/50 dark:focus:ring-blue-500/50 focus:border-blue-300 dark:focus:border-blue-500 transition-all duration-300 text-sm sm:text-lg shadow-2xl"
+              className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-white/20 dark:border-slate-700/50 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-300/50 dark:focus:ring-blue-500/50 focus:border-blue-300 dark:focus:border-blue-500 transition-all duration-300 text-sm sm:text-lg shadow-2xl"
             />
           </div>
+
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
             <div className="text-center">
@@ -244,23 +276,22 @@ const ProjectListing = () => {
         </div>
       </div>
 
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         {/* Filters */}
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30 dark:border-slate-700/30 relative z-10 transition-colors">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 overflow-visible">
             {/* Filter by Technology Dropdown */}
             <div ref={dropdownRef} className="relative z-20">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">Filter by Technology</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">Filter by Technology</label>
               <div className="relative">
                 <button
                   onClick={() => setTechDropdownOpen(!techDropdownOpen)}
                   className="w-full p-2 sm:p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300 cursor-pointer font-medium text-left flex items-center justify-between"
                 >
-                  <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300 truncate">
+                  <span className="text-gray-700 dark:text-gray-300 truncate">
                     {selectedTags.length > 0 ? `${selectedTags.length} selected` : 'Select Technologies'}
                   </span>
-                  <ChevronDown className={`text-gray-400 dark:text-gray-500 dark:text-gray-400 w-4 h-4 sm:w-5 sm:h-5 transition-transform flex-shrink-0 ${techDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`text-gray-400 dark:text-gray-500 w-4 h-4 sm:w-5 sm:h-5 transition-transform flex-shrink-0 ${techDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {techDropdownOpen && (
@@ -268,13 +299,13 @@ const ProjectListing = () => {
                     {/* Search Input */}
                     <div className="p-3 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                         <input
                           type="text"
                           placeholder="Search technologies..."
                           value={techSearchTerm}
                           onChange={(e) => setTechSearchTerm(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                          className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                           onClick={(e) => e.stopPropagation()}
                           autoFocus
                         />
@@ -288,7 +319,7 @@ const ProjectListing = () => {
                           <button
                             key={tag}
                             onClick={() => toggleTag(tag)}
-                            className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm ${selectedTags.includes(tag) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-gray-300 dark:text-gray-300'
+                            className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm ${selectedTags.includes(tag) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-gray-300'
                               }`}
                           >
                             <div className="flex items-center justify-between">
@@ -300,7 +331,7 @@ const ProjectListing = () => {
                           </button>
                         ))
                       ) : (
-                        <div className="px-4 py-3 text-gray-500 dark:text-gray-400 dark:text-gray-400 text-sm text-center">
+                        <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-sm text-center">
                           No technologies found
                         </div>
                       )}
