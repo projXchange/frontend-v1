@@ -1530,17 +1530,25 @@ const ProjectDetail = () => {
               {/* Pricing */}
               <div className="text-center mb-4 sm:mb-8">
                 <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4 animate-slideInUp">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
-                    ₹{project.pricing?.sale_price || 0}
-                  </div>
-                  {project.pricing?.original_price &&
-                    project.pricing.original_price > (project.pricing?.sale_price || 0) && (
-                      <div className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 line-through">
-                        ₹{project.pricing.original_price}
+                  {project.isDemo ? (
+                    <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      FREE
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
+                        ₹{project.pricing?.sale_price || 0}
                       </div>
-                    )}
+                      {project.pricing?.original_price &&
+                        project.pricing.original_price > (project.pricing?.sale_price || 0) && (
+                          <div className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 line-through">
+                            ₹{project.pricing.original_price}
+                          </div>
+                        )}
+                    </>
+                  )}
                 </div>
-                {project.discount_percentage && project.discount_percentage > 0 && (
+                {!project.isDemo && project.discount_percentage && project.discount_percentage > 0 && (
                   <div className="text-xs sm:text-sm text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full inline-block animate-pulse">
                     Save {project.discount_percentage}%
                   </div>
@@ -1591,13 +1599,15 @@ const ProjectDetail = () => {
                   >
                     <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" />
                     <span className="line-clamp-1">
-                      {isAuthenticated
-                        ? loading
-                          ? "Processing..."
-                          : cartStatus
-                            ? "Checkout"
-                            : `Buy (₹${project.pricing?.sale_price || 0})`
-                        : "Login to Buy"}
+                      {project.isDemo
+                        ? "View Demo (Free)"
+                        : isAuthenticated
+                          ? loading
+                            ? "Processing..."
+                            : cartStatus
+                              ? "Checkout"
+                              : `Buy (₹${project.pricing?.sale_price || 0})`
+                          : "Login to Buy"}
                     </span>
                   </button>
 
