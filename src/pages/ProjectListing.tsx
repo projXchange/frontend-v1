@@ -9,7 +9,7 @@ import { DEMO_PROJECTS } from '../constants/demoProjects';
 
 const ProjectListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -33,11 +33,11 @@ const ProjectListing = () => {
   // Initialize from URL params on first load
   useEffect(() => {
     if (isInitialized) return;
-    
+
     const categoryParam = searchParams.get('category');
     const searchParam = searchParams.get('search');
     const sortParam = searchParams.get('sort');
-    
+
     if (categoryParam) {
       setSelectedCategory(categoryParam.toLowerCase());
     }
@@ -48,7 +48,7 @@ const ProjectListing = () => {
     if (sortParam) {
       setSortBy(sortParam);
     }
-    
+
     setIsInitialized(true);
   }, [searchParams, isInitialized]);
 
@@ -124,7 +124,7 @@ const ProjectListing = () => {
       const params = new URLSearchParams();
       params.append('status', 'approved');
       params.append('page', page.toString());
-      params.append('limit', '6');
+      params.append('limit', '8');
 
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
       if (selectedTags.length > 0) params.append('tech_stack', selectedTags.join(','));
@@ -160,12 +160,12 @@ const ProjectListing = () => {
       const data = await res.json();
 
       const newProjects = data.data || data || [];
-      
+
       let projectsToDisplay = newProjects;
       if (page === 1 && !append) {
         projectsToDisplay = [...DEMO_PROJECTS, ...newProjects];
       }
-      
+
       setProjects(prev => append ? [...prev, ...newProjects] : projectsToDisplay);
 
       const pagination = data.pagination || {};
@@ -183,7 +183,7 @@ const ProjectListing = () => {
   // Fetch projects when filters change (only after initialization)
   useEffect(() => {
     if (!isInitialized) return;
-    
+
     setCurrentPage(1);
     fetchProjects(1, false);
   }, [debouncedSearchTerm, selectedCategory, sortBy, debouncedPriceRange, selectedTags, isInitialized]);
