@@ -108,7 +108,7 @@ const PrivacyPolicy = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">9. Contact Us</h2>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  If you have any questions about this Privacy Policy, please contact us at privacy@projxchange.in
+                  If you have any questions about this Privacy Policy, please contact us at <a href="mailto:help.projxchange@gmail.com" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">help.projxchange@gmail.com</a>
                 </p>
               </div>
             </div>

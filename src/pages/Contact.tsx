@@ -13,7 +13,16 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Message sent successfully! We\'ll get back to you soon.');
+    
+    // Create mailto link with form data
+    const mailtoLink = `mailto:help.projxchange@gmail.com?subject=${encodeURIComponent(formData.subject || 'Contact Form Submission')}&body=${encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+    )}`;
+    
+    // Open email client
+    window.location.href = mailtoLink;
+    
+    toast.success('Opening your email client...');
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
@@ -163,7 +172,7 @@ const Contact = () => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
                       Email
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">support@projxchange.in</p>
+                    <a href="mailto:help.projxchange@gmail.com" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">help.projxchange@gmail.com</a>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       We'll respond within 24 hours
                     </p>

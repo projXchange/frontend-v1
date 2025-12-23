@@ -59,7 +59,7 @@ const RefundPolicy = () => {
                   To request a refund:
                 </p>
                 <ol className="list-decimal list-inside text-gray-600 dark:text-gray-300 space-y-2">
-                  <li>Contact our support team at support@projxchange.in</li>
+                  <li>Contact our support team at <a href="mailto:help.projxchange@gmail.com" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">help.projxchange@gmail.com</a></li>
                   <li>Provide your order number and reason for refund</li>
                   <li>Include any relevant screenshots or documentation</li>
                   <li>Wait for our team to review your request (usually within 2-3 business days)</li>
@@ -97,7 +97,7 @@ const RefundPolicy = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">8. Contact Us</h2>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  For any questions about our refund policy, please contact us at support@projxchange.in
+                  For any questions about our refund policy, please contact us at <a href="mailto:help.projxchange@gmail.com" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">help.projxchange@gmail.com</a>
                 </p>
               </div>
             </div>

@@ -66,7 +66,7 @@ const Footer = () => {
           <div className="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-2 sm:space-y-0 text-center sm:text-left">
             <div className="flex items-center space-x-2">
               <Mail className="w-4 h-4" />
-              <span>support@projXchange.in</span>
+              <a href="mailto:help.projxchange@gmail.com" className="hover:text-white transition-colors">help.projxchange@gmail.com</a>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin className="w-4 h-4" />

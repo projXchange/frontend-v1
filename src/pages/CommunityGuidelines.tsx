@@ -127,7 +127,7 @@ const CommunityGuidelines = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">7. Reporting Violations</h2>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  If you encounter content or behavior that violates these guidelines, please report it to our moderation team at moderation@projxchange.in. We take all reports seriously and will investigate promptly.
+                  If you encounter content or behavior that violates these guidelines, please report it to our moderation team at <a href="mailto:help.projxchange@gmail.com" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">help.projxchange@gmail.com</a>. We take all reports seriously and will investigate promptly.
                 </p>
               </div>
 
