@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   Upload,
@@ -19,6 +19,11 @@ import {
   Users,
   Clock,
   ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Zap,
+  Target,
+  Rocket,
 } from "lucide-react"
 import toast from "react-hot-toast"
 import { apiClient } from "../utils/apiClient"
@@ -69,11 +74,12 @@ const UploadProject = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [createdProjectId, setCreatedProjectId] = useState<string | null>(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
-  // Cloudinary configuration
-  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-  
+  const navigate = useNavigate()
+
+  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 
   const categories = [
     { label: "Web Development", value: "web_development" },
@@ -91,7 +97,29 @@ const UploadProject = () => {
   ]
   const difficulties = ["Beginner", "Intermediate", "Advanced"]
 
-  // Generic upload function for Cloudinary
+  // Auto-save to localStorage
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("projectDraft")
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft)
+        setFormData(parsed)
+        toast.success("Draft restored!")
+      } catch (e) {
+        console.error("Failed to restore draft")
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.title || formData.description) {
+        localStorage.setItem("projectDraft", JSON.stringify(formData))
+      }
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [formData])
+
   const uploadToCloudinary = async (
     file: File,
     folder: string,
@@ -120,7 +148,6 @@ const UploadProject = () => {
     }
   }
 
-  // 1. Thumbnail Upload (Single Image)
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -138,11 +165,10 @@ const UploadProject = () => {
       }
       reader.readAsDataURL(file)
 
-      // Store the actual file for later upload
-      setThumbnailFile(file) // CHANGE THIS
+      setThumbnailFile(file)
       setFormData((prev) => ({ ...prev, thumbnailUrl: "TEMP_FILE" }))
 
-      toast.success("Thumbnail selected! It will be uploaded when you submit the project.")
+      toast.success("Thumbnail selected!")
     } catch (error) {
       toast.error("Failed to process thumbnail.")
     } finally {
@@ -150,7 +176,6 @@ const UploadProject = () => {
     }
   }
 
-  // 2. Multiple Images Upload
   const handleMultipleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -165,24 +190,21 @@ const UploadProject = () => {
     const remainingSlots = 3 - alreadyUploadedImages
 
     if (imageFiles.length > remainingSlots) {
-      toast.error(
-        `You can upload a maximum of 3 images. You already uploaded ${alreadyUploadedImages}, so you can select up to ${remainingSlots} more.`,
-      )
+      toast.error(`You can upload a maximum of 3 images. You already uploaded ${alreadyUploadedImages}, so you can select up to ${remainingSlots} more.`)
       return
     }
 
     setImagesUploading(true)
     setUploadedFiles((prev) => [...prev, ...imageFiles])
-    toast.success(`${imageFiles.length} image(s) selected! They will be uploaded when you submit the project.`)
+    toast.success(`${imageFiles.length} image(s) selected!`)
     setImagesUploading(false)
   }
 
-  // 3. Source Files Upload (ZIP, RAR, etc.)
   const handleSourceFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    const maxSize = 10 * 1024 * 1024 // 10 MB
+    const maxSize = 10 * 1024 * 1024
     const sourceFiles = Array.from(files).filter(
       (file) =>
         (file.name.endsWith(".zip") ||
@@ -200,16 +222,15 @@ const UploadProject = () => {
 
     setSourceFilesUploading(true)
     setUploadedFiles((prev) => [...prev, ...sourceFiles])
-    toast.success(`${sourceFiles.length} source file(s) selected! They will be uploaded when you submit the project.`)
+    toast.success(`${sourceFiles.length} source file(s) selected!`)
     setSourceFilesUploading(false)
   }
 
-  // 4. Documentation Files Upload (PDF, MD, DOCX, etc.)
   const handleDocFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    const maxSize = 10 * 1024 * 1024 // 10 MB in bytes
+    const maxSize = 10 * 1024 * 1024
 
     const docFiles = Array.from(files).filter(
       (file) =>
@@ -228,16 +249,14 @@ const UploadProject = () => {
 
     setDocFilesUploading(true)
     setUploadedFiles((prev) => [...prev, ...docFiles])
-    toast.success(`${docFiles.length} documentation file(s) selected! They will be uploaded when you submit the project.`)
+    toast.success(`${docFiles.length} documentation file(s) selected!`)
     setDocFilesUploading(false)
   }
 
-  // Remove uploaded image
   const removeUploadedImage = (index: number) => {
     setUploadedImages((prev) => prev.filter((_, i) => i !== index))
   }
 
-  // Remove file from uploadedFiles
   const removeFile = (index: number) => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index))
   }
@@ -353,7 +372,6 @@ const UploadProject = () => {
       const files = Array.from(e.dataTransfer.files)
       setUploadedFiles((prev) => [...prev, ...files])
 
-      // If it's an image, set as preview
       const imageFile = files.find((file) => file.type.startsWith("image/"))
       if (imageFile) {
         const reader = new FileReader()
@@ -368,10 +386,8 @@ const UploadProject = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Prevent multiple submissions
     if (isSubmitting) return
 
-    // Validate all fields
     Object.keys(formData).forEach((key) => {
       if (typeof formData[key as keyof typeof formData] === "string") {
         validateField(key, formData[key as keyof typeof formData] as string)
@@ -387,7 +403,6 @@ const UploadProject = () => {
           throw new Error("Authentication token not found. Please login again.")
         }
 
-        // Step 1: Create project first to get project ID
         const initialProjectData = {
           title: formData.title,
           description: formData.description,
@@ -406,8 +421,8 @@ const UploadProject = () => {
             currency: formData.currency || "INR",
           },
           delivery_time: formData.deliveryTime ? Number.parseInt(formData.deliveryTime, 10) : 0,
-          thumbnail: "", // Will update after upload
-          images: [], // Will update after upload
+          thumbnail: "",
+          images: [],
           files: {
             source_files: [],
             documentation_files: [],
@@ -437,7 +452,6 @@ const UploadProject = () => {
 
         const projectResult = await projectResponse.json()
 
-        // Get the project ID from backend response
         const backendProjectId =
           projectResult.project?.id ||
           projectResult.id ||
@@ -448,7 +462,6 @@ const UploadProject = () => {
           throw new Error("Project ID not found in response")
         }
 
-        // Step 2: Upload all files to Cloudinary with project ID as folder
         const projectFolder = `projects/${backendProjectId}`
 
         let finalThumbnailUrl = ""
@@ -456,7 +469,6 @@ const UploadProject = () => {
         let finalSourceFileUrls: string[] = []
         let finalDocFileUrls: string[] = []
 
-        // 2.1 Upload Thumbnail
         if (thumbnailFile || (formData.thumbnailUrl && formData.thumbnailUrl !== "TEMP_FILE")) {
           try {
             if (thumbnailFile) {
@@ -469,7 +481,6 @@ const UploadProject = () => {
           }
         }
 
-        // 2.2 Upload Multiple Images
         const imageFiles = uploadedFiles.filter((file) => file.type.startsWith("image/"))
 
         if (imageFiles.length > 0) {
@@ -483,7 +494,6 @@ const UploadProject = () => {
           }
         }
 
-        // 2.3 Upload Source Files
         const sourceFiles = uploadedFiles.filter(
           (file) =>
             file.name.endsWith(".zip") ||
@@ -504,7 +514,6 @@ const UploadProject = () => {
           }
         }
 
-        // 2.4 Upload Documentation Files
         const docFiles = uploadedFiles.filter(
           (file) =>
             file.name.endsWith(".pdf") ||
@@ -523,7 +532,6 @@ const UploadProject = () => {
           }
         }
 
-        // Step 3: Update project with all Cloudinary URLs
         const updateData = {
           thumbnail: finalThumbnailUrl,
           images: finalImageUrls,
@@ -554,11 +562,10 @@ const UploadProject = () => {
           console.error("Error updating project with files:", updateError)
         }
 
-        // Store project ID and show success modal
         setCreatedProjectId(backendProjectId)
         setShowSuccessModal(true)
+        localStorage.removeItem("projectDraft")
 
-        // Reset form
         setFormData({
           title: "",
           description: "",
@@ -599,6 +606,22 @@ const UploadProject = () => {
         setIsSubmitting(false)
       }
     }
+  }
+
+  const getCompletionPercentage = () => {
+    let completed = 0
+    let total = 8
+
+    if (formData.title.trim()) completed++
+    if (formData.category) completed++
+    if (formData.description.length >= 100) completed++
+    if (formData.features.some(f => f.trim())) completed++
+    if (formData.techStack.some(t => t.trim())) completed++
+    if (thumbnailFile || formData.thumbnailUrl) completed++
+    if (formData.price) completed++
+    if (formData.deliveryTime) completed++
+
+    return Math.round((completed / total) * 100)
   }
 
   const ProjectPreview = () => (
@@ -656,38 +679,36 @@ const UploadProject = () => {
   )
 
   const steps = [
-    { id: 1, title: "Basic Info", icon: FileText },
-    { id: 2, title: "Details", icon: Tag },
-    { id: 3, title: "Media & Files", icon: Upload },
-    { id: 4, title: "Pricing", icon: IndianRupee },
+    { id: 1, title: "What did you build?", icon: Target, color: "from-blue-600 to-cyan-600" },
+    { id: 2, title: "How does it work?", icon: Zap, color: "from-purple-600 to-pink-600" },
+    { id: 3, title: "Show it off", icon: Video, color: "from-orange-600 to-red-600" },
+    { id: 4, title: "Publish & Price", icon: Rocket, color: "from-green-600 to-teal-600" },
   ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-4 sm:py-6 md:py-8 lg:py-8 transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-8 sm:mb-10 md:mb-12 animate-slideInDown">
           <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-100 to-teal-100 text-blue-700 rounded-full text-xs sm:text-sm font-bold mb-4 sm:mb-6">
             <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Share Your Amazing Project
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 sm:mb-4 md:mb-6 text-balance">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 md:mb-6 text-balance">
             Upload Your Project
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-3xl mx-auto px-2 sm:px-4">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 sm:px-4">
             Share your work with the community and help fellow developers learn from your expertise
           </p>
         </div>
 
-        {/* Progress Steps */}
         <div className="mb-8 sm:mb-10 md:mb-12 animate-slideInUp">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center mb-4">
             <div className="flex items-center space-x-2 sm:space-x-4">
               {steps.map((step, index) => (
                 <React.Fragment key={step.id}>
                   <div
                     className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${currentStep >= step.id
-                      ? "bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg"
+                      ? `bg-gradient-to-r ${step.color} text-white shadow-lg`
                       : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-md"
                       }`}
                   >
@@ -704,24 +725,42 @@ const UploadProject = () => {
               ))}
             </div>
           </div>
+          <div className="max-w-md mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+              <span className="text-sm font-bold text-blue-600">{getCompletionPercentage()}%</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+              <div
+                className="bg-gradient-to-r from-blue-600 to-teal-600 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${getCompletionPercentage()}%` }}
+              ></div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-          {/* Form */}
           <div className="lg:col-span-2">
             <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 border border-white/20 dark:border-slate-700/30 animate-slideInLeft transition-colors">
               <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-                {/* Step 1: Basic Information */}
+
                 {currentStep === 1 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
-                      <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                      Basic Information
+                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                        <Sparkles className="w-4 h-4 inline mr-2" />
+                        Let's start with the basics. Tell us what you've created in just a few words.
+                      </p>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
+                      <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      What did you build?
                     </h2>
 
                     <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                           Project Title *
                         </label>
                         <input
@@ -729,8 +768,8 @@ const UploadProject = () => {
                           name="title"
                           value={formData.title}
                           onChange={handleInputChange}
-                          placeholder="Enter an engaging project title"
-                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 transition-all duration-200 ${errors.title ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
+                          placeholder="e.g., AI-Powered Task Manager"
+                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 transition-all duration-200 ${errors.title ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                             }`}
                         />
                         {errors.title && (
@@ -743,7 +782,7 @@ const UploadProject = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             Category *
                           </label>
                           <select
@@ -769,14 +808,14 @@ const UploadProject = () => {
                         </div>
 
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             Difficulty Level
                           </label>
                           <select
                             name="difficulty"
                             value={formData.difficulty}
                             onChange={handleInputChange}
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           >
                             {difficulties.map((difficulty) => (
                               <option key={difficulty} value={difficulty}>
@@ -787,144 +826,21 @@ const UploadProject = () => {
                         </div>
                       </div>
 
-                      {/* Requirements: System Requirements */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
-                          System Requirements
-                        </label>
-                        <div className="space-y-2 sm:space-y-3">
-                          {formData.systemRequirements.map((req, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 sm:gap-3 animate-slideInUp"
-                              style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                              <input
-                                type="text"
-                                value={req}
-                                onChange={(e) => handleArrayChange(index, e.target.value, "systemRequirements")}
-                                placeholder="e.g., Windows 10, 8GB RAM"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
-                              />
-                              {formData.systemRequirements.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeArrayItem(index, "systemRequirements")}
-                                  className="px-3 sm:px-4 py-2 sm:py-3 text-red-600 border border-red-300 rounded-lg sm:rounded-xl hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => addArrayItem("systemRequirements")}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Add Requirement
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Requirements: Dependencies */}
-                      <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
-                          Dependencies
-                        </label>
-                        <div className="space-y-2 sm:space-y-3">
-                          {formData.dependenciesArr.map((dep, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 sm:gap-3 animate-slideInUp"
-                              style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                              <input
-                                type="text"
-                                value={dep}
-                                onChange={(e) => handleArrayChange(index, e.target.value, "dependenciesArr")}
-                                placeholder="e.g., Node 18, MongoDB, Redis"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
-                              />
-                              {formData.dependenciesArr.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeArrayItem(index, "dependenciesArr")}
-                                  className="px-3 sm:px-4 py-2 sm:py-3 text-red-600 border border-red-300 rounded-lg sm:rounded-xl hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => addArrayItem("dependenciesArr")}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Add Dependency
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Requirements: Installation Steps */}
-                      <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
-                          Installation Steps
-                        </label>
-                        <div className="space-y-2 sm:space-y-3">
-                          {formData.installationSteps.map((step, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 sm:gap-3 animate-slideInUp"
-                              style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                              <input
-                                type="text"
-                                value={step}
-                                onChange={(e) => handleArrayChange(index, e.target.value, "installationSteps")}
-                                placeholder="e.g., Clone repo, Install deps, Run app"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
-                              />
-                              {formData.installationSteps.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeArrayItem(index, "installationSteps")}
-                                  className="px-3 sm:px-4 py-2 sm:py-3 text-red-600 border border-red-300 rounded-lg sm:rounded-xl hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => addArrayItem("installationSteps")}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Add Step
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                          Project Description *
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                          Short Description *
                           <span className="text-gray-500 dark:text-gray-400 font-normal ml-2 text-xs sm:text-sm">
-                            ({formData.description.length}/500 characters)
+                            ({formData.description.length}/150 characters)
                           </span>
                         </label>
                         <textarea
                           name="description"
                           value={formData.description}
                           onChange={handleInputChange}
-                          rows={5}
-                          maxLength={500}
-                          placeholder="Describe your project, what it does, what makes it special, and what others can learn from it..."
-                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 transition-all duration-200 resize-none ${errors.description ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
+                          rows={3}
+                          maxLength={150}
+                          placeholder="A brief, compelling summary of your project..."
+                          className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 transition-all duration-200 resize-none ${errors.description ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                             }`}
                         />
                         {errors.description && (
@@ -938,18 +854,23 @@ const UploadProject = () => {
                   </div>
                 )}
 
-                {/* Step 2: Features & Tech Stack */}
                 {currentStep === 2 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
-                      <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                      Project Details
+                    <div className="mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                      <p className="text-sm text-purple-800 dark:text-purple-300">
+                        <Zap className="w-4 h-4 inline mr-2" />
+                        Help others understand the technical details and capabilities of your project.
+                      </p>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
+                      <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+                      How does it work?
                     </h2>
 
                     <div className="space-y-6 sm:space-y-8">
-                      {/* Features */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-4">
                           Key Features
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -963,8 +884,8 @@ const UploadProject = () => {
                                 type="text"
                                 value={feature}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "features")}
-                                placeholder="Enter a key feature"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                placeholder="e.g., Real-time collaboration"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.features.length > 1 && (
                                 <button
@@ -994,9 +915,8 @@ const UploadProject = () => {
                         )}
                       </div>
 
-                      {/* Tech Stack */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-4">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-4">
                           Technology Stack
                         </label>
                         <div className="space-y-2 sm:space-y-3">
@@ -1011,7 +931,7 @@ const UploadProject = () => {
                                 value={tech}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "techStack")}
                                 placeholder="e.g., React, Node.js, MongoDB"
-                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
                               {formData.techStack.length > 1 && (
                                 <button
@@ -1041,10 +961,9 @@ const UploadProject = () => {
                         )}
                       </div>
 
-                      {/* URLs */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             GitHub Repository URL
                           </label>
                           <input
@@ -1062,7 +981,7 @@ const UploadProject = () => {
                         </div>
 
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             Live Demo URL
                           </label>
                           <input
@@ -1071,27 +990,167 @@ const UploadProject = () => {
                             value={formData.liveDemo}
                             onChange={handleInputChange}
                             placeholder="https://your-demo.vercel.app"
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           />
                         </div>
+                      </div>
+
+                      <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
+                        <button
+                          type="button"
+                          onClick={() => setShowAdvanced(!showAdvanced)}
+                          className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                        >
+                          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <Shield className="w-4 h-4" />
+                            Advanced Setup (Optional)
+                          </span>
+                          {showAdvanced ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                        </button>
+
+                        {showAdvanced && (
+                          <div className="mt-4 space-y-6 animate-slideInUp">
+                            <div>
+                              <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 sm:mb-4">
+                                System Requirements
+                              </label>
+                              <div className="space-y-2 sm:space-y-3">
+                                {formData.systemRequirements.map((req, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex gap-2 sm:gap-3"
+                                  >
+                                    <input
+                                      type="text"
+                                      value={req}
+                                      onChange={(e) => handleArrayChange(index, e.target.value, "systemRequirements")}
+                                      placeholder="e.g., Windows 10, 8GB RAM"
+                                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    />
+                                    {formData.systemRequirements.length > 1 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => removeArrayItem(index, "systemRequirements")}
+                                        className="px-3 sm:px-4 py-2 sm:py-3 text-red-600 border border-red-300 rounded-lg sm:rounded-xl hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                                <button
+                                  type="button"
+                                  onClick={() => addArrayItem("systemRequirements")}
+                                  className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  Add Requirement
+                                </button>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 sm:mb-4">
+                                Dependencies
+                              </label>
+                              <div className="space-y-2 sm:space-y-3">
+                                {formData.dependenciesArr.map((dep, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex gap-2 sm:gap-3"
+                                  >
+                                    <input
+                                      type="text"
+                                      value={dep}
+                                      onChange={(e) => handleArrayChange(index, e.target.value, "dependenciesArr")}
+                                      placeholder="e.g., Node 18, MongoDB, Redis"
+                                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    />
+                                    {formData.dependenciesArr.length > 1 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => removeArrayItem(index, "dependenciesArr")}
+                                        className="px-3 sm:px-4 py-2 sm:py-3 text-red-600 border border-red-300 rounded-lg sm:rounded-xl hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                                <button
+                                  type="button"
+                                  onClick={() => addArrayItem("dependenciesArr")}
+                                  className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  Add Dependency
+                                </button>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 sm:mb-4">
+                                Installation Steps
+                              </label>
+                              <div className="space-y-2 sm:space-y-3">
+                                {formData.installationSteps.map((step, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex gap-2 sm:gap-3"
+                                  >
+                                    <input
+                                      type="text"
+                                      value={step}
+                                      onChange={(e) => handleArrayChange(index, e.target.value, "installationSteps")}
+                                      placeholder="e.g., Clone repo, Install deps, Run app"
+                                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                                    />
+                                    {formData.installationSteps.length > 1 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => removeArrayItem(index, "installationSteps")}
+                                        className="px-3 sm:px-4 py-2 sm:py-3 text-red-600 border border-red-300 rounded-lg sm:rounded-xl hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                                <button
+                                  type="button"
+                                  onClick={() => addArrayItem("installationSteps")}
+                                  className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  Add Step
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Step 3: Media & Files */}
                 {currentStep === 3 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
-                      <Video className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                      Media & Files
+                    <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
+                      <p className="text-sm text-orange-800 dark:text-orange-300">
+                        <Video className="w-4 h-4 inline mr-2" />
+                        Nothing is published until you confirm. Add visuals to showcase your work.
+                      </p>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
+                      <Video className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+                      Show it off
                     </h2>
 
                     <div className="space-y-6 sm:space-y-8">
-                      {/* 1. Thumbnail Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                          Project Thumbnail * (Single Image)
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                          Project Thumbnail *
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           {previewImage ? (
@@ -1116,7 +1175,7 @@ const UploadProject = () => {
                           ) : (
                             <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-blue-400 transition-colors">
                               <ImageIcon className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
-                              <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
+                              <p className="text-xs sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
                                 Upload a thumbnail for your project
                               </p>
                               <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1150,15 +1209,14 @@ const UploadProject = () => {
                         )}
                       </div>
 
-                      {/* 2. Multiple Images Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                          Project Screenshots (Multiple Images)
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                          Project Screenshots (up to 3)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-blue-400 transition-colors">
                             <ImageIcon className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
-                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
+                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
                               Upload multiple screenshots of your project
                             </p>
                             <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1184,7 +1242,6 @@ const UploadProject = () => {
                             </label>
                           </div>
 
-                          {/* Display Selected Images */}
                           {uploadedFiles.filter((f) => f.type.startsWith("image/")).length > 0 && (
                             <div className="space-y-2 sm:space-y-3">
                               <h4 className="font-semibold text-xs sm:text-base text-gray-900 dark:text-gray-100">
@@ -1204,7 +1261,7 @@ const UploadProject = () => {
                                           <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                                         </div>
                                         <div className="min-w-0">
-                                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">
+                                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                                             {file.name}
                                           </p>
                                           <p className="text-xs text-gray-500">
@@ -1227,16 +1284,15 @@ const UploadProject = () => {
                         </div>
                       </div>
 
-                      {/* 3. Source Files Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                           Source Files (ZIP, RAR, etc.)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-purple-400 transition-colors">
                             <FileText className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
-                            <p className="text-xs sm:text-base text-red-600 mb-2 sm:mb-4">a maximum size of 10 MB.</p>
-                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
+                            <p className="text-xs sm:text-base text-red-600 mb-2 sm:mb-4">Maximum size: 10 MB</p>
+                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
                               Upload source code archives (.zip, .rar, .7z, .tar, .gz)
                             </p>
                             <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1262,7 +1318,6 @@ const UploadProject = () => {
                             </label>
                           </div>
 
-                          {/* Display Selected Source Files */}
                           {uploadedFiles.filter(
                             (f) =>
                               f.name.endsWith(".zip") ||
@@ -1307,7 +1362,7 @@ const UploadProject = () => {
                                             <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                                           </div>
                                           <div className="min-w-0">
-                                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                                               {file.name}
                                             </p>
                                             <p className="text-xs text-gray-500">
@@ -1330,16 +1385,15 @@ const UploadProject = () => {
                         </div>
                       </div>
 
-                      {/* 4. Documentation Files Upload */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                           Documentation Files (PDF, MD, DOCX, etc.)
                         </label>
                         <div className="space-y-3 sm:space-y-4">
                           <div className="border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-4 sm:p-8 text-center hover:border-green-400 transition-colors">
                             <FileText className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-2 sm:mb-4" />
-                            <p className="text-xs sm:text-base text-red-600 mb-2 sm:mb-4">a maximum size of 10 MB.</p>
-                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
+                            <p className="text-xs sm:text-base text-red-600 mb-2 sm:mb-4">Maximum size: 10 MB</p>
+                            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
                               Upload documentation files (.pdf, .md, .txt, .docx, .doc)
                             </p>
                             <label className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 cursor-pointer text-xs sm:text-base">
@@ -1365,7 +1419,6 @@ const UploadProject = () => {
                             </label>
                           </div>
 
-                          {/* Display Selected Documentation Files */}
                           {uploadedFiles.filter(
                             (f) =>
                               f.name.endsWith(".pdf") ||
@@ -1410,7 +1463,7 @@ const UploadProject = () => {
                                             <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                                           </div>
                                           <div className="min-w-0">
-                                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                                               {file.name}
                                             </p>
                                             <p className="text-xs text-gray-500">
@@ -1433,9 +1486,8 @@ const UploadProject = () => {
                         </div>
                       </div>
 
-                      {/* YouTube URL */}
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                        <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                           YouTube Demo Video URL (Optional)
                         </label>
                         <input
@@ -1455,18 +1507,24 @@ const UploadProject = () => {
                   </div>
                 )}
 
-                {/* Step 4: Pricing */}
                 {currentStep === 4 && (
                   <div className="animate-slideInUp">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
-                      <IndianRupee className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                      Pricing Strategy
+                    <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                      <p className="text-sm text-green-800 dark:text-green-300">
+                        <Rocket className="w-4 h-4 inline mr-2" />
+                        Final step! Set your pricing and get ready to launch.
+                      </p>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-8 flex items-center gap-3">
+                      <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                      Publish & Price
                     </h2>
 
                     <div className="space-y-4 sm:space-y-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             Sale Price (INR) *
                           </label>
                           <div className="relative">
@@ -1493,7 +1551,7 @@ const UploadProject = () => {
                           )}
                         </div>
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             Original Price (INR)
                           </label>
                           <div className="relative">
@@ -1508,7 +1566,7 @@ const UploadProject = () => {
                               min="10"
                               max="20000"
                               placeholder="800"
-                              className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                              className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                             />
                           </div>
                         </div>
@@ -1516,14 +1574,14 @@ const UploadProject = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
+                          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                             Currency
                           </label>
                           <select
                             name="currency"
                             value={formData.currency}
                             onChange={handleInputChange}
-                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                            className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                           >
                             <option value="INR">INR</option>
                             <option value="USD">USD</option>
@@ -1531,7 +1589,7 @@ const UploadProject = () => {
                         </div>
                         <div>
                           <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-                            Expected Timeline (days)
+                            Delivery Time (days)
                           </label>
                           <input
                             type="number"
@@ -1591,13 +1649,12 @@ const UploadProject = () => {
                   </div>
                 )}
 
-                {/* Navigation Buttons */}
                 <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-gray-200">
                   {currentStep > 1 && (
                     <button
                       type="button"
                       onClick={() => setCurrentStep((prev) => prev - 1)}
-                      className="px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
+                      className="px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 text-xs sm:text-base text-gray-700 dark:text-gray-300 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
                     >
                       Previous
                     </button>
@@ -1608,58 +1665,55 @@ const UploadProject = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          // Validate required fields before moving to next step
-                          let hasErrors = false;
-                          const newErrors: Record<string, string> = {};
+                          let hasErrors = false
+                          const newErrors: Record<string, string> = {}
 
                           if (currentStep === 1) {
-                            // Step 1: Basic Information validation
                             if (!formData.title.trim()) {
-                              newErrors.title = "Project title is required";
-                              hasErrors = true;
+                              newErrors.title = "Project title is required"
+                              hasErrors = true
                             }
                             if (!formData.description.trim()) {
-                              newErrors.description = "Description is required";
-                              hasErrors = true;
+                              newErrors.description = "Description is required"
+                              hasErrors = true
                             } else if (formData.description.length < 100) {
-                              newErrors.description = "Description must be at least 100 characters";
-                              hasErrors = true;
+                              newErrors.description = "Description must be at least 100 characters"
+                              hasErrors = true
                             }
                             if (!formData.category) {
-                              newErrors.category = "Please select a category";
-                              hasErrors = true;
+                              newErrors.category = "Please select a category"
+                              hasErrors = true
                             }
                           } else if (currentStep === 2) {
-                            // Step 2: Details validation
-                            const validFeatures = formData.features.filter(f => f.trim());
-                            const validTechStack = formData.techStack.filter(t => t.trim());
+                            const validFeatures = formData.features.filter(f => f.trim())
+                            const validTechStack = formData.techStack.filter(t => t.trim())
 
                             if (validFeatures.length === 0) {
-                              newErrors.features = "Please add at least one feature";
-                              hasErrors = true;
+                              newErrors.features = "Please add at least one feature"
+                              hasErrors = true
                             }
                             if (validTechStack.length === 0) {
-                              newErrors.techStack = "Please add at least one technology";
-                              hasErrors = true;
+                              newErrors.techStack = "Please add at least one technology"
+                              hasErrors = true
                             }
                           } else if (currentStep === 3) {
-                            // Step 3: Media & Files validation
                             if (!formData.thumbnailUrl && !thumbnailFile) {
-                              newErrors.thumbnail = "Please upload a thumbnail image";
-                              hasErrors = true;
+                              newErrors.thumbnail = "Please upload a thumbnail image"
+                              hasErrors = true
                             }
                           }
 
                           if (hasErrors) {
-                            setErrors(newErrors);
+                            setErrors(newErrors)
+                            toast.error("Please fill in all required fields")
                           } else {
-                            setErrors({});
-                            setCurrentStep((prev) => prev + 1);
+                            setErrors({})
+                            setCurrentStep((prev) => prev + 1)
                           }
                         }}
                         className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-base hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
                       >
-                        Next Step
+                        Continue to {steps[currentStep].title}
                       </button>
                     ) : (
                       <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
@@ -1674,17 +1728,17 @@ const UploadProject = () => {
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-base hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-base hover:from-green-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                           {isSubmitting ? (
                             <>
                               <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              Submitting...
+                              Publishing...
                             </>
                           ) : (
                             <>
-                              <Send className="w-3 h-3 sm:w-4 sm:h-4" />
-                              Submit Project
+                              <Rocket className="w-3 h-3 sm:w-4 sm:h-4" />
+                              Publish Project 🚀
                             </>
                           )}
                         </button>
@@ -1696,9 +1750,7 @@ const UploadProject = () => {
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* Preview Card */}
             <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight">
               <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
@@ -1707,7 +1759,6 @@ const UploadProject = () => {
               <ProjectPreview />
             </div>
 
-            {/* Benefits */}
             <div
               className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight"
               style={{ animationDelay: "200ms" }}
@@ -1718,30 +1769,29 @@ const UploadProject = () => {
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <IndianRupee className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Earn money from your work</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 font-medium">Earn money from your work</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Help other developers learn</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 font-medium">Help other developers learn</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Build your reputation</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 font-medium">Build your reputation</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-500 rounded-full flex-shrink-0 flex items-center justify-center">
                     <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
-                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 font-medium">Secure platform & payments</span>
+                  <span className="text-xs sm:text-base text-gray-700 dark:text-gray-300 font-medium">Secure platform & payments</span>
                 </div>
               </div>
             </div>
 
-            {/* Guidelines */}
             <div
               className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight"
               style={{ animationDelay: "400ms" }}
@@ -1769,7 +1819,6 @@ const UploadProject = () => {
           </div>
         </div>
 
-        {/* Preview Modal */}
         {showPreview && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50">
             <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-4 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -1777,7 +1826,7 @@ const UploadProject = () => {
                 <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Project Preview</h3>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
@@ -1787,7 +1836,6 @@ const UploadProject = () => {
           </div>
         )}
 
-        {/* Success Modal */}
         {showSuccessModal && (
           <SuccessModal
             projectId={createdProjectId}
@@ -1802,31 +1850,26 @@ const UploadProject = () => {
   )
 }
 
-// Success Modal Component
 const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClose: () => void }) => {
   const navigate = useNavigate()
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-slideInUp">
-        {/* Success Icon */}
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
           <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
         </div>
 
-        {/* Title */}
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 text-center mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4">
           Project Submitted Successfully!
         </h2>
 
-        {/* Description */}
-        <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 text-center mb-6 text-sm sm:text-base">
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-6 text-sm sm:text-base">
           Your project has been created and saved as a <span className="font-semibold text-yellow-600">draft</span>.
         </p>
 
-        {/* Next Steps */}
         <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
-          <h3 className="font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-3 flex items-center gap-2">
+          <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
             <Clock className="w-5 h-5 text-blue-600" />
             Next Steps:
           </h3>
@@ -1850,7 +1893,6 @@ const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClos
           </ol>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => navigate('/dashboard')}
@@ -1861,7 +1903,7 @@ const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClos
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 dark:text-gray-300 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
+            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
           >
             Upload Another
           </button>
