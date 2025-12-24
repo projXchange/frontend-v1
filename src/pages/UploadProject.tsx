@@ -1860,34 +1860,37 @@ const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClos
           <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
         </div>
 
+        {/* Title */}
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4">
           Project Submitted Successfully!
         </h2>
 
-        <p className="text-gray-600 dark:text-gray-400 text-center mb-6 text-sm sm:text-base">
-          Your project has been created and saved as a <span className="font-semibold text-yellow-600">draft</span>.
+        {/* Description */}
+        <p className="text-gray-600 dark:text-gray-300 text-center mb-6 text-sm sm:text-base">
+          Your project has been created and saved as a <span className="font-semibold text-yellow-600 dark:text-yellow-400">draft</span>.
         </p>
 
-        <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
+        {/* Next Steps */}
+        <div className="bg-blue-50 dark:bg-slate-800 rounded-xl p-4 mb-6 border border-blue-100 dark:border-slate-700">
           <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-blue-600" />
+            <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Next Steps:
           </h3>
           <ol className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
             <li className="flex items-start gap-2">
-              <span className="font-bold text-blue-600 flex-shrink-0">1.</span>
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">1.</span>
               <span>Go to <span className="font-semibold">My Uploads</span> in your dashboard</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="font-bold text-blue-600 flex-shrink-0">2.</span>
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">2.</span>
               <span>Review your project details</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="font-bold text-blue-600 flex-shrink-0">3.</span>
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">3.</span>
               <span>Click <span className="font-semibold">"Send for Approval"</span> when ready</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="font-bold text-blue-600 flex-shrink-0">4.</span>
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">4.</span>
               <span>Our team will review within 24-48 hours</span>
             </li>
           </ol>
@@ -1903,7 +1906,7 @@ const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClos
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:bg-slate-800 transition-colors"
+            className="flex-1 px-6 py-3 border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800 transition-colors"
           >
             Upload Another
           </button>
