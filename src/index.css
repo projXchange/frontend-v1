@@ -1,3 +1,6 @@
+/* Import accessibility styles */
+@import './styles/accessibility.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,6 +15,17 @@ body, html {
 .dark body,
 .dark html {
   background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+}
+
+/* Hide scrollbar utility */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Respect user's motion preferences */

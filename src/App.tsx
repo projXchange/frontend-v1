@@ -4,12 +4,13 @@ import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
+//import ErrorBoundary from './components/ErrorBound
 import Home from './pages/Home';
 import ProjectListing from './pages/ProjectListing';
 import ProjectDetail from './pages/ProjectDetail';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import UploadProject from './pages/UploadProject';
+//import UploadProject from './pages/UploadProject';
 import WishlistPage from './pages/WishlistPage';
 import CartPage from './pages/CartPage';
 import ResetPassword from './pages/ResetPassword';
@@ -26,6 +27,12 @@ import RefundPolicy from './pages/RefundPolicy';
 import CommunityGuidelines from './pages/CommunityGuidelines';
 import { Toaster } from 'react-hot-toast';
 import EmailVerification from './pages/EmailVerification';
+import PayoutVerification from './pages/PayoutVerification';
+import PaymentMethods from './pages/PaymentMethods';
+import PayoutBalance from './pages/PayoutBalance';
+import PayoutHistory from './pages/PayoutHistory';
+import AdminPayouts from './pages/AdminPayouts';
+import UploadProjectNew from './pages/UploadProjectNew';
 
 function App() {
   return (
@@ -42,6 +49,7 @@ function App() {
             <Route path="/project/:id" element={<ProjectDetail />} />
             <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
             <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
+            <Route path="/payouts/verify/:token" element={<PayoutVerification />} />
             
             {/* Support Pages */}
             <Route path="/help" element={<HelpCenter />} />
@@ -72,7 +80,8 @@ function App() {
             } />
             <Route path="/upload" element={
               <ProtectedRoute>
-                <UploadProject />
+                {/* <UploadProject /> */}
+                <UploadProjectNew/>
               </ProtectedRoute>
             } />
             <Route path="/wishlist" element={
@@ -85,6 +94,31 @@ function App() {
                 <CartPage />
               </ProtectedRoute>
             } />
+            
+            {/* Payout Routes */}
+            <Route path="/payouts/methods" element={
+              <ProtectedRoute>
+                <PaymentMethods />
+              </ProtectedRoute>
+            } />
+            <Route path="/payouts/balance" element={
+              <ProtectedRoute>
+                <PayoutBalance />
+              </ProtectedRoute>
+            } />
+            <Route path="/payouts/history" element={
+              <ProtectedRoute>
+                <PayoutHistory />
+              </ProtectedRoute>
+            } />
+            
+            {/* Admin Payout Route */}
+            <Route path="/admin/payouts" element={
+              <ProtectedRoute requireAdmin>
+                <AdminPayouts />
+              </ProtectedRoute>
+            } />
+            
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>
