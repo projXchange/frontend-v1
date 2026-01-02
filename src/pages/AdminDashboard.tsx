@@ -23,7 +23,6 @@ import {
 import { useAuth } from "../contexts/AuthContext"
 import type { User, UsersApiResponse } from "../types/User"
 import type { Project, ProjectResponse, Review } from "../types/Project"
-import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import UserDetailsModal from "../components/UserDetailsModal"
 import { useNavigate } from "react-router-dom"
 import type { Transaction, TransactionsApiResponse } from "../types/Transaction"
