@@ -33,6 +33,7 @@ import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import LoadingNumber from "../components/LoadingNumber"
 import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
+import ProjectDetailsModalNew from "../components/ProjectDetailsModalNew"
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
@@ -1927,7 +1928,7 @@ const AdminDashboard = () => {
         />
       )}
       {isProjectModalOpen && (
-        <ProjectDetailsModal
+        <ProjectDetailsModalNew
           isOpen={isProjectModalOpen}
           onClose={() => {
             setIsProjectModalOpen(false)
