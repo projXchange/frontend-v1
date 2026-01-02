@@ -23,6 +23,7 @@ import {
 import { useAuth } from "../contexts/AuthContext"
 import type { User, UsersApiResponse } from "../types/User"
 import type { Project, ProjectResponse, Review } from "../types/Project"
+import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import UserDetailsModal from "../components/UserDetailsModal"
 import { useNavigate } from "react-router-dom"
 import type { Transaction, TransactionsApiResponse } from "../types/Transaction"
@@ -918,9 +919,9 @@ const AdminDashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Recent Activity */}
                   <div className="lg:col-span-2">
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-lg">
-                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3">
-                        <Activity className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600" />
+                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-4 sm:p-8 border border-gray-100 dark:border-slate-700 shadow-lg transition-colors">
+                      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-3 text-gray-900 dark:text-gray-100">
+                        <Activity className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600 dark:text-blue-400" />
                         Recent Activity
                       </h3>
                       <div className="space-y-3 sm:space-y-4">
@@ -982,50 +983,50 @@ const AdminDashboard = () => {
 
                   {/* Quick Stats */}
                   <div className="space-y-4 sm:space-y-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl p-4 sm:p-6 border border-blue-100">
-                      <h4 className="font-bold text-blue-900 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                        <Target className="w-4 sm:w-5 h-4 sm:h-5" />
+                    <div className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-2xl p-4 sm:p-6 border border-blue-100 dark:border-blue-800 transition-colors">
+                      <h4 className="font-bold text-blue-900 dark:text-blue-200 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+                        <Target className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 dark:text-blue-400" />
                         Today's Metrics
                       </h4>
                       <div className="space-y-3 sm:space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-blue-700 text-sm sm:text-base">New Signups</span>
-                          <span className="text-xl sm:text-2xl font-bold text-blue-900">12</span>
+                          <span className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">New Signups</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">12</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-blue-700 text-sm sm:text-base">Projects Sold</span>
-                          <span className="text-xl sm:text-2xl font-bold text-blue-900">8</span>
+                          <span className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">Projects Sold</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">8</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-blue-700 text-sm sm:text-base">Revenue</span>
-                          <span className="text-xl sm:text-2xl font-bold text-blue-900">$450</span>
+                          <span className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">Revenue</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">$450</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 sm:p-6 border border-purple-100">
-                      <h4 className="font-bold text-purple-900 mb-3 sm:mb-4 text-sm sm:text-base">Platform Health</h4>
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-4 sm:p-6 border border-purple-100 dark:border-purple-800 transition-colors">
+                      <h4 className="font-bold text-purple-900 dark:text-purple-200 mb-3 sm:mb-4 text-sm sm:text-base">Platform Health</h4>
                       <div className="space-y-3">
                         <div>
                           <div className="flex justify-between text-xs sm:text-sm mb-1">
-                            <span className="text-purple-700">Server Uptime</span>
-                            <span className="font-semibold">99.9%</span>
+                            <span className="text-purple-700 dark:text-purple-300">Server Uptime</span>
+                            <span className="font-semibold text-purple-900 dark:text-purple-100">99.9%</span>
                           </div>
-                          <div className="w-full bg-purple-200 rounded-full h-2">
+                          <div className="w-full bg-purple-200 dark:bg-purple-900/40 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400 h-2 rounded-full"
                               style={{ width: "99.9%" }}
                             />
                           </div>
                         </div>
                         <div>
                           <div className="flex justify-between text-xs sm:text-sm mb-1">
-                            <span className="text-purple-700">User Satisfaction</span>
-                            <span className="font-semibold">{stats.avgRating}/5.0</span>
+                            <span className="text-purple-700 dark:text-purple-300">User Satisfaction</span>
+                            <span className="font-semibold text-purple-900 dark:text-purple-100">{stats.avgRating}/5.0</span>
                           </div>
-                          <div className="w-full bg-purple-200 rounded-full h-2">
+                          <div className="w-full bg-purple-200 dark:bg-purple-900/40 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400 h-2 rounded-full"
                               style={{ width: `${(stats.avgRating / 5) * 100}%` }}
                             />
                           </div>
@@ -1046,22 +1047,22 @@ const AdminDashboard = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
                   {/* Sales Chart */}
-                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-lg">
-                    <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Monthly Performance</h3>
+                  <div className="bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-4 sm:p-8 border border-gray-100 dark:border-slate-700 shadow-lg transition-colors">
+                    <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">Monthly Performance</h3>
                     <div className="space-y-3 sm:space-y-4">
                       {salesData.map((data, index) => (
                         <div key={index} className="animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2">
                             <span className="text-gray-700 dark:text-gray-300 font-semibold text-sm sm:text-base">{data.month}</span>
                             <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm">
-                              <span className="text-green-600 font-bold">${data.sales}</span>
-                              <span className="text-blue-600">{data.projects} projects</span>
-                              <span className="text-purple-600">{data.users} users</span>
+                              <span className="text-green-600 dark:text-green-400 font-bold">${data.sales}</span>
+                              <span className="text-blue-600 dark:text-blue-400">{data.projects} projects</span>
+                              <span className="text-purple-600 dark:text-purple-400">{data.users} users</span>
                             </div>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
+                          <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 sm:h-3">
                             <div
-                              className="bg-gradient-to-r from-blue-500 to-teal-500 h-2 sm:h-3 rounded-full transition-all duration-1000"
+                              className="bg-gradient-to-r from-blue-500 to-teal-500 dark:from-blue-400 dark:to-teal-400 h-2 sm:h-3 rounded-full transition-all duration-1000"
                               style={{ width: `${(data.sales / 3000) * 100}%` }}
                             />
                           </div>
@@ -1071,8 +1072,8 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Top Categories */}
-                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-lg">
-                    <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Popular Categories</h3>
+                  <div className="bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-4 sm:p-8 border border-gray-100 dark:border-slate-700 shadow-lg transition-colors">
+                    <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">Popular Categories</h3>
                     <div className="space-y-3 sm:space-y-4">
                       {[
                         { name: "React", projects: 15, sales: "$1,250", color: "from-blue-500 to-blue-600" },
@@ -1082,7 +1083,7 @@ const AdminDashboard = () => {
                       ].map((category, index) => (
                         <div
                           key={index}
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
                           style={{ animationDelay: `${index * 100}ms` }}
                         >
                           <div className="flex items-center gap-3 min-w-0">
@@ -1093,7 +1094,7 @@ const AdminDashboard = () => {
                             <div className="font-bold text-gray-900 dark:text-gray-100 text-sm sm:text-base">
                               {category.projects} projects
                             </div>
-                            <div className="text-xs sm:text-sm text-green-600 font-semibold">{category.sales}</div>
+                            <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">{category.sales}</div>
                           </div>
                         </div>
                       ))}
@@ -1103,25 +1104,25 @@ const AdminDashboard = () => {
 
                 {/* KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Conversion Rate</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{stats.conversionRate}%</div>
-                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 0.3% from last month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{stats.conversionRate}%</div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ 0.3% from last month</div>
                   </div>
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Avg Order Value</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">$34.50</div>
-                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ $2.10 from last month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">$34.50</div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ $2.10 from last month</div>
                   </div>
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">User Retention</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">78%</div>
-                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 5% from last month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">78%</div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ 5% from last month</div>
                   </div>
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Active Sellers</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">24</div>
-                    <div className="text-xs sm:text-sm text-green-600 font-semibold">↑ 3 new this month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">24</div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ 3 new this month</div>
                   </div>
                 </div>
               </div>
