@@ -22,7 +22,7 @@ const Home = () => {
     if (user) {
       navigate("/dashboard");
     } else {
-      openAuthModal(false); // open signup/login modal
+      openAuthModal(false); 
     }
   };
   // Fetch projects from API
