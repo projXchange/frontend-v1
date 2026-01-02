@@ -1672,7 +1672,7 @@ const ProjectDetail = () => {
               >
                 <div className="flex items-center justify-center gap-2">
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
-                  <span>Lifetime access</span>
+                  <span>Access with all features</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
@@ -1682,17 +1682,78 @@ const ProjectDetail = () => {
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
                   <span>Documentation provided</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
-                  <span>Money-back guarantee</span>
+
+              </div>
+            </div>
+
+            {/* Tutorial Request - Coming Soon */}
+            <div
+              className="bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-blue-900/20 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-purple-200/50 dark:border-purple-700/30 animate-slideInRight transition-colors overflow-hidden relative"
+              style={{ animationDelay: "350ms" }}
+            >
+              {/* Decorative background gradient */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded-full blur-3xl -z-0"></div>
+
+              <div className="relative z-10">
+                {/* Coming Soon Badge */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse">
+                    <span className="w-2 h-2 bg-white rounded-full animate-ping"></span>
+                    COMING SOON
+                  </span>
                 </div>
+
+                {/* Icon and Title */}
+                <div className="flex items-start gap-3 sm:gap-4 mb-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <svg
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-1.5">
+                      Want to Learn This?
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      Soon you'll be able to request personalized lessons and tutorials for this project!
+                    </p>
+                  </div>
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-2 mb-4 sm:mb-5">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                    <span>Step-by-step video tutorials</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                    <div className="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
+                    <span>Q&A sessions with author</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    <span>Live code walkthroughs</span>
+                  </div>
+                </div>
+
+
               </div>
             </div>
 
             {/* Author Details */}
             <div
               className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors"
-              style={{ animationDelay: "400ms" }}
+              style={{ animationDelay: "450ms" }}
             >
               <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-3 sm:mb-6 text-gray-900 dark:text-white">About the Author</h3>
               <div className="text-center mb-4 sm:mb-6">
