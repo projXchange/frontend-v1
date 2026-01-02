@@ -9,6 +9,13 @@ import { apiClient } from '../utils/apiClient';
 import { getApiUrl } from '../config/api';
 import heroVideo from "../asset/Hero.mp4";
 
+import { ImageCarousel } from '../components/ImageCarousel';
+import imgMain from '../asset/carousel/main_1.png';
+import imgEarn from '../asset/carousel/earn.png';
+import imgCommunity from '../asset/carousel/community.png';
+import imgHowItWorks from '../asset/carousel/HowItWorks.png';
+import imgPC from '../asset/carousel/onlyOnPc.png';
+
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
@@ -22,7 +29,7 @@ const Home = () => {
     if (user) {
       navigate("/dashboard");
     } else {
-      openAuthModal(false); 
+      openAuthModal(false);
     }
   };
   // Fetch projects from API
@@ -214,7 +221,7 @@ const Home = () => {
           Your browser does not support the video tag.
         </video>
         {/* Overlay */}
-         <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/60"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
 
@@ -431,6 +438,55 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Carousel Section */}
+      <section className="py-10 bg-gray-50 dark:bg-slate-900/50 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="mb-8"
+          >
+            <ImageCarousel
+              images={[
+                {
+                  src: imgMain,
+                  alt: "Platform Showcase",
+                  title: "Unlock Your Academic Potential",
+                  description: "Discover, share, and monetize your academic projects with ProjXchange."
+                },
+                {
+                  src: imgEarn,
+                  alt: "Earn",
+                  title: "Earn While You Learn",
+                  description: "Turn your hard work into income. List your projects and start earning today."
+                },
+                {
+                  src: imgCommunity,
+                  alt: "Community",
+                  title: "Join a Thriving Community",
+                  description: "Connect with thousands of students, mentors, and developers worldwide."
+                },
+                {
+                  src: imgHowItWorks,
+                  alt: "How It Works",
+                  title: "Simple & Secure",
+                  description: "Upload, verify, and start selling. We handle the rest."
+                },
+                {
+                  src: imgPC,
+                  alt: "Desktop Optimized",
+                  title: "Projects at your fingertips",
+                  description: "Access advanced features, code previews, and analytics on our desktop view."
+                }
+              ]}
+              autoPlayInterval={5000}
+            />
+          </motion.div>
+        </div>
+      </section>
+
       {/* Categories Section */}
       <section className="py-20 bg-gray-50 dark:bg-slate-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -610,6 +666,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+
 
 
 
