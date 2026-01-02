@@ -26,6 +26,9 @@ import {
   Trash2,
   User,
   DollarSign,
+  Wallet,
+  Settings,
+  AlertCircle,
 } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 import { apiClient } from "../utils/apiClient"
@@ -684,6 +687,7 @@ const StudentDashboard = () => {
                 { id: "wishlist", label: "Wishlist", icon: Heart },
                 { id: "reviews", label: "Reviews", icon: Trophy },
                 { id: "transactions", label: "Payments", icon: Clock },
+                { id: "payouts", label: "Payouts", icon: Wallet },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1484,6 +1488,94 @@ const StudentDashboard = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === "payouts" && (
+              <div className="animate-slideInUp">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <Wallet className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
+                    Payout Management
+                  </h2>
+                </div>
+                
+                <div className="grid gap-6 sm:gap-8">
+                  {/* Quick Links */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Link
+                      to="/payouts/balance"
+                      className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <DollarSign className="w-8 h-8" />
+                        <TrendingUp className="w-5 h-5 opacity-70" />
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">Balance & Earnings</h3>
+                      <p className="text-sm text-blue-100">View your available balance and request payouts</p>
+                    </Link>
+                    
+                    <Link
+                      to="/payouts/methods"
+                      className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <Wallet className="w-8 h-8" />
+                        <Settings className="w-5 h-5 opacity-70" />
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">Payment Methods</h3>
+                      <p className="text-sm text-purple-100">Manage your UPI and bank account details</p>
+                    </Link>
+                    
+                    <Link
+                      to="/payouts/history"
+                      className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <Clock className="w-8 h-8" />
+                        <Activity className="w-5 h-5 opacity-70" />
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">Payout History</h3>
+                      <p className="text-sm text-teal-100">Track all your payout requests and status</p>
+                    </Link>
+                  </div>
+                  
+                  {/* Info Card */}
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                          <AlertCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Getting Started with Payouts</h3>
+                        <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                          <li className="flex items-start gap-2">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold">1.</span>
+                            <span>Add your payment method (UPI or Bank Account)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold">2.</span>
+                            <span>Check your available balance from project sales</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold">3.</span>
+                            <span>Request a payout when you reach the minimum amount (₹100)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold">4.</span>
+                            <span>Verify your payout via email link</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold">5.</span>
+                            <span>Track your payout status in the history section</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
