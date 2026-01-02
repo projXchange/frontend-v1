@@ -70,111 +70,123 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl w-full max-w-5xl my-4 shadow-2xl flex flex-col max-h-[96vh] transition-colors">
-        {/* Compact Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 flex-shrink-0 transition-colors">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-base sm:text-lg">{project.title?.charAt(0) || 'P'}</span>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl w-full max-w-5xl my-4 shadow-2xl shadow-blue-500/10 dark:shadow-blue-500/20 flex flex-col max-h-[96vh] transition-all duration-300 border border-gray-200/50 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
+        {/* Enhanced Header with Gradient */}
+        <div className="relative flex items-center justify-between p-4 sm:p-5 border-b border-gray-200/50 dark:border-slate-700/50 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex-shrink-0 overflow-hidden">
+          {/* Animated Background Pattern */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+          
+          <div className="relative flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-white/30 transform hover:scale-105 transition-transform duration-300">
+              <span className="text-white font-bold text-lg sm:text-2xl drop-shadow-lg">{project.title?.charAt(0) || 'P'}</span>
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">Project Details</h2>
-              <p className="text-xs text-gray-600 dark:text-gray-400 font-mono truncate">ID: {project.id}</p>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white truncate drop-shadow-md">Project Details</h2>
+              <p className="text-xs sm:text-sm text-white/80 font-mono truncate mt-0.5">ID: {project.id}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 sm:p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-white/80 dark:hover:bg-slate-800 rounded-lg transition-all flex-shrink-0 ml-2"
+            className="relative p-2 sm:p-2.5 text-white/80 hover:text-white hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all flex-shrink-0 ml-2 hover:rotate-90 duration-300 ring-1 ring-white/20 hover:ring-white/40"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        {/* Compact Status Bar */}
-        <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 flex-shrink-0 transition-colors">
-          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-            {/* Status Badges */}
+        {/* Enhanced Status Bar with Glass Effect */}
+        <div className="px-4 sm:px-5 py-3 sm:py-4 bg-gradient-to-r from-gray-50/80 via-white/50 to-gray-50/80 dark:from-slate-800/80 dark:via-slate-800/50 dark:to-slate-800/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-slate-700/50 flex-shrink-0 transition-all">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-xs sm:text-sm">
+            {/* Enhanced Status Badges */}
             <span
-              className={`px-2 py-1 text-xs font-semibold rounded-full ${project.status === "approved"
-                ? "bg-green-100 text-green-700"
+              className={`px-3 py-1.5 text-xs font-bold rounded-full shadow-sm ring-1 transition-all hover:scale-105 ${project.status === "approved"
+                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white ring-green-500/20"
                 : project.status === "pending"
-                  ? "bg-yellow-100 text-yellow-700"
+                  ? "bg-gradient-to-r from-yellow-400 to-orange-400 text-white ring-yellow-500/20"
                   : project.status === "suspended"
-                    ? "bg-red-100 text-red-700"
+                    ? "bg-gradient-to-r from-red-500 to-pink-500 text-white ring-red-500/20"
                     : project.status === "draft"
-                      ? "bg-gray-100 text-gray-700"
-                      : "bg-blue-100 text-blue-700"
+                      ? "bg-gradient-to-r from-gray-400 to-slate-400 text-white ring-gray-500/20"
+                      : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white ring-blue-500/20"
                 }`}
             >
               {project.status?.toUpperCase()}
             </span>
 
             {project.difficulty_level && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+              <span className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full text-xs font-bold shadow-sm ring-1 ring-blue-500/20 transition-all hover:scale-105">
                 {project.difficulty_level?.toUpperCase()}
               </span>
             )}
 
             {project.is_featured && (
-              <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
+              <span className="px-3 py-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 text-white rounded-full text-xs font-bold shadow-sm ring-1 ring-amber-500/20 transition-all hover:scale-105 animate-pulse">
                 ⭐ FEATURED
               </span>
             )}
 
-            {/* Dates - Hidden on mobile */}
+            {/* Enhanced Dates */}
             <div className="hidden sm:flex items-center gap-3 ml-auto text-xs text-gray-600 dark:text-gray-400">
-              <div className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{new Date(project.created_at).toLocaleDateString()}</span>
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm rounded-lg ring-1 ring-gray-200/50 dark:ring-slate-600/50">
+                <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                <span className="font-medium">{new Date(project.created_at).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Compact Tabs */}
-        <div className="flex gap-1 px-2 sm:px-3 pt-2 border-b border-gray-200 dark:border-slate-700 overflow-x-auto flex-shrink-0">
+        {/* Enhanced Tabs with Smooth Transitions */}
+        <div className="flex gap-1 sm:gap-2 px-3 sm:px-4 pt-3 border-b border-gray-200/50 dark:border-slate-700/50 overflow-x-auto flex-shrink-0 bg-gradient-to-b from-gray-50/50 to-transparent dark:from-slate-800/50">
           {(['basic', 'technical', 'media'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-3 py-2 font-medium text-xs sm:text-sm rounded-t-lg transition-colors whitespace-nowrap ${activeTab === tab
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-800'
+              className={`relative px-4 sm:px-5 py-2.5 sm:py-3 font-semibold text-xs sm:text-sm rounded-t-xl transition-all duration-300 whitespace-nowrap ${activeTab === tab
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-lg shadow-blue-500/10 scale-105 -mb-px'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/60 dark:hover:bg-slate-800/60 hover:scale-102'
                 }`}
             >
-              {tab === 'basic' && '📋 Basic'}
+              {activeTab === tab && (
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full"></div>
+              )}
+              {tab === 'basic' && '📋 Basic Info'}
               {tab === 'technical' && '⚙️ Technical'}
-              {tab === 'media' && '🎨 Media'}
+              {tab === 'media' && '🎨 Media & Links'}
             </button>
           ))}
         </div>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5">
+        {/* Scrollable Content with Smooth Animations */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 md:p-6 bg-gradient-to-b from-transparent via-gray-50/30 to-transparent dark:via-slate-800/30">
           {activeTab === 'basic' && (
-            <div className="space-y-4 max-w-4xl mx-auto">
+            <div className="space-y-5 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Title */}
-              <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Project Title *</label>
+              <div className="group">
+                <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                  <span className="w-1 h-4 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></span>
+                  Project Title *
+                </label>
                 <input
                   type="text"
                   value={currentData.title || ''}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
+                  className="w-full px-4 py-3 text-sm sm:text-base border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all duration-300 hover:border-gray-300 dark:hover:border-slate-600"
                 />
               </div>
 
               {/* Description */}
-              <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Description *</label>
+              <div className="group">
+                <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                  <span className="w-1 h-4 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></span>
+                  Description *
+                </label>
                 <textarea
                   rows={4}
                   value={currentData.description || ''}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   disabled={!canEditAll}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 resize-none transition-colors"
+                  className="w-full px-4 py-3 text-sm border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none transition-all duration-300 hover:border-gray-300 dark:hover:border-slate-600"
                 />
               </div>
 
@@ -254,10 +266,12 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
                 </div>
               </div>
 
-              {/* Compact Pricing Section */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-3 sm:p-4 border border-green-200 dark:border-green-800 transition-colors">
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                  💰 Pricing
+              {/* Enhanced Pricing Section with Glass Effect */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-teal-900/30 rounded-2xl p-4 sm:p-5 border-2 border-green-200/50 dark:border-green-700/50 shadow-lg shadow-green-500/5 transition-all hover:shadow-xl hover:shadow-green-500/10 hover:scale-[1.01] duration-300">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-3xl"></div>
+                <h3 className="relative text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                  <span className="text-2xl">💰</span>
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Pricing Details</span>
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
@@ -357,7 +371,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           )}
 
           {activeTab === 'technical' && (
-            <div className="space-y-4 max-w-4xl mx-auto">
+            <div className="space-y-5 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Tech Stack */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Technology Stack</label>
@@ -446,7 +460,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           )}
 
           {activeTab === 'media' && (
-            <div className="space-y-4 max-w-4xl mx-auto">
+            <div className="space-y-5 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* URLs Section */}
               <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl p-3 sm:p-4 border border-cyan-200 dark:border-cyan-800 transition-colors">
                 <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
@@ -561,42 +575,44 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
           )}
         </div>
 
-        {/* Compact Footer */}
-        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 flex-shrink-0 transition-colors">
-          <div className="text-xs text-gray-600 dark:text-gray-400 text-center sm:text-left">
-            <span className="font-semibold">Updated:</span> {new Date(project.updated_at).toLocaleDateString()}
+        {/* Enhanced Footer with Gradient */}
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-t border-gray-200/50 dark:border-slate-700/50 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 flex-shrink-0 backdrop-blur-sm transition-all">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
+            <div className="px-3 py-1.5 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm rounded-lg ring-1 ring-gray-200/50 dark:ring-slate-600/50 font-medium">
+              <span className="font-semibold text-gray-700 dark:text-gray-300">Updated:</span> {new Date(project.updated_at).toLocaleDateString()}
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
             {onSendForApproval && project.status === 'draft' && (
               <button
                 onClick={onSendForApproval}
                 disabled={updatingProjectStatus}
-                className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-xl text-xs sm:text-sm font-bold hover:from-purple-700 hover:via-pink-700 hover:to-rose-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 hover:scale-105 active:scale-95 duration-300"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 <span>Send for Approval</span>
               </button>
             )}
             <button
               onClick={onUpdate}
               disabled={updatingProjectStatus}
-              className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:from-blue-700 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white rounded-xl text-xs sm:text-sm font-bold hover:from-blue-700 hover:via-cyan-700 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95 duration-300"
             >
               {updatingProjectStatus ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Saving...</span>
                 </>
               ) : (
                 <>
-                  <Save className="w-3.5 h-3.5" />
+                  <Save className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                   <span>Save Changes</span>
                 </>
               )}
             </button>
             <button
               onClick={onClose}
-              className="px-3 sm:px-4 py-2 bg-gray-600 dark:bg-slate-700 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-gray-700 dark:hover:bg-slate-600 transition-all"
+              className="px-4 sm:px-5 py-2.5 sm:py-3 bg-gray-600 dark:bg-slate-700 text-white rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-700 dark:hover:bg-slate-600 transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95 duration-300 ring-1 ring-gray-500/20"
             >
               Close
             </button>

@@ -39,9 +39,9 @@ import type { ProfileForm, SocialLinks } from "../types/ProfileForm"
 import type { Review, Project } from "../types/Project"
 import type { Transaction } from "../types/Transaction"
 import ReviewDetailsModal from "../components/ReviewDetailsModal"
-import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import toast from "react-hot-toast"
 import LoadingNumber from "../components/LoadingNumber"
+import ProjectDetailsModalNew from "../components/ProjectDetailsModalNew"
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
@@ -1954,7 +1954,7 @@ const StudentDashboard = () => {
 
       {/* Project Details Modal */}
       {isProjectModalOpen && (
-        <ProjectDetailsModal
+        <ProjectDetailsModalNew
           isOpen={isProjectModalOpen}
           onClose={() => {
             setIsProjectModalOpen(false)
