@@ -417,6 +417,11 @@ const StudentDashboard = () => {
   })
 
   useEffect(() => {
+    // Fetch dashboard stats on mount to get profile data
+    if (!dashboardStats && !statsLoading) {
+      fetchDashboardStats()
+    }
+    
     if (activeTab === "overview" && !dashboardStats && !statsLoading) {
       fetchDashboardStats()
     }
@@ -453,26 +458,32 @@ const StudentDashboard = () => {
               <div className="relative flex-shrink-0">
                 <img
                   src={
+                    dashboardStats?.profile?.avatar ||
                     user?.avatar ||
                     "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80"
                   }
-                  // alt={user.full_name}
+                  alt={dashboardStats?.profile?.full_name || user?.full_name || "User"}
                   className="w-16 sm:w-20 h-16 sm:h-20 rounded-full object-cover ring-4 ring-white/30"
                 />
-                <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold">
-                  {/* {profileForm.experience_level} */}
+                <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold capitalize">
+                  {dashboardStats?.profile?.experience_level || "Beginner"}
                 </div>
               </div>
               <div className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
-                  {/* Welcome back, {user.full_name}! */}
+                  Welcome back, {dashboardStats?.profile?.full_name || user?.full_name || "User"}!
                 </h1>
-                {/* <p className="text-blue-100 text-sm sm:text-lg">{user.email}</p> */}
+                <p className="text-blue-100 text-sm sm:text-lg">{dashboardStats?.profile?.email || user?.email}</p>
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 mt-2 text-xs sm:text-sm">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>
-                      {/* Member since {user.created_at ? new Date(user.created_at).toLocaleDateString() : "Recently"} */}
+                      Member since{" "}
+                      {dashboardStats?.profile?.created_at
+                        ? new Date(dashboardStats.profile.created_at).toLocaleDateString()
+                        : user?.created_at
+                          ? new Date(user.created_at).toLocaleDateString()
+                          : "Recently"}
                     </span>
                   </div>
                 </div>
