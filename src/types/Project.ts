@@ -5,6 +5,7 @@ export interface Project {
   key_features?: string;
   category: string;
   author_id: string;
+  author_name?: string;
   buyers: string[];
   difficulty_level: string;
   tech_stack: string[];

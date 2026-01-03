@@ -1226,7 +1226,7 @@ const AdminDashboard = () => {
                                   </div>
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 dark:text-gray-300 font-medium hidden sm:table-cell truncate">
-                                  {project.author_id}
+                                  {project.author_name ? `${project.author_name} (${project.author_id})` : project.author_id}
                                 </td>
                                 <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                                   <span className="px-3 py-1 inline-flex text-xs font-bold rounded-full bg-blue-100 text-blue-800">
