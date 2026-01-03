@@ -35,7 +35,6 @@ import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
 import { useWishlist } from "../contexts/WishlistContext"
 import { motion } from "framer-motion"
-import type { ProfileForm, SocialLinks } from "../types/ProfileForm"
 import type { Review, Project } from "../types/Project"
 import type { Transaction } from "../types/Transaction"
 import ReviewDetailsModal from "../components/ReviewDetailsModal"
@@ -48,10 +47,8 @@ const StudentDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const { user } = useAuth()
-  const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const [newSkill, setNewSkill] = useState("")
   const [loading, setLoading] = useState(false) // reviews loading
   const [reviews, setReviews] = useState<Review[]>([])
   const [myProjects, setMyProjects] = useState<Project[]>([])
@@ -60,8 +57,6 @@ const StudentDashboard = () => {
   const [purchasedProjectsLoading, setPurchasedProjectsLoading] = useState(false)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [transactionsLoading, setTransactionsLoading] = useState(false)
-  const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [avatarPreview, setAvatarPreview] = useState<string>("")
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [updatingReview, setUpdatingReview] = useState<string | null>(null)
@@ -77,22 +72,6 @@ const StudentDashboard = () => {
   const [projectEditData, setProjectEditData] = useState<Partial<Project>>({})
   const [updatingProjectStatus, setUpdatingProjectStatus] = useState(false)
   const [updatingProjectId, setUpdatingProjectId] = useState<string | null>(null)
-
-  const [profileForm, setProfileForm] = useState<ProfileForm>({
-    id: "",
-    rating: 0,
-    total_sales: 0,
-    total_purchases: 0,
-    experience_level: "beginner",
-    avatar: "",
-    bio: "",
-    location: "",
-    website: "",
-    social_links: { github: "", linkedin: "", twitter: "" },
-    skills: [],
-    status: "active",
-    created_at: "",
-  })
 
   const { wishlist } = useWishlist()
 
@@ -234,46 +213,6 @@ const StudentDashboard = () => {
     }
   }
 
-  const fetchUserProfile = async () => {
-    setIsLoading(true)
-    setError("")
-    try {
-      const res = await apiClient(getApiUrl(`/users/profile/me`), {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-      })
-      if (!res.ok) throw new Error("Failed to fetch profile")
-      const data = await res.json()
-      if (data.profile) {
-        const profile = data.profile
-        const normalizedSocialLinks = Object.fromEntries(
-          Object.entries(profile.social_links || {}).map(([k, v]) => [k, v ?? ""]),
-        )
-        setProfileForm({
-          id: profile.id || "",
-          rating: profile.rating ?? 0,
-          total_sales: profile.total_sales ?? 0,
-          total_purchases: profile.total_purchases ?? 0,
-          experience_level: profile.experience_level || "beginner",
-          avatar: profile.avatar || "",
-          bio: profile.bio ?? "",
-          location: profile.location ?? "",
-          website: profile.website ?? "",
-          social_links: normalizedSocialLinks as any,
-          skills: profile.skills || [],
-          status: profile.status || "active",
-          created_at: profile.created_at || "",
-        })
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to load profile")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const openProjectDetails = (project: Project) => {
     setSelectedProject(project)
     setProjectUpdateData({ status: project.status, is_featured: project.is_featured })
@@ -407,92 +346,6 @@ const StudentDashboard = () => {
     }
   }
 
-  const handleSaveProfile = async () => {
-    setIsLoading(true)
-    setError("")
-    try {
-      const method = "PATCH"
-      const url = getApiUrl(`/users/profile/${profileForm.id || user?.id}`)
-      const payload = {
-        rating: profileForm.rating,
-        total_sales: profileForm.total_sales,
-        total_purchases: profileForm.total_purchases,
-        experience_level: profileForm.experience_level,
-        avatar: avatarFile && avatarPreview ? avatarPreview : profileForm.avatar || "",
-        bio: profileForm.bio ?? "",
-        location: profileForm.location ?? "",
-        website: profileForm.website ?? "",
-        social_links: Object.fromEntries(Object.entries(profileForm.social_links || {}).map(([k, v]) => [k, v ?? ""])),
-        skills: profileForm.skills || [],
-      }
-      const res = await apiClient(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-      if (!res.ok) throw new Error("Failed to save profile")
-      const data = await res.json()
-      setProfileForm({
-        ...data.profile,
-        social_links: {
-          github: data.profile.social_links?.github || "",
-          linkedin: data.profile.social_links?.linkedin || "",
-          twitter: data.profile.social_links?.twitter || "",
-        },
-        skills: data.profile.skills || [],
-      })
-      setAvatarFile(null)
-      setAvatarPreview("")
-      setIsEditingProfile(false)
-      toast.success("Profile updated successfully!")
-    } catch (err: any) {
-      setError(err.message || "Failed to save profile")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleCancelEdit = () => {
-    fetchUserProfile() // reload to reset form
-    setIsEditingProfile(false)
-    setError("")
-  }
-
-  const handleInputChange = (field: keyof ProfileForm, value: any) => {
-    setProfileForm((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleSocialLinkChange = (platform: keyof SocialLinks, value: string) => {
-    setProfileForm((prev) => ({
-      ...prev,
-      social_links: { ...prev.social_links, [platform]: value },
-    }))
-  }
-
-  const handleAddSkill = () => {
-    const trimmedSkill = newSkill.trim()
-    if (!trimmedSkill || profileForm.skills.includes(trimmedSkill)) return
-    setProfileForm((prev) => ({
-      ...prev,
-      skills: [...prev.skills, trimmedSkill],
-    }))
-    setNewSkill("")
-  }
-
-  const handleRemoveSkill = (index: number) => {
-    setProfileForm((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((_, i) => i !== index),
-    }))
-  }
-
-  const handleAvatarClear = () => {
-    setAvatarFile(null)
-    setAvatarPreview("")
-  }
 
   const handleUpdateReview = async (reviewId: string, updatedReview: { review_text: string; rating: number }) => {
     setUpdatingReview(reviewId)
@@ -579,17 +432,7 @@ const StudentDashboard = () => {
     if (activeTab === "transactions" && transactions.length === 0 && !transactionsLoading) {
       fetchMyTransactions()
     }
-    if (activeTab === "profile" && !isLoading) {
-      fetchUserProfile()
-    }
   }, [activeTab])
-
-  // Load profile data on mount for the navbar dropdown
-  useEffect(() => {
-    fetchUserProfile()
-  }, [])
-
-  if (!user) return <p>No profile data found</p>
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
@@ -613,23 +456,23 @@ const StudentDashboard = () => {
                     user?.avatar ||
                     "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80"
                   }
-                  alt={user.full_name}
+                  // alt={user.full_name}
                   className="w-16 sm:w-20 h-16 sm:h-20 rounded-full object-cover ring-4 ring-white/30"
                 />
                 <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold">
-                  {profileForm.experience_level}
+                  {/* {profileForm.experience_level} */}
                 </div>
               </div>
               <div className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
-                  Welcome back, {user.full_name}!
+                  {/* Welcome back, {user.full_name}! */}
                 </h1>
-                <p className="text-blue-100 text-sm sm:text-lg">{user.email}</p>
+                {/* <p className="text-blue-100 text-sm sm:text-lg">{user.email}</p> */}
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 mt-2 text-xs sm:text-sm">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>
-                      Member since {user.created_at ? new Date(user.created_at).toLocaleDateString() : "Recently"}
+                      {/* Member since {user.created_at ? new Date(user.created_at).toLocaleDateString() : "Recently"} */}
                     </span>
                   </div>
                 </div>
@@ -684,10 +527,9 @@ const StudentDashboard = () => {
                 { id: "overview", label: "Overview", icon: BarChart3 },
                 { id: "my-projects", label: "My Uploads", icon: ShoppingBag },
                 { id: "purchased-projects", label: "My Purchases", icon: ShoppingBag },
-                { id: "wishlist", label: "Wishlist", icon: Heart },
+                { id: "payouts", label: "Payouts", icon: Wallet },
                 { id: "reviews", label: "Reviews", icon: Trophy },
                 { id: "transactions", label: "Payments", icon: Clock },
-                { id: "payouts", label: "Payouts", icon: Wallet },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1126,114 +968,6 @@ const StudentDashboard = () => {
               </div>
             )}
 
-
-            {activeTab === "wishlist" && (
-              <div className="animate-slideInUp">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Wishlist</h2>
-                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-semibold">{wishlist.length}</span> items saved
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {wishlist.length === 0 ? (
-                    <div className="col-span-full text-center py-12 sm:py-16">
-                      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                        <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
-                      </div>
-                      <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">No items in wishlist</h3>
-                      <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-6 sm:mb-8">
-                        Start exploring projects and add them to your wishlist!
-                      </p>
-                      <Link
-                        to="/projects"
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-                      >
-                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                        Browse Projects
-                      </Link>
-                    </div>
-                  ) : (
-                    wishlist.map((item, index) => (
-                      <div
-                        key={item.id}
-                        className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-gray-100 dark:border-slate-700 group animate-slideInUp"
-                        style={{ animationDelay: `${index * 100}ms` }}
-                      >
-                        <div className="relative">
-                          <img
-                            src={`https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400`}
-                            alt={item.project.title}
-                            className="w-full h-32 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-700"
-                          />
-                          <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
-                            <span className="px-2 sm:px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold">
-                              {item.project.category}
-                            </span>
-                          </div>
-                          <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                            <button className="w-8 h-8 sm:w-10 sm:h-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white dark:hover:bg-slate-800 hover:scale-110 transition-all duration-300 shadow-lg">
-                              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 fill-current" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="p-4 sm:p-6">
-                          <div className="flex items-center justify-between mb-2 sm:mb-3">
-                            <div className="flex items-center">
-                              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
-                              <span className="ml-1 text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">4.8</span>
-                            </div>
-                            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                              {item.project.purchase_count || 0} sales
-                            </span>
-                          </div>
-                          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                            {item.project.title}
-                          </h3>
-                          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-3 sm:mb-4">
-                            <div className="flex items-center justify-between">
-                              <span>Added:</span>
-                              <span className="font-semibold">{new Date(item.added_at).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                ₹{item.project.pricing?.sale_price || 0}
-                              </span>
-                              {item.project.pricing &&
-                                item.project.pricing.original_price > item.project.pricing.sale_price && (
-                                  <span className="text-sm sm:text-lg text-gray-500 dark:text-gray-400 line-through">
-                                    ₹{item.project.pricing.original_price}
-                                  </span>
-                                )}
-                            </div>
-                            {item.project.pricing &&
-                              item.project.pricing.original_price > item.project.pricing.sale_price && (
-                                <span className="text-xs sm:text-sm text-green-600 font-semibold">
-                                  Save ₹{item.project.pricing.original_price - item.project.pricing.sale_price}
-                                </span>
-                              )}
-                          </div>
-                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                            <Link
-                              to={`/project/${item.project.id}`}
-                              className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-2 sm:py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 text-center text-sm sm:text-base"
-                            >
-                              View Details
-                            </Link>
-                            <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-xl text-gray-700 dark:text-gray-300 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-900 hover:scale-105 transition-all duration-200">
-                              <Eye className="w-4 h-4 mx-auto" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-
             {activeTab === "reviews" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
@@ -1499,7 +1233,7 @@ const StudentDashboard = () => {
                     Payout Management
                   </h2>
                 </div>
-                
+
                 <div className="grid gap-6 sm:gap-8">
                   {/* Quick Links */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1514,7 +1248,7 @@ const StudentDashboard = () => {
                       <h3 className="text-lg font-bold mb-2">Balance & Earnings</h3>
                       <p className="text-sm text-blue-100">View your available balance and request payouts</p>
                     </Link>
-                    
+
                     <Link
                       to="/payouts/methods"
                       className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
@@ -1526,7 +1260,7 @@ const StudentDashboard = () => {
                       <h3 className="text-lg font-bold mb-2">Payment Methods</h3>
                       <p className="text-sm text-purple-100">Manage your UPI and bank account details</p>
                     </Link>
-                    
+
                     <Link
                       to="/payouts/history"
                       className="bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
@@ -1539,7 +1273,7 @@ const StudentDashboard = () => {
                       <p className="text-sm text-teal-100">Track all your payout requests and status</p>
                     </Link>
                   </div>
-                  
+
                   {/* Info Card */}
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6">
                     <div className="flex items-start gap-4">
@@ -1577,361 +1311,6 @@ const StudentDashboard = () => {
                   </div>
                 </div>
               </div>
-            )}
-
-            {activeTab === "profile" && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6 sm:space-y-8"
-              >
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                    {error}
-                  </div>
-                )}
-
-                {isLoading && (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600" />
-                    <span className="ml-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading profile...</span>
-                  </div>
-                )}
-
-                {/* Profile Header */}
-                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-8">
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">Profile Settings</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                        Manage your account information and preferences
-                      </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                      {isEditingProfile ? (
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <button
-                            onClick={handleSaveProfile}
-                            disabled={isLoading}
-                            className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
-                          >
-                            {isLoading ? (
-                              <Loader className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                            ) : (
-                              <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                            )}
-                            {isLoading ? "Saving..." : "Save Changes"}
-                          </button>
-                          <button
-                            onClick={handleCancelEdit}
-                            disabled={isLoading}
-                            className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all duration-200 text-sm"
-                          >
-                            <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setIsEditingProfile(true)}
-                          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
-                        >
-                          <Edit3 className="w-4 h-4 sm:w-5 sm:h-5" />
-                          Edit Profile
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-                    <div className="relative flex-shrink-0">
-                      <img
-                        src={
-                          avatarPreview ||
-                          profileForm.avatar ||
-                          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150" ||
-                          "/placeholder.svg"
-                        }
-                        alt="Profile"
-                        className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl object-cover ring-4 ring-blue-100"
-                      />
-                      {isEditingProfile && (
-                        <div className="mt-4 w-full">
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">Profile Picture</label>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              const file = e.target.files && e.target.files[0]
-                              if (!file) return
-                              setAvatarFile(file)
-                              const reader = new FileReader()
-                              reader.onloadend = () => {
-                                setAvatarPreview(reader.result as string)
-                              }
-                              reader.readAsDataURL(file)
-                            }}
-                            className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-                          />
-                          {(avatarPreview || profileForm.avatar) && (
-                            <div className="flex items-center gap-3 mt-3">
-                              <button
-                                type="button"
-                                onClick={handleAvatarClear}
-                                className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 text-center sm:text-left">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">{user?.full_name}</h2>
-                      <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 mb-4 text-sm">{user?.email}</p>
-                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <div className="flex items-center gap-2">
-                          <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
-                          <span className="font-semibold">
-                            {profileForm.rating ? profileForm.rating.toFixed(1) : "0.0"}/5.0
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-                          <span className="font-semibold">{profileForm.total_sales} sales</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                          <span>
-                            Joined{" "}
-                            {profileForm.created_at
-                              ? new Date(profileForm.created_at).toLocaleDateString()
-                              : "Recently"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Profile Form */}
-                  <div className="mt-8 space-y-6 sm:space-y-8">
-                    {/* Basic Information */}
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Basic Information</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                        <div>
-                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                            Bio
-                          </label>
-                          <textarea
-                            rows={4}
-                            value={profileForm.bio}
-                            onChange={(e) => handleInputChange("bio", e.target.value)}
-                            disabled={!isEditingProfile}
-                            placeholder="Tell us about yourself..."
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                          />
-                        </div>
-                        <div className="space-y-4 sm:space-y-6">
-                          <div>
-                            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                              Location
-                            </label>
-                            <div className="relative">
-                              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                              <input
-                                type="text"
-                                value={profileForm.location}
-                                onChange={(e) => handleInputChange("location", e.target.value)}
-                                disabled={!isEditingProfile}
-                                placeholder="Your location"
-                                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                              Website
-                            </label>
-                            <div className="relative">
-                              <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                              <input
-                                type="url"
-                                value={profileForm.website}
-                                onChange={(e) => handleInputChange("website", e.target.value)}
-                                disabled={!isEditingProfile}
-                                placeholder="https://yourwebsite.com"
-                                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Professional Information */}
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-                        Professional Information
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                        <div>
-                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                            Experience Level
-                          </label>
-                          <select
-                            value={profileForm.experience_level}
-                            onChange={(e) => handleInputChange("experience_level", e.target.value)}
-                            disabled={!isEditingProfile}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                          >
-                            <option value="beginner" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Beginner</option>
-                            <option value="intermediate" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Intermediate</option>
-                            <option value="advanced" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Advanced</option>
-                            <option value="expert" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Expert</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2 sm:mb-3">
-                            Account Status
-                          </label>
-                          <select
-                            value={profileForm.status}
-                            onChange={(e) => handleInputChange("status", e.target.value)}
-                            disabled={!isEditingProfile}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                          >
-                            <option value="active" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Active</option>
-                            <option value="inactive" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Inactive</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Skills */}
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Skills</h3>
-                      <div className="space-y-3 sm:space-y-4">
-                        <div className="flex flex-wrap gap-2">
-                          {profileForm.skills.map((skill, index) => (
-                            <span
-                              key={index}
-                              className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium"
-                            >
-                              {skill}
-                              {isEditingProfile && (
-                                <button
-                                  onClick={() => handleRemoveSkill(index)}
-                                  className="text-blue-500 hover:text-blue-700"
-                                  type="button"
-                                >
-                                  <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                                </button>
-                              )}
-                            </span>
-                          ))}
-                        </div>
-                        {isEditingProfile && (
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            <input
-                              type="text"
-                              value={newSkill}
-                              onChange={(e) => setNewSkill(e.target.value)}
-                              placeholder="Add a skill"
-                              className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  e.preventDefault()
-                                  handleAddSkill()
-                                }
-                              }}
-                            />
-                            <button
-                              onClick={handleAddSkill}
-                              className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors text-sm"
-                              type="button"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Social Links */}
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Social Links</h3>
-                      <div className="space-y-3 sm:space-y-4">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                          <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300 dark:text-gray-300 mt-2.5 sm:mt-0 flex-shrink-0" />
-                          <input
-                            type="url"
-                            value={profileForm.social_links.github}
-                            onChange={(e) => handleSocialLinkChange("github", e.target.value)}
-                            disabled={!isEditingProfile}
-                            placeholder="https://github.com/username"
-                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                          />
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                          <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mt-2.5 sm:mt-0 flex-shrink-0" />
-                          <input
-                            type="url"
-                            value={profileForm.social_links.linkedin}
-                            onChange={(e) => handleSocialLinkChange("linkedin", e.target.value)}
-                            disabled={!isEditingProfile}
-                            placeholder="https://linkedin.com/in/username"
-                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                          />
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                          <Twitter className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400 mt-2.5 sm:mt-0 flex-shrink-0" />
-                          <input
-                            type="url"
-                            value={profileForm.social_links.twitter}
-                            onChange={(e) => handleSocialLinkChange("twitter", e.target.value)}
-                            disabled={!isEditingProfile}
-                            placeholder="https://twitter.com/username"
-                            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-slate-900"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Statistics */}
-                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Account Statistics</h3>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 sm:p-6 text-center">
-                      <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2">
-                        {profileForm.rating || 0}
-                      </div>
-                      <div className="text-xs sm:text-sm text-blue-700 font-medium">Average Rating</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 sm:p-6 text-center">
-                      <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1 sm:mb-2">
-                        {profileForm.total_sales}
-                      </div>
-                      <div className="text-xs sm:text-sm text-green-700 font-medium">Total Sales</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 sm:p-6 text-center">
-                      <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2">
-                        {profileForm.total_purchases}
-                      </div>
-                      <div className="text-xs sm:text-sm text-purple-700 font-medium">Total Purchases</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-4 sm:p-6 text-center">
-                      <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1 sm:mb-2">
-                        {profileForm.skills.length}
-                      </div>
-                      <div className="text-xs sm:text-sm text-orange-700 font-medium">Skills</div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
             )}
           </div>
         </div>
