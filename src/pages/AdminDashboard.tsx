@@ -23,7 +23,6 @@ import {
 import { useAuth } from "../contexts/AuthContext"
 import type { User, UsersApiResponse } from "../types/User"
 import type { Project, ProjectResponse, Review } from "../types/Project"
-import ProjectDetailsModal from "../components/ProjectDetailsModal"
 import UserDetailsModal from "../components/UserDetailsModal"
 import { useNavigate } from "react-router-dom"
 import type { Transaction, TransactionsApiResponse } from "../types/Transaction"
@@ -68,7 +67,30 @@ const AdminDashboard = () => {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [updatingReview, setUpdatingReview] = useState<string | null>(null)
   const [deletingReview, setDeletingReview] = useState<string | null>(null)
+  const [adminDashboardStats, setAdminDashboardStats] = useState<any>(null)
+  const [statsLoading, setStatsLoading] = useState(false)
 
+  const fetchAdminDashboardStats = async () => {
+    setStatsLoading(true)
+    const token = localStorage.getItem("token")
+    try {
+      const res = await apiClient(getApiUrl("/admin/dashboard/stats"), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (!res.ok) throw new Error("Failed to fetch admin dashboard stats")
+      const data = await res.json()
+      setAdminDashboardStats(data)
+    } catch (err) {
+      console.error(err)
+      setAdminDashboardStats(null)
+    } finally {
+      setStatsLoading(false)
+    }
+  }
 
   const fetchAllStats = async () => {
     setLoading(true)
@@ -116,73 +138,88 @@ const AdminDashboard = () => {
     }
   }
 
-  const recentActivity = [
-    {
-      id: 1,
-      action: "New project submitted",
-      user: "John Doe",
-      time: "2 hours ago",
-      type: "project",
-      avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
-      status: "pending",
-    },
-    {
-      id: 2,
-      action: "Project approved",
-      user: "Sarah Wilson",
-      time: "5 hours ago",
-      type: "approval",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
-      status: "approved",
-    },
-    {
-      id: 3,
-      action: "New user registered",
-      user: "Mike Johnson",
-      time: "1 day ago",
-      type: "user",
-      avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100",
-      status: "active",
-    },
-    {
-      id: 4,
-      action: "Payment processed",
-      user: "Emma Davis",
-      time: "2 days ago",
-      type: "payment",
-      avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100",
-      status: "completed",
-    },
-    {
-      id: 5,
-      action: "Project rejected",
-      user: "Alex Brown",
-      time: "3 days ago",
-      type: "rejection",
-      avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100",
-      status: "rejected",
-    },
+  const salesData = adminDashboardStats?.stats?.monthly_performance || [
+    { month: "Jan", revenue: 1200, projects_created: 15, new_users: 45 },
+    { month: "Feb", revenue: 1800, projects_created: 22, new_users: 67 },
+    { month: "Mar", revenue: 2200, projects_created: 28, new_users: 89 },
+    { month: "Apr", revenue: 1900, projects_created: 24, new_users: 102 },
+    { month: "May", revenue: 2540, projects_created: 32, new_users: 134 },
+    { month: "Jun", revenue: 2800, projects_created: 35, new_users: 156 },
   ]
 
-  const salesData = [
-    { month: "Jan", sales: 1200, projects: 15, users: 45 },
-    { month: "Feb", sales: 1800, projects: 22, users: 67 },
-    { month: "Mar", sales: 2200, projects: 28, users: 89 },
-    { month: "Apr", sales: 1900, projects: 24, users: 102 },
-    { month: "May", sales: 2540, projects: 32, users: 134 },
-    { month: "Jun", sales: 2800, projects: 35, users: 156 },
-  ]
+  const recentActivity = (adminDashboardStats?.stats?.recent_activity && adminDashboardStats.stats.recent_activity.length > 0)
+    ? adminDashboardStats.stats.recent_activity.map((activity: any) => ({
+      id: activity.id,
+      action: activity.type === "project_submitted" ? "New project submitted" :
+        activity.type === "project_approved" ? "Project approved" :
+          activity.type === "user_registered" ? "New user registered" :
+            activity.type === "payment_processed" ? "Payment processed" : "Activity",
+      user: activity.user_name || "Unknown User",
+      time: new Date(activity.timestamp).toLocaleString(),
+      type: activity.type?.includes("project") ? "project" :
+        activity.type?.includes("user") ? "user" :
+          activity.type?.includes("payment") ? "payment" : "other",
+      avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
+      status: activity.status || "completed",
+    }))
+    : [
+      {
+        id: "1",
+        action: "New project submitted",
+        user: "John Doe",
+        time: "2 hours ago",
+        type: "project",
+        avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
+        status: "pending",
+      },
+      {
+        id: "2",
+        action: "Project approved",
+        user: "Sarah Wilson",
+        time: "5 hours ago",
+        type: "approval",
+        avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
+        status: "approved",
+      },
+      {
+        id: "3",
+        action: "New user registered",
+        user: "Mike Johnson",
+        time: "1 day ago",
+        type: "user",
+        avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100",
+        status: "active",
+      },
+      {
+        id: "4",
+        action: "Payment processed",
+        user: "Emma Davis",
+        time: "2 days ago",
+        type: "payment",
+        avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100",
+        status: "completed",
+      },
+      {
+        id: "5",
+        action: "Project rejected",
+        user: "Alex Brown",
+        time: "3 days ago",
+        type: "rejection",
+        avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100",
+        status: "rejected",
+      },
+    ]
 
   const stats = {
-    totalProjects: projects.length,
-    pendingApproval: pendingProjects.length,
-    totalSales: transactions.length, // or derive from transactions
-    totalUsers: users.length,
-    monthlyGrowth: 24, // could be derived later
+    totalProjects: adminDashboardStats?.stats?.platform_overview?.total_projects || projects.length,
+    pendingApproval: adminDashboardStats?.stats?.platform_overview?.pending_approval_count || pendingProjects.length,
+    totalSales: adminDashboardStats?.stats?.platform_overview?.total_sales || transactions.length,
+    totalUsers: adminDashboardStats?.stats?.platform_overview?.total_users || users.length,
+    monthlyGrowth: adminDashboardStats?.stats?.platform_overview?.revenue_growth_percentage || 24,
     avgRating: 4.8, // placeholder for now
-    activeUsers: users.filter((u) => u.verification_status === "active").length,
-    revenue: transactions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
-    conversionRate: 3.2,
+    activeUsers: adminDashboardStats?.stats?.platform_overview?.active_users_24h || users.filter((u) => u.verification_status === "active").length,
+    revenue: adminDashboardStats?.stats?.platform_overview?.monthly_revenue ? parseFloat(adminDashboardStats.stats.platform_overview.monthly_revenue) : transactions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
+    conversionRate: adminDashboardStats?.stats?.business_metrics?.conversion_rate || 3.2,
   }
 
   const fetchUsers = async () => {
@@ -739,6 +776,7 @@ const AdminDashboard = () => {
   )
   // fetchAllStats will load everything once when dashboard mounts
   useEffect(() => {
+    fetchAdminDashboardStats()
     fetchAllStats()
   }, [])
 
@@ -775,19 +813,21 @@ const AdminDashboard = () => {
             <div className="animate-slideInLeft w-full sm:w-auto">
               <h1 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-3">Admin Dashboard</h1>
               <p className="text-blue-100 text-sm sm:text-lg mb-4">
-                Welcome back, {user?.full_name}! Manage your platform with ease.
+                Welcome back, {adminDashboardStats?.profile?.full_name || user?.full_name}! Manage your platform with ease.
               </p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <Activity className="w-5 h-5 text-green-300" />
-                  <span className="text-xs sm:text-sm">System Status: Healthy</span>
+                  <span className="text-xs sm:text-sm">
+                    System Status: {adminDashboardStats?.stats?.platform_overview?.system_status === "healthy" ? "Healthy" : "Healthy"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-blue-300" />
                   <span className="text-xs sm:text-sm">
                     <LoadingNumber
                       value={`${stats.activeUsers} Active Users`}
-                      isLoading={loading}
+                      isLoading={statsLoading || loading}
                       className="inline"
                     />
                   </span>
@@ -796,12 +836,12 @@ const AdminDashboard = () => {
             </div>
             <div className="text-left sm:text-right w-full sm:w-auto animate-slideInRight">
               <LoadingNumber
-                value={`$${stats.revenue.toLocaleString()}`}
-                isLoading={loading}
+                value={`₹${stats.revenue.toLocaleString()}`}
+                isLoading={statsLoading || loading}
                 className="text-2xl sm:text-3xl font-bold"
               />
               <div className="text-blue-200 text-xs sm:text-sm">Monthly Revenue</div>
-              {!loading && (
+              {!statsLoading && !loading && (
                 <div className="text-xs sm:text-sm text-green-300 font-semibold mt-1">+{stats.monthlyGrowth}% growth</div>
               )}
             </div>
@@ -820,7 +860,7 @@ const AdminDashboard = () => {
             color="text-blue-600"
             trend="+5 new projects"
             onClick={() => setActiveTab("projects")}
-            isLoading={loading}
+            isLoading={statsLoading || loading}
           />
           <StatCard
             title="Pending Approval"
@@ -829,7 +869,7 @@ const AdminDashboard = () => {
             icon={AlertCircle}
             color="text-orange-600"
             onClick={() => setActiveTab("approval")}
-            isLoading={loading}
+            isLoading={statsLoading || loading}
           />
           <StatCard
             title="Total Sales"
@@ -839,7 +879,7 @@ const AdminDashboard = () => {
             color="text-green-600"
             trend="+450 today"
             onClick={() => setActiveTab("transactions")}
-            isLoading={loading}
+            isLoading={statsLoading || loading}
           />
           <StatCard
             title="Total Users"
@@ -849,7 +889,7 @@ const AdminDashboard = () => {
             color="text-purple-600"
             trend="+12 new users"
             onClick={() => setActiveTab("users")}
-            isLoading={loading}
+            isLoading={statsLoading || loading}
           />
         </div>
 
@@ -925,7 +965,7 @@ const AdminDashboard = () => {
                         Recent Activity
                       </h3>
                       <div className="space-y-3 sm:space-y-4">
-                        {recentActivity.map((activity, index) => (
+                        {recentActivity.map((activity: any, index: number) => (
                           <div
                             key={activity.id}
                             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
@@ -991,15 +1031,21 @@ const AdminDashboard = () => {
                       <div className="space-y-3 sm:space-y-4">
                         <div className="flex items-center justify-between">
                           <span className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">New Signups</span>
-                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">12</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">
+                            {adminDashboardStats?.stats?.daily_metrics?.new_signups || 12}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">Projects Sold</span>
-                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">8</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">
+                            {adminDashboardStats?.stats?.daily_metrics?.projects_sold || 8}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-blue-700 dark:text-blue-300 text-sm sm:text-base">Revenue</span>
-                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">$450</span>
+                          <span className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">
+                            ₹{adminDashboardStats?.stats?.daily_metrics?.revenue || 450}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1010,24 +1056,28 @@ const AdminDashboard = () => {
                         <div>
                           <div className="flex justify-between text-xs sm:text-sm mb-1">
                             <span className="text-purple-700 dark:text-purple-300">Server Uptime</span>
-                            <span className="font-semibold text-purple-900 dark:text-purple-100">99.9%</span>
+                            <span className="font-semibold text-purple-900 dark:text-purple-100">
+                              {adminDashboardStats?.stats?.platform_health?.server_uptime || 99.9}%
+                            </span>
                           </div>
                           <div className="w-full bg-purple-200 dark:bg-purple-900/40 rounded-full h-2">
                             <div
                               className="bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400 h-2 rounded-full"
-                              style={{ width: "99.9%" }}
+                              style={{ width: `${adminDashboardStats?.stats?.platform_health?.server_uptime || 99.9}%` }}
                             />
                           </div>
                         </div>
                         <div>
                           <div className="flex justify-between text-xs sm:text-sm mb-1">
                             <span className="text-purple-700 dark:text-purple-300">User Satisfaction</span>
-                            <span className="font-semibold text-purple-900 dark:text-purple-100">{stats.avgRating}/5.0</span>
+                            <span className="font-semibold text-purple-900 dark:text-purple-100">
+                              {adminDashboardStats?.stats?.platform_health?.user_satisfaction || stats.avgRating}/5.0
+                            </span>
                           </div>
                           <div className="w-full bg-purple-200 dark:bg-purple-900/40 rounded-full h-2">
                             <div
                               className="bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400 h-2 rounded-full"
-                              style={{ width: `${(stats.avgRating / 5) * 100}%` }}
+                              style={{ width: `${((adminDashboardStats?.stats?.platform_health?.user_satisfaction || stats.avgRating) / 5) * 100}%` }}
                             />
                           </div>
                         </div>
@@ -1050,20 +1100,28 @@ const AdminDashboard = () => {
                   <div className="bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-4 sm:p-8 border border-gray-100 dark:border-slate-700 shadow-lg transition-colors">
                     <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">Monthly Performance</h3>
                     <div className="space-y-3 sm:space-y-4">
-                      {salesData.map((data, index) => (
+                      {salesData.map((data: any, index: number) => (
                         <div key={index} className="animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-2">
-                            <span className="text-gray-700 dark:text-gray-300 font-semibold text-sm sm:text-base">{data.month}</span>
-                            <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm">
-                              <span className="text-green-600 dark:text-green-400 font-bold">${data.sales}</span>
-                              <span className="text-blue-600 dark:text-blue-400">{data.projects} projects</span>
-                              <span className="text-purple-600 dark:text-purple-400">{data.users} users</span>
+                            <span className="text-gray-700 dark:text-gray-300 font-semibold text-sm sm:text-base min-w-[80px]">
+                              {data.month}
+                            </span>
+                            <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
+                              <span className="text-green-600 dark:text-green-400 font-bold whitespace-nowrap">
+                                ₹{data.revenue?.toLocaleString() || data.revenue}
+                              </span>
+                              <span className="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                                {data.projects_created} projects
+                              </span>
+                              <span className="text-purple-600 dark:text-purple-400 whitespace-nowrap">
+                                {data.new_users} users
+                              </span>
                             </div>
                           </div>
-                          <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 sm:h-3">
+                          <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 sm:h-3 overflow-hidden">
                             <div
                               className="bg-gradient-to-r from-blue-500 to-teal-500 dark:from-blue-400 dark:to-teal-400 h-2 sm:h-3 rounded-full transition-all duration-1000"
-                              style={{ width: `${(data.sales / 3000) * 100}%` }}
+                              style={{ width: `${Math.min((data.revenue / 10000) * 100, 100)}%` }}
                             />
                           </div>
                         </div>
@@ -1075,29 +1133,37 @@ const AdminDashboard = () => {
                   <div className="bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-4 sm:p-8 border border-gray-100 dark:border-slate-700 shadow-lg transition-colors">
                     <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">Popular Categories</h3>
                     <div className="space-y-3 sm:space-y-4">
-                      {[
-                        { name: "React", projects: 15, sales: "$1,250", color: "from-blue-500 to-blue-600" },
-                        { name: "Java", projects: 12, sales: "$980", color: "from-orange-500 to-red-600" },
-                        { name: "Python", projects: 10, sales: "$850", color: "from-green-500 to-emerald-600" },
-                        { name: "PHP", projects: 8, sales: "$640", color: "from-purple-500 to-indigo-600" },
-                      ].map((category, index) => (
-                        <div
-                          key={index}
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
-                          style={{ animationDelay: `${index * 100}ms` }}
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${category.color} flex-shrink-0`} />
-                            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base">{category.name}</span>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <div className="font-bold text-gray-900 dark:text-gray-100 text-sm sm:text-base">
-                              {category.projects} projects
+                      {(adminDashboardStats?.stats?.popular_categories || [
+                        { category: "React", project_count: 15, total_revenue: 1250 },
+                        { category: "Java", project_count: 12, total_revenue: 980 },
+                        { category: "Python", project_count: 10, total_revenue: 850 },
+                        { category: "PHP", project_count: 8, total_revenue: 640 },
+                      ]).map((category: any, index: number) => {
+                        const colors = [
+                          "from-blue-500 to-blue-600",
+                          "from-orange-500 to-red-600",
+                          "from-green-500 to-emerald-600",
+                          "from-purple-500 to-indigo-600",
+                        ]
+                        return (
+                          <div
+                            key={index}
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:scale-105 transition-all duration-300 animate-slideInUp"
+                            style={{ animationDelay: `${index * 100}ms` }}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${colors[index % colors.length]} flex-shrink-0`} />
+                              <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base">{category.category}</span>
                             </div>
-                            <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">{category.sales}</div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="font-bold text-gray-900 dark:text-gray-100 text-sm sm:text-base">
+                                {category.project_count} projects
+                              </div>
+                              <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">₹{category.total_revenue}</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1106,23 +1172,39 @@ const AdminDashboard = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                   <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Conversion Rate</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{stats.conversionRate}%</div>
-                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ 0.3% from last month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                      {adminDashboardStats?.stats?.business_metrics?.conversion_rate || stats.conversionRate}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">
+                      ↑ {adminDashboardStats?.stats?.business_metrics?.conversion_rate_change || 0.3}% from last month
+                    </div>
                   </div>
                   <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Avg Order Value</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">$34.50</div>
-                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ $2.10 from last month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+                      ₹{adminDashboardStats?.stats?.business_metrics?.avg_order_value || 34.50}
+                    </div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">
+                      ↑ ₹{adminDashboardStats?.stats?.business_metrics?.avg_order_value_change || 2.10} from last month
+                    </div>
                   </div>
                   <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">User Retention</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">78%</div>
-                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ 5% from last month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                      {adminDashboardStats?.stats?.business_metrics?.user_retention || 78}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">
+                      ↑ {adminDashboardStats?.stats?.business_metrics?.user_retention_change || 5}% from last month
+                    </div>
                   </div>
                   <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-gray-100 dark:border-slate-700 hover:shadow-2xl hover:scale-105 transition-all duration-300">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-sm sm:text-base">Active Sellers</h4>
-                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">24</div>
-                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">↑ 3 new this month</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
+                      {adminDashboardStats?.stats?.business_metrics?.active_sellers || 24}
+                    </div>
+                    <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">
+                      ↑ {adminDashboardStats?.stats?.business_metrics?.active_sellers_change || 3} new this month
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1845,7 +1927,7 @@ const AdminDashboard = () => {
                 )}
               </div>
             )}
-            
+
             {activeTab === "payouts" && (
               <div className="animate-slideInUp">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
@@ -1854,7 +1936,7 @@ const AdminDashboard = () => {
                     Payout Management
                   </h2>
                 </div>
-                
+
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-8 text-center">
                   <div className="max-w-2xl mx-auto">
                     <div className="w-20 h-20 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -1864,7 +1946,7 @@ const AdminDashboard = () => {
                       Full Payout Management Dashboard
                     </h3>
                     <p className="text-gray-700 dark:text-gray-300 mb-6">
-                      Access the complete payout management system with detailed statistics, 
+                      Access the complete payout management system with detailed statistics,
                       payout operations, and administrative controls.
                     </p>
                     <button
@@ -1875,7 +1957,7 @@ const AdminDashboard = () => {
                       Open Payout Dashboard
                       <TrendingUp className="w-5 h-5" />
                     </button>
-                    
+
                     <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
                       <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-md">
                         <div className="flex items-center gap-3 mb-2">
@@ -1886,7 +1968,7 @@ const AdminDashboard = () => {
                           View payout volume, success rates, and trends
                         </p>
                       </div>
-                      
+
                       <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-md">
                         <div className="flex items-center gap-3 mb-2">
                           <Settings className="w-5 h-5 text-purple-600" />
@@ -1896,7 +1978,7 @@ const AdminDashboard = () => {
                           Retry failed payouts and manage requests
                         </p>
                       </div>
-                      
+
                       <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-md">
                         <div className="flex items-center gap-3 mb-2">
                           <Users className="w-5 h-5 text-teal-600" />
