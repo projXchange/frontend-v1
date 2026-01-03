@@ -34,6 +34,7 @@ const UploadProject = () => {
     title: "",
     description: "",
     category: "",
+    customCategory: "",
     price: "",
     originalPrice: "",
     youtubeUrl: "",
@@ -407,12 +408,12 @@ const UploadProject = () => {
           title: formData.title,
           description: formData.description,
           key_features: formData.features.filter((f) => f.trim()).join(", "),
-          category: formData.category,
+          category: formData.category === "other" ? formData.customCategory : formData.category,
           difficulty_level: formData.difficulty.toLowerCase(),
           tech_stack: formData.techStack.filter((tech) => tech.trim()),
           github_url: formData.githubUrl,
-          demo_url: formData.liveDemo,
-          youtube_url: formData.youtubeUrl,
+          demo_url: formData.liveDemo && formData.liveDemo.trim() ? formData.liveDemo : null,
+          youtube_url: formData.youtubeUrl && formData.youtubeUrl.trim() ? formData.youtubeUrl : null,
           pricing: {
             sale_price: Number.parseFloat(formData.price),
             original_price: formData.originalPrice
@@ -570,6 +571,7 @@ const UploadProject = () => {
           title: "",
           description: "",
           category: "",
+          customCategory: "",
           price: "",
           originalPrice: "",
           youtubeUrl: "",
@@ -636,7 +638,9 @@ const UploadProject = () => {
         )}
         <div className="absolute top-4 left-4 flex gap-2">
           <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full text-sm font-semibold">
-            {categories.find((cat) => cat.value === formData.category)?.label || "Category"}
+            {formData.category === "other" 
+              ? formData.customCategory || "Custom Category"
+              : categories.find((cat) => cat.value === formData.category)?.label || "Category"}
           </span>
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${formData.difficulty === "Beginner"
@@ -799,6 +803,18 @@ const UploadProject = () => {
                               </option>
                             ))}
                           </select>
+                          {formData.category === "other" && (
+                            <div className="mt-3">
+                              <input
+                                type="text"
+                                name="customCategory"
+                                value={formData.customCategory}
+                                onChange={handleInputChange}
+                                placeholder="Enter your custom category"
+                                className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                              />
+                            </div>
+                          )}
                           {errors.category && (
                             <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
                               <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -830,7 +846,7 @@ const UploadProject = () => {
                         <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                           Short Description *
                           <span className="text-gray-500 dark:text-gray-400 font-normal ml-2 text-xs sm:text-sm">
-                            ({formData.description.length}/150 characters)
+                            ({formData.description.length}/150 characters, minimum 100)
                           </span>
                         </label>
                         <textarea
@@ -839,7 +855,7 @@ const UploadProject = () => {
                           onChange={handleInputChange}
                           rows={3}
                           maxLength={150}
-                          placeholder="A brief, compelling summary of your project..."
+                          placeholder="A brief, compelling summary of your project (minimum 100 characters)..."
                           className={`w-full px-3 sm:px-4 py-3 sm:py-4 border rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 transition-all duration-200 resize-none ${errors.description ? "border-red-300 bg-red-50" : "border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500"
                             }`}
                         />

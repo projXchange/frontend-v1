@@ -30,6 +30,16 @@ import { getApiUrl } from "../config/api"
 const UploadProjectNew = () => {
   const navigate = useNavigate()
 
+  // Helper function to validate URLs
+  const isValidUrl = (string: string) => {
+    try {
+      new URL(string)
+      return true
+    } catch (_) {
+      return false
+    }
+  }
+
   // Cloudinary configuration
   const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
   const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
@@ -38,6 +48,7 @@ const UploadProjectNew = () => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
+    customCategory: "",
     techStack: [] as string[],
     description: "",
     githubUrl: "",
@@ -71,11 +82,17 @@ const UploadProjectNew = () => {
   const [techStackInput, setTechStackInput] = useState("")
 
   const categories = [
-    { label: "Web Development", value: "web" },
-     { label: "Backend Development", value: "backend" },
-    { label: "Android Development", value: "android" },
-    { label: "Java Projects", value: "java" },
-    { label: "AI/ML Projects", value: "ai_ml" },
+    { label: "Web Development", value: "web_development" },
+    { label: "Mobile Development", value: "mobile_development" },
+    { label: "Desktop Application", value: "desktop_application" },
+    { label: "AI/Machine Learning", value: "ai_machine_learning" },
+    { label: "Blockchain", value: "blockchain" },
+    { label: "Game Development", value: "game_development" },
+    { label: "Data Science", value: "data_science" },
+    { label: "DevOps", value: "devops" },
+    { label: "API/Backend", value: "api_backend" },
+    { label: "Automation Scripts", value: "automation_scripts" },
+    { label: "UI/UX Design", value: "ui_ux_design" },
     { label: "Other", value: "other" },
   ]
 
@@ -237,6 +254,10 @@ const UploadProjectNew = () => {
           toast.error("Please select a category")
           return false
         }
+        if (formData.category === "other" && !formData.customCategory.trim()) {
+          toast.error("Please enter a custom category")
+          return false
+        }
         if (formData.techStack.length === 0) {
           toast.error("Please add at least one technology")
           return false
@@ -245,8 +266,24 @@ const UploadProjectNew = () => {
           toast.error("Short description is required")
           return false
         }
+        if (formData.description.trim().length < 100) {
+          toast.error("Short description must be at least 100 characters")
+          return false
+        }
         if (!formData.githubUrl.trim()) {
           toast.error("GitHub repository URL is required")
+          return false
+        }
+        if (formData.githubUrl && !formData.githubUrl.includes("github.com")) {
+          toast.error("Please enter a valid GitHub URL")
+          return false
+        }
+        if (formData.liveDemoUrl && !isValidUrl(formData.liveDemoUrl)) {
+          toast.error("Please enter a valid demo URL")
+          return false
+        }
+        if (formData.youtubeUrl && !formData.youtubeUrl.includes("youtube.com") && !formData.youtubeUrl.includes("youtu.be")) {
+          toast.error("Please enter a valid YouTube URL")
           return false
         }
         return true
@@ -328,12 +365,12 @@ const UploadProjectNew = () => {
       const initialProjectData = {
         title: formData.title,
         description: formData.description,
-        category: formData.category,
+        category: formData.category === "other" ? formData.customCategory : formData.category,
         difficulty_level: "intermediate", // Default value
         tech_stack: formData.techStack,
         github_url: formData.githubUrl,
-        demo_url: formData.liveDemoUrl || "",
-        youtube_url: formData.youtubeUrl || "",
+        demo_url: formData.liveDemoUrl && isValidUrl(formData.liveDemoUrl) ? formData.liveDemoUrl : null,
+        youtube_url: formData.youtubeUrl && (formData.youtubeUrl.includes("youtube.com") || formData.youtubeUrl.includes("youtu.be")) ? formData.youtubeUrl : null,
         pricing: {
           sale_price: Number.parseFloat(formData.price),
           original_price: formData.originalPrice
@@ -473,6 +510,7 @@ const UploadProjectNew = () => {
       setFormData({
         title: "",
         category: "",
+        customCategory: "",
         techStack: [],
         description: "",
         githubUrl: "",
@@ -643,7 +681,9 @@ const UploadProjectNew = () => {
           {formData.category && (
             <div className="absolute top-3 left-3 flex gap-2">
               <span className="px-2.5 py-1 bg-blue-600 text-white rounded-full text-xs font-semibold shadow-lg">
-                {categories.find((cat) => cat.value === formData.category)?.label || "Category"}
+                {formData.category === "other" 
+                  ? formData.customCategory || "Custom Category"
+                  : categories.find((cat) => cat.value === formData.category)?.label || "Category"}
               </span>
             </div>
           )}
@@ -854,6 +894,19 @@ const UploadProjectNew = () => {
                             </option>
                           ))}
                         </select>
+                        {formData.category === "other" && (
+                          <div className="mt-3">
+                            <input
+                              type="text"
+                              name="customCategory"
+                              value={formData.customCategory}
+                              onChange={handleInputChange}
+                              placeholder="Enter your custom category"
+                              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                              required
+                            />
+                          </div>
+                        )}
                       </div>
 
                       {/* Tech Stack */}
@@ -911,16 +964,29 @@ const UploadProjectNew = () => {
                       <div>
                         <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                           Short Description <span className="text-red-500">*</span>
+                          <span className="text-gray-500 dark:text-gray-400 font-normal ml-2 text-xs">
+                            ({formData.description.length}/100 characters minimum)
+                          </span>
                         </label>
                         <textarea
                           name="description"
                           value={formData.description}
                           onChange={handleInputChange}
                           rows={3}
-                          placeholder="A brief, compelling summary of your project (2-3 lines)"
-                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none"
+                          placeholder="A brief, compelling summary of your project (minimum 100 characters)"
+                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none transition-colors ${
+                            formData.description.length > 0 && formData.description.length < 100
+                              ? "border-red-300 dark:border-red-600"
+                              : "border-gray-300 dark:border-slate-600"
+                          }`}
                           required
                         />
+                        {formData.description.length > 0 && formData.description.length < 100 && (
+                          <p className="text-red-600 text-xs mt-2 flex items-center gap-2">
+                            <AlertCircle className="w-3 h-3" />
+                            Description must be at least 100 characters ({100 - formData.description.length} more needed)
+                          </p>
+                        )}
                       </div>
 
                       {/* GitHub Repository URL */}
