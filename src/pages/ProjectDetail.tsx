@@ -696,20 +696,30 @@ const ProjectDetail = () => {
                     allowFullScreen
                   />
                 </div>
-              ) : !isPurchased ? (
+              ) : isPurchased && !project?.youtube_url && (project.thumbnail || (project.images && project.images.length > 0)) ? (
+                // Show thumbnail/images for purchased projects without YouTube video
+                <div
+                  className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-all duration-300 group"
+                  style={{ animationDelay: "600ms" }}
+                >
+                  <img
+                    src={(project.images && project.images.length > 0 ? project.images[0] : project.thumbnail) || "/placeholder.svg"}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+              ) : !isPurchased && (project.thumbnail || (project.images && project.images.length > 0)) ? (
                 <div
                   className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp relative group cursor-pointer"
                   style={{ animationDelay: "600ms" }}
                   onClick={handleUnlockContent}
                 >
                   {/* Project Thumbnail - Always visible */}
-                  {project.thumbnail && (
-                    <img
-                      src={project.thumbnail || "/placeholder.svg"}
-                      alt={project.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  )}
+                  <img
+                    src={(project.images && project.images.length > 0 ? project.images[0] : project.thumbnail) || "/placeholder.svg"}
+                    alt={project.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
 
                   {/* Overlay - Shows on hover/touch */}
                   <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
