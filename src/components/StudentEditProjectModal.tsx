@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Plus, Target, Video, DollarSign } from 'lucide-react';
+import { X, Save, Plus, Target, Video, DollarSign, AlertCircle } from 'lucide-react';
 import { Project } from '../types/Project';
 import toast from 'react-hot-toast';
+import { usePermissions } from '../contexts/PermissionContext';
+import FieldOwnershipIndicator from './FieldOwnershipIndicator';
+import ReApprovalNotification from './ReApprovalNotification';
+import AdminOverrideBadge from './AdminOverrideBadge';
+import PermissionHelpTooltip from './PermissionHelpTooltip';
+import PermissionLoadingState from './PermissionLoadingState';
+import PermissionErrorState from './PermissionErrorState';
+import { filterEditableFields } from '../services/permissionService';
 
 interface StudentEditProjectModalProps {
   isOpen: boolean;
@@ -20,6 +28,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'basic' | 'media' | 'pricing'>('basic');
   const [techStackInput, setTechStackInput] = useState('');
+  const { 
+    canEditField, 
+    getFieldUploader, 
+    fetchPermissions, 
+    clearPermissions, 
+    loading: permissionsLoading, 
+    error: permissionsError,
+    isAdmin,
+    permissions // Add permissions to get the full permissions object
+  } = usePermissions();
   
   // Form state - only fields from UploadProjectNew
   const [formData, setFormData] = useState({
@@ -39,6 +57,19 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
   // Image URLs (not files, since we're editing)
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+  // Fetch permissions when modal opens
+  useEffect(() => {
+    if (isOpen && project?.id) {
+      fetchPermissions(project.id);
+    }
+    
+    return () => {
+      if (!isOpen) {
+        clearPermissions();
+      }
+    };
+  }, [isOpen, project?.id]);
 
   useEffect(() => {
     if (project) {
@@ -126,8 +157,8 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
       return;
     }
 
-    // Prepare update data - only fields students can edit
-    const updateData: Partial<Project> = {
+    // Prepare update data - only include fields the user can edit
+    const allUpdateData: Partial<Project> = {
       title: formData.title,
       category: formData.category,
       tech_stack: formData.techStack,
@@ -147,7 +178,40 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
       delivery_time: formData.deliveryTime ? Number.parseInt(formData.deliveryTime, 10) : 0,
     };
 
-    await onUpdate(updateData);
+    // Filter to only include editable fields (unless admin)
+    const updateData = isAdmin 
+      ? allUpdateData 
+      : filterEditableFields(allUpdateData, permissions);
+
+    // Check if there are any fields to update
+    if (Object.keys(updateData).length === 0) {
+      toast.error('No editable fields to update');
+      return;
+    }
+
+    try {
+      await onUpdate(updateData);
+      
+      // Show re-approval notification if project was already approved (only for non-admin users)
+      if (!isAdmin && project.status === 'approved') {
+        toast.success(
+          'Changes saved successfully! Your project has been submitted for re-approval.',
+          { duration: 5000, icon: '✅' }
+        );
+      } else if (isAdmin) {
+        toast.success('Changes saved successfully! (Admin override - no re-approval needed)');
+      } else {
+        toast.success('Changes saved successfully!');
+      }
+      
+      // Close modal after successful update
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    } catch (error: any) {
+      console.error('Error updating project:', error);
+      toast.error(error.message || 'Failed to update project. Please try again.');
+    }
   };
 
   const tabs = [
@@ -156,7 +220,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
     { id: 'pricing', label: 'Pricing', icon: DollarSign },
   ];
 
-  const canEdit = project.status === 'draft' || project.status === 'pending';
+  const canEdit = project.status === 'draft' || project.status === 'pending' || project.status === 'approved';
+  
+  // Helper function to check if a specific field can be edited
+  const isFieldEditable = (fieldName: string): boolean => {
+    // First check project status - allow editing for draft, pending, and approved
+    if (!canEdit) return false;
+    
+    // Then check field-level permissions
+    return canEditField(fieldName);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-lg flex items-center justify-center p-4 z-50">
@@ -176,19 +249,55 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
             </div>
           </div>
           
-          <button
-            onClick={onClose}
-            className="relative z-10 p-2.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-all hover:rotate-90 duration-300"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          <div className="relative z-10 flex items-center gap-2">
+            {!isAdmin && canEdit && (
+              <PermissionHelpTooltip />
+            )}
+            <button
+              onClick={onClose}
+              className="p-2.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-all hover:rotate-90 duration-300"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         {!canEdit && (
-          <div className="px-6 py-4 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
-            <p className="text-sm text-yellow-800 dark:text-yellow-300">
-              <strong>Read-only:</strong> Your project is {project.status}. Contact admin to request changes.
-            </p>
+          <ReApprovalNotification status={project.status as any} />
+        )}
+        
+        {permissionsLoading && !isAdmin && canEdit && (
+          <PermissionLoadingState />
+        )}
+        
+        {permissionsError && !isAdmin && canEdit && (
+          <PermissionErrorState 
+            error={permissionsError} 
+            onRetry={() => project?.id && fetchPermissions(project.id)}
+          />
+        )}
+        
+        {isAdmin && canEdit && (
+          <AdminOverrideBadge />
+        )}
+        
+        {!isAdmin && canEdit && project.status === 'approved' && !permissionsLoading && (
+          <ReApprovalNotification status="approved" showReApprovalInfo={true} />
+        )}
+        
+        {!isAdmin && canEdit && !permissionsLoading && !permissionsError && (
+          <div className="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-blue-800 dark:text-blue-300 font-semibold mb-1">
+                  Field-Level Editing
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-400">
+                  You can only edit fields you originally uploaded. Fields uploaded by others or the admin team will be read-only. Any changes you make will require admin re-approval.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -230,10 +339,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('title')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="Enter project title"
                   />
+                  {!isFieldEditable('title') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="title"
+                      uploadedBy={getFieldUploader('title')}
+                    />
+                  )}
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -244,14 +359,20 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('category')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     <option value="">Select category</option>
                     {categories.map(cat => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
                     ))}
                   </select>
+                  {!isFieldEditable('category') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="category"
+                      uploadedBy={getFieldUploader('category')}
+                    />
+                  )}
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -263,7 +384,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                       {formData.techStack.map((tech, idx) => (
                         <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg text-sm font-medium">
                           {tech}
-                          {canEdit && (
+                          {canEdit && isFieldEditable('tech_stack') && (
                             <button type="button" onClick={() => removeTechStack(idx)} className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5">
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -272,7 +393,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                       ))}
                     </div>
                   )}
-                  {canEdit && (
+                  {canEdit && isFieldEditable('tech_stack') && (
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -297,6 +418,12 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                       </button>
                     </div>
                   )}
+                  {!isFieldEditable('tech_stack') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="tech_stack"
+                      uploadedBy={getFieldUploader('tech_stack')}
+                    />
+                  )}
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -308,10 +435,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     rows={4}
                     value={formData.description}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none"
+                    disabled={!isFieldEditable('description')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="Brief project description"
                   />
+                  {!isFieldEditable('description') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="description"
+                      uploadedBy={getFieldUploader('description')}
+                    />
+                  )}
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -323,10 +456,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="githubUrl"
                     value={formData.githubUrl}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('github_url')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="https://github.com/username/repo"
                   />
+                  {!isFieldEditable('github_url') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="github_url"
+                      uploadedBy={getFieldUploader('github_url')}
+                    />
+                  )}
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -339,10 +478,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="deliveryTime"
                     value={formData.deliveryTime}
                     onChange={handleNumericInput}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('delivery_time')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="1"
                   />
+                  {!isFieldEditable('delivery_time') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="delivery_time"
+                      uploadedBy={getFieldUploader('delivery_time')}
+                    />
+                  )}
                 </div>
               </>
             )}
@@ -358,12 +503,18 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     type="url"
                     value={thumbnailUrl}
                     onChange={(e) => setThumbnailUrl(e.target.value)}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('thumbnail')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="https://example.com/thumbnail.jpg"
                   />
                   {thumbnailUrl && (
                     <img src={thumbnailUrl} alt="Thumbnail" className="mt-3 w-full h-48 object-cover rounded-xl" />
+                  )}
+                  {!isFieldEditable('thumbnail') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="thumbnail"
+                      uploadedBy={getFieldUploader('thumbnail')}
+                    />
                   )}
                 </div>
 
@@ -376,10 +527,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="liveDemoUrl"
                     value={formData.liveDemoUrl}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('demo_url')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="https://demo.yourproject.com"
                   />
+                  {!isFieldEditable('demo_url') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="demo_url"
+                      uploadedBy={getFieldUploader('demo_url')}
+                    />
+                  )}
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -391,10 +548,16 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="youtubeUrl"
                     value={formData.youtubeUrl}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('youtube_url')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="https://youtube.com/watch?v=..."
                   />
+                  {!isFieldEditable('youtube_url') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="youtube_url"
+                      uploadedBy={getFieldUploader('youtube_url')}
+                    />
+                  )}
                 </div>
               </>
             )}
@@ -415,11 +578,17 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                         name="price"
                         value={formData.price}
                         onChange={handleNumericInput}
-                        disabled={!canEdit}
-                        className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                        disabled={!isFieldEditable('pricing')}
+                        className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                         placeholder="500"
                       />
                     </div>
+                    {!isFieldEditable('pricing') && canEdit && (
+                      <FieldOwnershipIndicator
+                        fieldName="pricing"
+                        uploadedBy={getFieldUploader('pricing')}
+                      />
+                    )}
                   </div>
 
                   <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
@@ -434,8 +603,8 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                         name="originalPrice"
                         value={formData.originalPrice}
                         onChange={handleNumericInput}
-                        disabled={!canEdit}
-                        className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                        disabled={!isFieldEditable('pricing')}
+                        className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                         placeholder="800"
                       />
                     </div>
@@ -450,8 +619,8 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     name="currency"
                     value={formData.currency}
                     onChange={handleInputChange}
-                    disabled={!canEdit}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50"
+                    disabled={!isFieldEditable('pricing')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>

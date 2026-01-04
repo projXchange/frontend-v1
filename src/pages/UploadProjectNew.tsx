@@ -41,8 +41,8 @@ const UploadProjectNew = () => {
   }
 
   // Cloudinary configuration
-  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+  const CLOUDINARY_CLOUD_NAME = "dmfh4f4yg"
+  const CLOUDINARY_UPLOAD_PRESET = "projectXchange"
 
   // Form state
   const [formData, setFormData] = useState({
@@ -54,18 +54,18 @@ const UploadProjectNew = () => {
     githubUrl: "",
     thumbnailFile: null as File | null,
     screenshots: [] as File[],
-    
+
     // Enhancement services toggle
     completeDocumentationEnabled: false,
     documentationFile: null as File | null,
     installationGuideText: "",
     systemRequirementsText: "",
     dependenciesText: "",
-    
+
     // Optional links
     liveDemoUrl: "",
     youtubeUrl: "",
-    
+
     // Pricing
     price: "",
     originalPrice: "",
@@ -185,7 +185,7 @@ const UploadProjectNew = () => {
     }
 
     setFormData((prev) => ({ ...prev, thumbnailFile: file }))
-    
+
     const reader = new FileReader()
     reader.onload = (e) => {
       setThumbnailPreview(e.target?.result as string)
@@ -200,7 +200,7 @@ const UploadProjectNew = () => {
     if (!files) return
 
     const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"))
-    
+
     if (formData.screenshots.length + imageFiles.length > 3) {
       toast.error("You can upload a maximum of 3 screenshots")
       return
@@ -361,16 +361,24 @@ const UploadProjectNew = () => {
         throw new Error("Authentication token not found. Please login again.")
       }
 
-      // Prepare initial project data
-      const initialProjectData = {
+      // Prepare initial project data - only include non-empty values
+      const systemReqs = formData.systemRequirementsText
+        ? formData.systemRequirementsText.split("\n").filter((s) => s.trim())
+        : []
+      const deps = formData.dependenciesText
+        ? formData.dependenciesText.split("\n").filter((d) => d.trim())
+        : []
+      const installSteps = formData.installationGuideText
+        ? formData.installationGuideText.split("\n").filter((s) => s.trim())
+        : []
+
+      const initialProjectData: any = {
         title: formData.title,
         description: formData.description,
         category: formData.category === "other" ? formData.customCategory : formData.category,
-        difficulty_level: "intermediate", // Default value
+        difficulty_level: "intermediate",
         tech_stack: formData.techStack,
         github_url: formData.githubUrl,
-        demo_url: formData.liveDemoUrl && isValidUrl(formData.liveDemoUrl) ? formData.liveDemoUrl : null,
-        youtube_url: formData.youtubeUrl && (formData.youtubeUrl.includes("youtube.com") || formData.youtubeUrl.includes("youtu.be")) ? formData.youtubeUrl : null,
         pricing: {
           sale_price: Number.parseFloat(formData.price),
           original_price: formData.originalPrice
@@ -378,24 +386,23 @@ const UploadProjectNew = () => {
             : Number.parseFloat(formData.price),
           currency: formData.currency || "INR",
         },
-        delivery_time: formData.deliveryTime ? Number.parseInt(formData.deliveryTime, 10) : 0,
-        thumbnail: "",
-        images: [],
-        files: {
-          source_files: [],
-          documentation_files: [],
-        },
-        requirements: {
-          system_requirements: formData.systemRequirementsText
-            ? formData.systemRequirementsText.split("\n").filter((s) => s.trim())
-            : [],
-          dependencies: formData.dependenciesText
-            ? formData.dependenciesText.split("\n").filter((d) => d.trim())
-            : [],
-          installation_steps: formData.installationGuideText
-            ? formData.installationGuideText.split("\n").filter((s) => s.trim())
-            : [],
-        },
+      }
+
+      // Only add optional fields if they have values
+      if (formData.liveDemoUrl && isValidUrl(formData.liveDemoUrl)) {
+        initialProjectData.demo_url = formData.liveDemoUrl
+      }
+      if (formData.youtubeUrl && (formData.youtubeUrl.includes("youtube.com") || formData.youtubeUrl.includes("youtu.be"))) {
+        initialProjectData.youtube_url = formData.youtubeUrl
+      }
+      if (formData.deliveryTime) {
+        initialProjectData.delivery_time = Number.parseInt(formData.deliveryTime, 10)
+      }
+      if (systemReqs.length > 0 || deps.length > 0 || installSteps.length > 0) {
+        initialProjectData.requirements = {}
+        if (systemReqs.length > 0) initialProjectData.requirements.system_requirements = systemReqs
+        if (deps.length > 0) initialProjectData.requirements.dependencies = deps
+        if (installSteps.length > 0) initialProjectData.requirements.installation_steps = installSteps
       }
 
       // Create project
@@ -476,32 +483,41 @@ const UploadProjectNew = () => {
       }
 
       // Update project with file URLs
-      const updateData = {
-        thumbnail: finalThumbnailUrl,
-        images: finalImageUrls,
-        files: {
-          source_files: [],
-          documentation_files: finalDocFileUrls,
-        },
+      // Update project with file URLs - only include non-empty values
+      const updateData: any = {}
+
+      if (finalThumbnailUrl) {
+        updateData.thumbnail = finalThumbnailUrl
+      }
+      if (finalImageUrls.length > 0) {
+        updateData.images = finalImageUrls
+      }
+      if (finalDocFileUrls.length > 0) {
+        updateData.files = {
+          documentation_files: finalDocFileUrls
+        }
       }
 
-      try {
-        const updateResponse = await apiClient(getApiUrl(`/projects/${backendProjectId}`), {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updateData),
-        })
+      // Only update if there's something to update
+      if (Object.keys(updateData).length > 0) {
+        try {
+          const updateResponse = await apiClient(getApiUrl(`/projects/${backendProjectId}`), {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(updateData),
+          })
 
-        if (!updateResponse.ok) {
-          const errorData = await updateResponse.json()
-          console.error("Failed to update project with files:", errorData)
+          if (!updateResponse.ok) {
+            const errorData = await updateResponse.json()
+            console.error("Failed to update project with files:", errorData)
+          }
+        } catch (updateError) {
+          console.error("Error updating project with files:", updateError)
         }
-      } catch (updateError) {
-        console.error("Error updating project with files:", updateError)
       }
 
       toast.success("Project submitted for review!")
@@ -534,7 +550,7 @@ const UploadProjectNew = () => {
       setCurrentStep(1)
 
       // Navigate to dashboard
-      navigate("/student-dashboard")
+      navigate("/dashboard")
     } catch (error) {
       console.error("Error submitting project:", error)
       toast.error(error instanceof Error ? error.message : "Failed to submit project. Please try again.")
@@ -664,7 +680,7 @@ const UploadProjectNew = () => {
   // Project Preview Component
   const ProjectPreview = () => {
     const hasContent = formData.title || formData.description || formData.techStack.length > 0 || thumbnailPreview
-    
+
     return (
       <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-slate-700 transition-colors">
         <div className="relative">
@@ -681,7 +697,7 @@ const UploadProjectNew = () => {
           {formData.category && (
             <div className="absolute top-3 left-3 flex gap-2">
               <span className="px-2.5 py-1 bg-blue-600 text-white rounded-full text-xs font-semibold shadow-lg">
-                {formData.category === "other" 
+                {formData.category === "other"
                   ? formData.customCategory || "Custom Category"
                   : categories.find((cat) => cat.value === formData.category)?.label || "Category"}
               </span>
@@ -695,7 +711,7 @@ const UploadProjectNew = () => {
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4 line-clamp-3">
             {formData.description || "Your project description will appear here. Add a compelling summary to attract buyers."}
           </p>
-          
+
           {/* Tech Stack */}
           {formData.techStack.length > 0 ? (
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
@@ -718,7 +734,7 @@ const UploadProjectNew = () => {
               <p className="text-xs text-gray-400 dark:text-gray-500 italic">Add tech stack to see tags here</p>
             </div>
           )}
-          
+
           {/* Footer */}
           <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700">
             <div className="flex flex-col gap-0.5">
@@ -737,14 +753,14 @@ const UploadProjectNew = () => {
                 <p className="text-sm text-gray-400 dark:text-gray-500">Price not set</p>
               )}
             </div>
-            <button 
+            <button
               type="button"
               className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs sm:text-sm transition-colors shadow-md hover:shadow-lg"
             >
               Buy Now
             </button>
           </div>
-          
+
           {!hasContent && (
             <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <p className="text-xs text-blue-700 dark:text-blue-300 text-center">
@@ -791,11 +807,10 @@ const UploadProjectNew = () => {
               {steps.map((step, index) => (
                 <React.Fragment key={step.id}>
                   <div
-                    className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all duration-300 cursor-pointer whitespace-nowrap ${
-                      currentStep >= step.id
-                        ? `bg-gradient-to-r ${step.color} text-white shadow-lg scale-105`
-                        : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-md hover:shadow-lg"
-                    }`}
+                    className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all duration-300 cursor-pointer whitespace-nowrap ${currentStep >= step.id
+                      ? `bg-gradient-to-r ${step.color} text-white shadow-lg scale-105`
+                      : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-md hover:shadow-lg"
+                      }`}
                     onClick={() => {
                       if (step.id < currentStep || (step.id === currentStep + 1 && validateStep(currentStep))) {
                         setCurrentStep(step.id)
@@ -810,11 +825,10 @@ const UploadProjectNew = () => {
                   </div>
                   {index < steps.length - 1 && (
                     <div
-                      className={`w-4 sm:w-6 md:w-8 h-1 rounded-full transition-colors duration-300 flex-shrink-0 ${
-                        currentStep > step.id
-                          ? "bg-gradient-to-r from-blue-600 to-teal-600"
-                          : "bg-gray-200 dark:bg-gray-600"
-                      }`}
+                      className={`w-4 sm:w-6 md:w-8 h-1 rounded-full transition-colors duration-300 flex-shrink-0 ${currentStep > step.id
+                        ? "bg-gradient-to-r from-blue-600 to-teal-600"
+                        : "bg-gray-200 dark:bg-gray-600"
+                        }`}
                     />
                   )}
                 </React.Fragment>
@@ -914,7 +928,7 @@ const UploadProjectNew = () => {
                         <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                           Tech Stack <span className="text-red-500">*</span>
                         </label>
-                        
+
                         {/* Display added tech stack tags */}
                         {formData.techStack.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3">
@@ -974,11 +988,10 @@ const UploadProjectNew = () => {
                           onChange={handleInputChange}
                           rows={3}
                           placeholder="A brief, compelling summary of your project (minimum 100 characters)"
-                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none transition-colors ${
-                            formData.description.length > 0 && formData.description.length < 100
-                              ? "border-red-300 dark:border-red-600"
-                              : "border-gray-300 dark:border-slate-600"
-                          }`}
+                          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none transition-colors ${formData.description.length > 0 && formData.description.length < 100
+                            ? "border-red-300 dark:border-red-600"
+                            : "border-gray-300 dark:border-slate-600"
+                            }`}
                           required
                         />
                         {formData.description.length > 0 && formData.description.length < 100 && (
@@ -1196,14 +1209,12 @@ const UploadProjectNew = () => {
                                 completeDocumentationEnabled: !prev.completeDocumentationEnabled,
                               }))
                             }
-                            className={`relative inline-flex h-6 w-11 sm:h-7 sm:w-12 items-center rounded-full transition-colors flex-shrink-0 ${
-                              formData.completeDocumentationEnabled ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
-                            }`}
+                            className={`relative inline-flex h-6 w-11 sm:h-7 sm:w-12 items-center rounded-full transition-colors flex-shrink-0 ${formData.completeDocumentationEnabled ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
+                              }`}
                           >
                             <span
-                              className={`inline-block h-4 w-4 sm:h-5 sm:w-5 transform rounded-full bg-white transition-transform ${
-                                formData.completeDocumentationEnabled ? "translate-x-6 sm:translate-x-6" : "translate-x-1"
-                              }`}
+                              className={`inline-block h-4 w-4 sm:h-5 sm:w-5 transform rounded-full bg-white transition-transform ${formData.completeDocumentationEnabled ? "translate-x-6 sm:translate-x-6" : "translate-x-1"
+                                }`}
                             />
                           </button>
                         </div>

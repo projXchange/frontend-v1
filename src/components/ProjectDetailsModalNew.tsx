@@ -70,9 +70,9 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
     handleInputChange(field, arrayValue);
   };
 
-  // Determine if student can edit (only draft/pending projects)
+  // Determine if student can edit (draft, pending, or approved projects)
   const isStudent = canEditAll;
-  const canStudentEdit = isStudent && (project.status === 'draft' || project.status === 'pending');
+  const canStudentEdit = isStudent && (project.status === 'draft' || project.status === 'pending' || project.status === 'approved');
   const effectiveCanEdit = isStudent ? canStudentEdit : canEditAll;
 
   const sections = [
@@ -136,9 +136,14 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
               }`}>
                 {project.status?.toUpperCase()}
               </span>
-              {isStudent && !canStudentEdit && (
+              {isStudent && !canStudentEdit && project.status !== 'approved' && (
                 <p className="text-white/60 text-xs mt-2">
                   Contact admin to make changes
+                </p>
+              )}
+              {isStudent && canStudentEdit && project.status === 'approved' && (
+                <p className="text-white/90 text-xs mt-2 font-semibold">
+                  ✅ You can edit
                 </p>
               )}
             </div>
@@ -167,7 +172,19 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50 dark:bg-slate-900/50">
             <div className="max-w-4xl mx-auto">
               
-              {/* Read-only warning for students */}
+              {/* Status notification for students */}
+              {isStudent && project.status === 'approved' && canStudentEdit && (
+                <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl">
+                  <p className="text-sm text-green-800 dark:text-green-300 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    <span>
+                      <strong>✅ Project Approved - You Can Edit:</strong> Your project is live and approved. You can edit your fields below. Any changes will be submitted for re-approval.
+                    </span>
+                  </p>
+                </div>
+              )}
+              
+              {/* Read-only warning for non-editable statuses */}
               {isStudent && !canStudentEdit && (
                 <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-xl">
                   <p className="text-sm text-yellow-800 dark:text-yellow-300 flex items-center gap-2">

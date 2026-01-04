@@ -5,7 +5,6 @@ import {
   FileText,
   Video,
   IndianRupee,
-  Tag,
   Award,
   Shield,
   CheckCircle,
@@ -15,7 +14,6 @@ import {
   AlertCircle,
   Sparkles,
   Eye,
-  Send,
   Users,
   Clock,
   ArrowRight,
@@ -58,29 +56,22 @@ const UploadProject = () => {
     rating1: "",
   })
 
-  const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [previewImage, setPreviewImage] = useState<string>("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [currentStep, setCurrentStep] = useState(1)
   const [showPreview, setShowPreview] = useState(false)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
-  const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const [uploadedSourceFiles, setUploadedSourceFiles] = useState<string[]>([])
-  const [uploadedDocFiles, setUploadedDocFiles] = useState<string[]>([])
   const [thumbnailUploading, setThumbnailUploading] = useState(false)
   const [imagesUploading, setImagesUploading] = useState(false)
   const [sourceFilesUploading, setSourceFilesUploading] = useState(false)
   const [docFilesUploading, setDocFilesUploading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null)
   const [showAdvanced, setShowAdvanced] = useState(false)
 
-  const navigate = useNavigate()
-
-  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+  const CLOUDINARY_CLOUD_NAME = "dmfh4f4yg"
+  const CLOUDINARY_UPLOAD_PRESET = "projectXchange"
 
   const categories = [
     { label: "Web Development", value: "web_development" },
@@ -106,7 +97,7 @@ const UploadProject = () => {
         const parsed = JSON.parse(savedDraft)
         setFormData(parsed)
         toast.success("Draft restored!")
-      } catch (e) {
+      } catch {
         console.error("Failed to restore draft")
       }
     }
@@ -170,7 +161,7 @@ const UploadProject = () => {
       setFormData((prev) => ({ ...prev, thumbnailUrl: "TEMP_FILE" }))
 
       toast.success("Thumbnail selected!")
-    } catch (error) {
+    } catch {
       toast.error("Failed to process thumbnail.")
     } finally {
       setThumbnailUploading(false)
@@ -252,10 +243,6 @@ const UploadProject = () => {
     setUploadedFiles((prev) => [...prev, ...docFiles])
     toast.success(`${docFiles.length} documentation file(s) selected!`)
     setDocFilesUploading(false)
-  }
-
-  const removeUploadedImage = (index: number) => {
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index))
   }
 
   const removeFile = (index: number) => {
@@ -354,36 +341,6 @@ const UploadProject = () => {
     }))
   }
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
-    } else if (e.type === "dragleave") {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const files = Array.from(e.dataTransfer.files)
-      setUploadedFiles((prev) => [...prev, ...files])
-
-      const imageFile = files.find((file) => file.type.startsWith("image/"))
-      if (imageFile) {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          setPreviewImage(e.target?.result as string)
-        }
-        reader.readAsDataURL(imageFile)
-      }
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -404,16 +361,20 @@ const UploadProject = () => {
           throw new Error("Authentication token not found. Please login again.")
         }
 
-        const initialProjectData = {
+        // Prepare initial project data - only include non-empty values
+        const features = formData.features.filter((f) => f.trim())
+        const techStack = formData.techStack.filter((tech) => tech.trim())
+        const systemReqs = formData.systemRequirements.filter((s) => s.trim())
+        const deps = formData.dependenciesArr.filter((d) => d.trim())
+        const installSteps = formData.installationSteps.filter((s) => s.trim())
+
+        const initialProjectData: Record<string, unknown> = {
           title: formData.title,
           description: formData.description,
-          key_features: formData.features.filter((f) => f.trim()).join(", "),
           category: formData.category === "other" ? formData.customCategory : formData.category,
           difficulty_level: formData.difficulty.toLowerCase(),
-          tech_stack: formData.techStack.filter((tech) => tech.trim()),
+          tech_stack: techStack,
           github_url: formData.githubUrl,
-          demo_url: formData.liveDemo && formData.liveDemo.trim() ? formData.liveDemo : null,
-          youtube_url: formData.youtubeUrl && formData.youtubeUrl.trim() ? formData.youtubeUrl : null,
           pricing: {
             sale_price: Number.parseFloat(formData.price),
             original_price: formData.originalPrice
@@ -421,18 +382,27 @@ const UploadProject = () => {
               : Number.parseFloat(formData.price),
             currency: formData.currency || "INR",
           },
-          delivery_time: formData.deliveryTime ? Number.parseInt(formData.deliveryTime, 10) : 0,
-          thumbnail: "",
-          images: [],
-          files: {
-            source_files: [],
-            documentation_files: [],
-          },
-          requirements: {
-            system_requirements: formData.systemRequirements.filter((s) => s.trim()),
-            dependencies: formData.dependenciesArr.filter((d) => d.trim()),
-            installation_steps: formData.installationSteps.filter((s) => s.trim()),
-          },
+        }
+
+        // Only add optional fields if they have values
+        if (features.length > 0) {
+          initialProjectData.key_features = features.join(", ")
+        }
+        if (formData.liveDemo && formData.liveDemo.trim()) {
+          initialProjectData.demo_url = formData.liveDemo
+        }
+        if (formData.youtubeUrl && formData.youtubeUrl.trim()) {
+          initialProjectData.youtube_url = formData.youtubeUrl
+        }
+        if (formData.deliveryTime) {
+          initialProjectData.delivery_time = Number.parseInt(formData.deliveryTime, 10)
+        }
+        if (systemReqs.length > 0 || deps.length > 0 || installSteps.length > 0) {
+          const requirements: Record<string, string[]> = {}
+          if (systemReqs.length > 0) requirements.system_requirements = systemReqs
+          if (deps.length > 0) requirements.dependencies = deps
+          if (installSteps.length > 0) requirements.installation_steps = installSteps
+          initialProjectData.requirements = requirements
         }
 
         const projectResponse = await apiClient(getApiUrl("/projects"), {
@@ -486,7 +456,7 @@ const UploadProject = () => {
 
         if (imageFiles.length > 0) {
           try {
-            const imageUploadPromises = imageFiles.map((file, index) =>
+            const imageUploadPromises = imageFiles.map((file) =>
               uploadToCloudinary(file, `${projectFolder}/images`, "image"),
             )
             finalImageUrls = await Promise.all(imageUploadPromises)
@@ -533,37 +503,46 @@ const UploadProject = () => {
           }
         }
 
-        const updateData = {
-          thumbnail: finalThumbnailUrl,
-          images: finalImageUrls,
-          files: {
-            source_files: finalSourceFileUrls,
-            documentation_files: finalDocFileUrls,
-          },
+        // Update project with file URLs - only include non-empty values
+        const updateData: Record<string, unknown> = {}
+
+        if (finalThumbnailUrl) {
+          updateData.thumbnail = finalThumbnailUrl
+        }
+        if (finalImageUrls.length > 0) {
+          updateData.images = finalImageUrls
+        }
+        if (finalSourceFileUrls.length > 0 || finalDocFileUrls.length > 0) {
+          const files: Record<string, string[]> = {}
+          if (finalSourceFileUrls.length > 0) files.source_files = finalSourceFileUrls
+          if (finalDocFileUrls.length > 0) files.documentation_files = finalDocFileUrls
+          updateData.files = files
         }
 
-        try {
-          const updateResponse = await apiClient(getApiUrl(`/projects/${backendProjectId}`), {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(updateData),
-          })
+        // Only update if there's something to update
+        if (Object.keys(updateData).length > 0) {
+          try {
+            const updateResponse = await apiClient(getApiUrl(`/projects/${backendProjectId}`), {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                accept: "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(updateData),
+            })
 
-          if (updateResponse.ok) {
-            // Project updated successfully
-          } else {
-            const errorData = await updateResponse.json()
-            console.error("Failed to update project with files:", errorData)
+            if (updateResponse.ok) {
+              // Project updated successfully
+            } else {
+              const errorData = await updateResponse.json()
+              console.error("Failed to update project with files:", errorData)
+            }
+          } catch (updateError) {
+            console.error("Error updating project with files:", updateError)
           }
-        } catch (updateError) {
-          console.error("Error updating project with files:", updateError)
         }
 
-        setCreatedProjectId(backendProjectId)
         setShowSuccessModal(true)
         localStorage.removeItem("projectDraft")
 
@@ -596,9 +575,6 @@ const UploadProject = () => {
         })
         setUploadedFiles([])
         setThumbnailFile(null)
-        setUploadedImages([])
-        setUploadedSourceFiles([])
-        setUploadedDocFiles([])
         setPreviewImage("")
         setCurrentStep(1)
       } catch (error) {
@@ -612,7 +588,7 @@ const UploadProject = () => {
 
   const getCompletionPercentage = () => {
     let completed = 0
-    let total = 8
+    const total = 8
 
     if (formData.title.trim()) completed++
     if (formData.category) completed++
@@ -638,7 +614,7 @@ const UploadProject = () => {
         )}
         <div className="absolute top-4 left-4 flex gap-2">
           <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full text-sm font-semibold">
-            {formData.category === "other" 
+            {formData.category === "other"
               ? formData.customCategory || "Custom Category"
               : categories.find((cat) => cat.value === formData.category)?.label || "Category"}
           </span>
@@ -1854,10 +1830,8 @@ const UploadProject = () => {
 
         {showSuccessModal && (
           <SuccessModal
-            projectId={createdProjectId}
             onClose={() => {
               setShowSuccessModal(false)
-              setCreatedProjectId(null)
             }}
           />
         )}
@@ -1866,7 +1840,7 @@ const UploadProject = () => {
   )
 }
 
-const SuccessModal = ({ projectId, onClose }: { projectId: string | null; onClose: () => void }) => {
+const SuccessModal = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate()
 
   return (

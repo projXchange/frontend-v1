@@ -37,6 +37,10 @@ export const API_CONFIG = {
     ADMIN_RETRY_PAYOUT: (id: string) => `/api/admin/payouts/${id}/retry`,
     ADMIN_CANCEL_PAYOUT: (id: string) => `/api/admin/payouts/${id}/cancel`,
     ADMIN_MANUAL_PAYOUT: '/api/admin/payouts/manual',
+    
+    // Field Permissions
+    PROJECT_PERMISSIONS: (id: string) => `/projects/${id}/permissions`,
+    UPDATE_PROJECT_FIELDS: (id: string) => `/projects/${id}`,
   },
 };
 

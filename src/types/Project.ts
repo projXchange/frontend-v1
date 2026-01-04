@@ -119,3 +119,72 @@ export interface ProjectRating {
   total_reviews: number;
   average_rating: number;
 }
+
+// Field-Level Permission Types
+export interface FieldPermission {
+  canEdit: boolean;
+  uploadedBy: string | null;
+}
+
+export interface FieldPermissions {
+  [fieldName: string]: FieldPermission;
+}
+
+export interface ProjectWithPermissions extends Project {
+  field_permissions?: FieldPermissions;
+}
+
+export interface FieldOwnershipInfo {
+  fieldName: string;
+  uploadedBy: string | null;
+  canEdit: boolean;
+}
+
+export interface PermissionState {
+  permissions: FieldPermissions | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export enum PermissionErrorType {
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+  FIELD_NOT_FOUND = 'FIELD_NOT_FOUND',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+}
+
+export interface PermissionError {
+  type: PermissionErrorType;
+  fieldName?: string;
+  message: string;
+  uploadedBy?: string;
+}
+
+export interface FieldPermissionResponse {
+  project_id: string;
+  field_permissions: FieldPermissions;
+}
+
+export interface ProjectUpdateResponse {
+  success: boolean;
+  project: ProjectWithPermissions;
+  message?: string;
+}
+
+// Trackable field names for permission system
+export type TrackableField = 
+  | 'title'
+  | 'description'
+  | 'key_features'
+  | 'category'
+  | 'difficulty_level'
+  | 'tech_stack'
+  | 'github_url'
+  | 'demo_url'
+  | 'youtube_url'
+  | 'pricing'
+  | 'delivery_time'
+  | 'thumbnail'
+  | 'images'
+  | 'files'
+  | 'requirements';
