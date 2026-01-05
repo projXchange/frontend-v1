@@ -19,6 +19,7 @@ import {
   Settings,
   MessageSquare,
   Wallet,
+  Award,
 } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 import type { User, UsersApiResponse } from "../types/User"
@@ -33,6 +34,8 @@ import LoadingNumber from "../components/LoadingNumber"
 import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
 import ProjectDetailsModalNew from "../components/ProjectDetailsModalNew"
+import ReferralStatsPanel from "../components/admin/ReferralStatsPanel"
+import SuspiciousReferralsPanel from "../components/admin/SuspiciousReferralsPanel"
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
@@ -929,6 +932,7 @@ const AdminDashboard = () => {
                 { id: "approval", label: "Pending", icon: AlertCircle },
                 { id: "transactions", label: "Transactions", icon: DollarSign },
                 { id: "reviews", label: "Reviews", icon: MessageSquare },
+                { id: "referrals", label: "Referrals", icon: Award },
                 { id: "payouts", label: "Payouts", icon: Wallet },
               ].map((tab) => (
                 <button
@@ -1925,6 +1929,13 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === "referrals" && (
+              <div className="animate-slideInUp space-y-8">
+                <ReferralStatsPanel />
+                <SuspiciousReferralsPanel />
               </div>
             )}
 

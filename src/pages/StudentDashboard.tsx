@@ -41,9 +41,12 @@ import ReviewDetailsModal from "../components/ReviewDetailsModal"
 import toast from "react-hot-toast"
 import LoadingNumber from "../components/LoadingNumber"
 import ProjectDetailsModalNew from "../components/ProjectDetailsModalNew"
+import ReferralDashboard from "../components/ReferralDashboard"
+import ReferralHistory from "../components/ReferralHistory"
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
+  const [referralSubTab, setReferralSubTab] = useState("dashboard")
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const { user } = useAuth()
@@ -538,6 +541,7 @@ const StudentDashboard = () => {
                 { id: "overview", label: "Overview", icon: BarChart3 },
                 { id: "my-projects", label: "My Uploads", icon: ShoppingBag },
                 { id: "purchased-projects", label: "My Purchases", icon: ShoppingBag },
+                { id: "referrals", label: "Referrals", icon: Award },
                 { id: "payouts", label: "Payouts", icon: Wallet },
                 { id: "reviews", label: "Reviews", icon: Trophy },
                 { id: "transactions", label: "Payments", icon: Clock },
@@ -976,6 +980,47 @@ const StudentDashboard = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === "referrals" && (
+              <div className="animate-slideInUp">
+                <div className="flex items-center justify-between mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <Award className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
+                    Referral System
+                  </h2>
+                </div>
+
+                {/* Sub-tabs for Referrals */}
+                <div className="mb-6">
+                  <div className="flex gap-2 border-b border-gray-200 dark:border-slate-700">
+                    <button
+                      onClick={() => setReferralSubTab("dashboard")}
+                      className={`px-4 py-2 font-semibold text-sm transition-all duration-200 border-b-2 ${
+                        referralSubTab === "dashboard"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      }`}
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={() => setReferralSubTab("history")}
+                      className={`px-4 py-2 font-semibold text-sm transition-all duration-200 border-b-2 ${
+                        referralSubTab === "history"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      }`}
+                    >
+                      History
+                    </button>
+                  </div>
+                </div>
+
+                {/* Render sub-tab content */}
+                {referralSubTab === "dashboard" && <ReferralDashboard />}
+                {referralSubTab === "history" && <ReferralHistory />}
               </div>
             )}
 
