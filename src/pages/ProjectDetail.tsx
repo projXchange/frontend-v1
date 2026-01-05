@@ -5,13 +5,16 @@ import { Star, Download, Lock, ShoppingCart, Heart, Share2, Eye, Calendar, Award
 import { useAuth } from "../contexts/AuthContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
+import { useReferralContext } from "../contexts/ReferralContext"
 import type { Project, Review } from "../types/Project"
 import toast from "react-hot-toast"
 import type { User } from "../types/User"
 import { DownloadFilesModal } from "../components/DownloadFilesModal"
+import { UnlockOptionsModal } from "../components/UnlockOptionsModal"
 import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
 import { DEMO_PROJECTS } from "../constants/demoProjects"
+import { getUserCredits } from "../services/referralService"
 
 interface UserStatus {
   has_purchased: boolean
@@ -56,8 +59,10 @@ const ProjectDetail = () => {
     };
   } | null>(null);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
 
   const navigate = useNavigate(); // Fetch project data on component mount
+  const { refreshCredits } = useReferralContext();
 
   useEffect(() => {
     if (project && user) {
@@ -386,6 +391,15 @@ const ProjectDetail = () => {
     }
 
     try {
+      // Check user credits before initiating download
+      const creditData = await getUserCredits();
+      
+      if (creditData.download_credits <= 0 && !isPurchased) {
+        // Show unlock options modal if insufficient credits
+        setIsUnlockModalOpen(true);
+        return;
+      }
+
       toast.loading("Preparing download...", { id: "download" });
 
       // Use backend proxy endpoint for authenticated downloads
@@ -399,6 +413,13 @@ const ProjectDetail = () => {
       });
 
       if (!response.ok) {
+        // Handle 402 Payment Required error
+        if (response.status === 402) {
+          toast.dismiss("download");
+          setIsUnlockModalOpen(true);
+          return;
+        }
+        
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Download failed: ${response.status}`);
       }
@@ -414,6 +435,9 @@ const ProjectDetail = () => {
       window.URL.revokeObjectURL(url);
 
       toast.success("File downloaded successfully!", { id: "download" });
+      
+      // Refresh credit balance after successful download
+      await refreshCredits();
     } catch (error: any) {
       console.error("Download error:", error);
       toast.error(error.message || "Failed to download file. Please try again.", { id: "download" });
@@ -1909,6 +1933,12 @@ const ProjectDetail = () => {
         sourceFiles={project?.files?.source_files || []}
         documentationFiles={project?.files?.documentation_files || []}
         onDownload={handleDownloadFile}
+      />
+
+      <UnlockOptionsModal
+        isOpen={isUnlockModalOpen}
+        onClose={() => setIsUnlockModalOpen(false)}
+        projectId={id || ''}
       />
 
       {/* Animations */}

@@ -37,6 +37,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
   const [verifyStatus, setVerifyStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [referralCode, setReferralCode] = useState('');
+  const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
 
   // Handle email verification when token is provided
   useEffect(() => {
@@ -44,6 +46,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
       handleEmailVerification(verificationToken);
     }
   }, [verificationToken, mode]);
+
+  // Extract referral code from URL parameter on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+      validateReferralCode(refCode);
+    }
+  }, []);
 
   // Detect reset token in URL or initialMode
   useEffect(() => {
@@ -77,9 +89,33 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setErrorMsg('');
       setSuccessMsg('');
       setVerifyStatus('loading');
+      // Don't reset referral code if it came from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.get('ref')) {
+        setReferralCode('');
+        setReferralCodeValid(null);
+      }
       if (initialMode) setMode(initialMode);
     }
   }, [isOpen, initialMode]);
+
+  const validateReferralCode = (code: string): boolean => {
+    if (!code) {
+      setReferralCodeValid(null);
+      return false;
+    }
+    
+    // Validate format: 8 alphanumeric characters
+    const isValid = /^[A-Z0-9]{8}$/.test(code.toUpperCase());
+    setReferralCodeValid(isValid);
+    return isValid;
+  };
+
+  const handleReferralCodeChange = (value: string) => {
+    const upperValue = value.toUpperCase();
+    setReferralCode(upperValue);
+    validateReferralCode(upperValue);
+  };
 
   const handleEmailVerification = async (token: string) => {
     if (!token) {
@@ -153,7 +189,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     try {
       if (mode === 'signup') {
-        const result: AuthResult = await signup(name, email, password, 'student');
+        const result: AuthResult = await signup(name, email, password, 'student', referralCode || undefined);
         if (result.success) {
           setPendingVerificationEmail(email);
           setMode('verify-pending');
@@ -453,6 +489,47 @@ const AuthModal: React.FC<AuthModalProps> = ({
                             Forgot Password?
                           </button>
                         </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Referral Code - Only for signup */}
+                  {mode === 'signup' && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Referral Code (Optional)
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={referralCode}
+                          onChange={(e) => handleReferralCodeChange(e.target.value)}
+                          placeholder="Enter referral code"
+                          maxLength={8}
+                          className={`w-full px-4 py-4 pr-12 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-colors ${
+                            referralCodeValid === true
+                              ? 'border-green-500 dark:border-green-400 focus:ring-green-500 dark:focus:ring-green-400'
+                              : referralCodeValid === false
+                              ? 'border-red-500 dark:border-red-400 focus:ring-red-500 dark:focus:ring-red-400'
+                              : 'border-gray-300 dark:border-slate-700 focus:ring-blue-500 dark:focus:ring-blue-400'
+                          }`}
+                        />
+                        {referralCodeValid === true && (
+                          <CheckCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500 dark:text-green-400" />
+                        )}
+                        {referralCodeValid === false && (
+                          <XCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500 dark:text-red-400" />
+                        )}
+                      </div>
+                      {referralCodeValid === true && (
+                        <p className="mt-2 text-sm text-green-600 dark:text-green-400 font-medium">
+                          🎉 Valid referral code! You'll receive bonus credits after your first purchase or upload.
+                        </p>
+                      )}
+                      {referralCodeValid === false && referralCode && (
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                          Referral code must be 8 alphanumeric characters
+                        </p>
                       )}
                     </div>
                   )}

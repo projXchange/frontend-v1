@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
-  signup: (name: string, email: string, password: string, role: 'student' | 'admin') => Promise<{ success: boolean; message?: string }>;
+  signup: (name: string, email: string, password: string, role: 'student' | 'admin', referralCode?: string) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<boolean>;
   confirmResetPassword: (token: string, password: string) => Promise<boolean>;
   verifyEmail: (token: string) => Promise<{ success: boolean; message?: string }>;
@@ -110,18 +110,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     name: string,
     email: string,
     password: string,
-    role: 'student' | 'admin'
+    role: 'student' | 'admin',
+    referralCode?: string
   ): Promise<AuthResult> => {
     try {
+      const requestBody: any = {
+        email,
+        password,
+        full_name: name,
+        user_type: role
+      };
+
+      // Include referral_code if provided
+      if (referralCode) {
+        requestBody.referral_code = referralCode;
+      }
+
       const res = await fetch(getApiUrl('/auth/signup'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          full_name: name,
-          user_type: role
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await res.json();
@@ -135,8 +143,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // localStorage.setItem('studystack_user', JSON.stringify(newUser));
       // localStorage.setItem('token', data.accessToken);
 
-      toast.success('Account created! Please check your email to verify.');
-      return { success: true, message: "Account created! Please check your email to verify." };
+      const successMessage = referralCode 
+        ? 'Account created! Please check your email to verify. You\'ll receive bonus credits after verification and your first purchase or upload.'
+        : 'Account created! Please check your email to verify.';
+      
+      toast.success(successMessage);
+      return { success: true, message: successMessage };
     } catch (error) {
       console.error(error);
       return { success: false, message: 'Something went wrong. Please try again.' };

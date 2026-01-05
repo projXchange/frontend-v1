@@ -20,6 +20,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import AuthModal from "./AuthModal";
 import ThemeToggle from "./ThemeToggle";
+import CreditBalance from "./CreditBalance";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -125,6 +126,11 @@ const Navbar = () => {
               >
                 <span>Projects</span>
               </Link>
+
+              {/* Credit Balance - Only for authenticated users */}
+              {isAuthenticated && (
+                <CreditBalance showLabel={false} size="md" />
+              )}
 
               {/* Theme Toggle - Available for all users */}
               <ThemeToggle />
@@ -302,6 +308,13 @@ const Navbar = () => {
                 <FolderOpenDot className={`w-5 h-5 mr-2 ${isActive("/projects") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
                 Projects
               </Link>
+
+              {/* Credit Balance - Only for authenticated users */}
+              {isAuthenticated && (
+                <div className="flex items-center justify-center px-4 py-3 border-t border-b border-gray-200 dark:border-slate-700">
+                  <CreditBalance showLabel={true} size="md" />
+                </div>
+              )}
 
               {/* Theme Toggle Mobile */}
               <div className="flex items-center justify-center px-4 py-3 border-t border-gray-200 dark:border-slate-700">

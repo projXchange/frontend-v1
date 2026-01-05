@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { ReferralProvider } from './contexts/ReferralContext';
 import { PermissionProvider } from './contexts/PermissionContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -39,11 +40,12 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <PermissionProvider>
-          <Toaster position="top-right" reverseOrder={false} />
-          <Router>
-            <ScrollToTop />
-            <Layout>
+        <ReferralProvider>
+          <PermissionProvider>
+            <Toaster position="top-right" reverseOrder={false} />
+            <Router>
+              <ScrollToTop />
+              <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
@@ -126,6 +128,7 @@ function App() {
         </Layout>
       </Router>
         </PermissionProvider>
+        </ReferralProvider>
       </AuthProvider>
     </ThemeProvider>
   );

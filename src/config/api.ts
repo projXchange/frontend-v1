@@ -41,6 +41,20 @@ export const API_CONFIG = {
     // Field Permissions
     PROJECT_PERMISSIONS: (id: string) => `/projects/${id}/permissions`,
     UPDATE_PROJECT_FIELDS: (id: string) => `/projects/${id}`,
+    
+    // Referral endpoints
+    REFERRAL_GENERATE: '/referrals/generate',
+    REFERRAL_DASHBOARD: '/referrals/dashboard',
+    REFERRAL_HISTORY: '/referrals/history',
+    REFERRAL_UNLOCK_OPTIONS: (projectId: string) => `/referrals/unlock-options/${projectId}`,
+    REFERRAL_SHARE: (platform: string) => `/referrals/share/${platform}`,
+    
+    // Credit endpoints
+    DOWNLOADS_CREDITS: '/downloads/credits',
+    
+    // Admin referral endpoints
+    ADMIN_REFERRAL_STATS: '/admin/referrals/stats',
+    ADMIN_REFERRAL_SUSPICIOUS: '/admin/referrals/suspicious',
   },
 };
 
