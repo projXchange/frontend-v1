@@ -140,3 +140,36 @@ export interface SuspiciousReferral {
   qualifiedAt: string | null;
   suspiciousReasons: string[];
 }
+
+// Referral-Only Access Mode Type Definitions
+
+export type ReferralStatus = 'PENDING' | 'CONFIRMED' | 'REVIEW' | 'BLOCKED';
+
+export interface ReferralConfirmationProgress {
+  downloads_completed: number;
+  wishlist_adds_completed: number;
+  qualified_views_completed: number;
+  is_confirmed: boolean;
+  confirmation_method: 'download' | 'wishlist' | 'views' | null;
+}
+
+export interface ReferralWithStatus {
+  id: string;
+  referral_code: string;
+  status: ReferralStatus;
+  referred_user: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  created_at: string;
+  confirmed_at: string | null;
+  confirmation_progress: ReferralConfirmationProgress;
+  action_needed: string | null;
+}
+
+export interface ProjectViewSession {
+  project_id: string;
+  start_time: number;
+  is_qualified: boolean;
+}

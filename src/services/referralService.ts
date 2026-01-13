@@ -325,3 +325,78 @@ export async function getSuspiciousReferrals(
     throw newError;
   }
 }
+
+/**
+ * Approve a referral under review (admin only)
+ * @param referralId - The ID of the referral to approve
+ * @returns Success message and updated referral status
+ */
+export async function approveReferral(
+  referralId: string
+): Promise<{
+  success: boolean;
+  message: string;
+  referral: {
+    id: string;
+    status: string;
+    confirmed_at: string;
+  };
+}> {
+  try {
+    const response = await apiClient(
+      getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_REFERRAL_APPROVE(referralId)),
+      {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      }
+    );
+
+    return handleResponse(response);
+  } catch (error) {
+    if (error instanceof Error && (error as any).code) {
+      throw error;
+    }
+    const mappedError = mapReferralError(error);
+    const newError = new Error(mappedError.userMessage);
+    (newError as any).code = mappedError.code;
+    (newError as any).retryable = mappedError.retryable;
+    throw newError;
+  }
+}
+
+/**
+ * Block a referral (admin only)
+ * @param referralId - The ID of the referral to block
+ * @returns Success message and updated referral status
+ */
+export async function blockReferral(
+  referralId: string
+): Promise<{
+  success: boolean;
+  message: string;
+  referral: {
+    id: string;
+    status: string;
+  };
+}> {
+  try {
+    const response = await apiClient(
+      getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_REFERRAL_BLOCK(referralId)),
+      {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      }
+    );
+
+    return handleResponse(response);
+  } catch (error) {
+    if (error instanceof Error && (error as any).code) {
+      throw error;
+    }
+    const mappedError = mapReferralError(error);
+    const newError = new Error(mappedError.userMessage);
+    (newError as any).code = mappedError.code;
+    (newError as any).retryable = mappedError.retryable;
+    throw newError;
+  }
+}

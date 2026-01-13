@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Shield, User, Mail, Globe, Calendar, CheckCircle } from 'lucide-react';
-import { getSuspiciousReferrals } from '../../services/referralService';
+import { AlertTriangle, Shield, User, Mail, Globe, Calendar, CheckCircle, Check, X } from 'lucide-react';
+import { getSuspiciousReferrals, approveReferral, blockReferral } from '../../services/referralService';
 import type { SuspiciousReferral } from '../../types/Referral';
 import toast from 'react-hot-toast';
 
@@ -11,6 +11,8 @@ const SuspiciousReferralsPanel = () => {
   const [limit] = useState<number>(50);
   const [offset, setOffset] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showBlockConfirm, setShowBlockConfirm] = useState<string | null>(null);
 
   const fetchSuspiciousReferrals = async () => {
     setLoading(true);
@@ -62,6 +64,49 @@ const SuspiciousReferralsPanel = () => {
 
   const handlePrevPage = () => {
     setOffset((prev) => Math.max(0, prev - limit));
+  };
+
+  const handleApprove = async (referralId: string) => {
+    setActionLoading(referralId);
+    try {
+      const result = await approveReferral(referralId);
+      toast.success(result.message || 'Referral approved successfully');
+      
+      // Remove the referral from the list
+      setSuspiciousReferrals((prev) => prev.filter((r) => r.id !== referralId));
+      setTotalCount((prev) => prev - 1);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to approve referral';
+      toast.error(errorMessage);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleBlock = async (referralId: string) => {
+    setActionLoading(referralId);
+    try {
+      const result = await blockReferral(referralId);
+      toast.success(result.message || 'Referral blocked successfully');
+      
+      // Remove the referral from the list
+      setSuspiciousReferrals((prev) => prev.filter((r) => r.id !== referralId));
+      setTotalCount((prev) => prev - 1);
+      setShowBlockConfirm(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to block referral';
+      toast.error(errorMessage);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const openBlockConfirmation = (referralId: string) => {
+    setShowBlockConfirm(referralId);
+  };
+
+  const closeBlockConfirmation = () => {
+    setShowBlockConfirm(null);
   };
 
   if (loading) {
@@ -252,10 +297,81 @@ const SuspiciousReferralsPanel = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
+                    <button
+                      onClick={() => handleApprove(referral.id)}
+                      disabled={actionLoading === referral.id}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
+                    >
+                      {actionLoading === referral.id ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Approve</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => openBlockConfirmation(referral.id)}
+                      disabled={actionLoading === referral.id}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Block</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Block Confirmation Dialog */}
+          {showBlockConfirm && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-slate-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    Block Referral?
+                  </h3>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Are you sure you want to block this referral? This action will prevent the referrer from earning credits for this referral and cannot be undone.
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={closeBlockConfirmation}
+                    disabled={actionLoading === showBlockConfirm}
+                    className="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-900 dark:text-gray-100 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleBlock(showBlockConfirm)}
+                    disabled={actionLoading === showBlockConfirm}
+                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
+                  >
+                    {actionLoading === showBlockConfirm ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Blocking...</span>
+                      </div>
+                    ) : (
+                      'Block Referral'
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Pagination Controls */}
           <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-lg border border-gray-100 dark:border-slate-700">

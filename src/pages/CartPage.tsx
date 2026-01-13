@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight, Shield } from 'lucide-react';
+import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight, Shield, Info } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useRazorpayCheckout } from '../hooks/useRazorpayCheckout';
+import { useFeatureFlags } from '../contexts/FeatureFlagContext';
 
 const CartPage = () => {
   const { cart, removeFromCart, getCartTotal, getCartCount, clearCart, loading } = useCart();
   const { isAuthenticated } = useAuth();
   const { initiateCheckout, isProcessing } = useRazorpayCheckout();
+  const { flags } = useFeatureFlags();
 
   const handleRemoveFromCart = async (projectId: string) => {
     await removeFromCart(projectId);
@@ -169,22 +171,49 @@ const CartPage = () => {
                 </div>
 
                 <div className="space-y-2 sm:space-y-3">
-                  <button
-                    onClick={handleCheckout}
-                    disabled={isProcessing || loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="truncate">{isProcessing ? 'Processing...' : 'Proceed to Checkout'}</span>
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
+                  {!flags.REFERRAL_ONLY_MODE ? (
+                    <>
+                      <button
+                        onClick={handleCheckout}
+                        disabled={isProcessing || loading}
+                        className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="truncate">{isProcessing ? 'Processing...' : 'Proceed to Checkout'}</span>
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
 
-                  <button
-                    onClick={clearCart}
-                    className="w-full border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-105 transition-all duration-200"
-                  >
-                    Clear Cart
-                  </button>
+                      <button
+                        onClick={clearCart}
+                        className="w-full border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-105 transition-all duration-200"
+                      >
+                        Clear Cart
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-start gap-3">
+                          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-300 mb-1">
+                              Credit-Only Mode Active
+                            </h4>
+                            <p className="text-xs text-blue-800 dark:text-blue-300">
+                              During our launch period, projects can be downloaded using credits earned through referrals and bonuses. Payment checkout is temporarily unavailable.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={clearCart}
+                        className="w-full border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-105 transition-all duration-200"
+                      >
+                        Clear Cart
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">

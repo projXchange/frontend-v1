@@ -6,9 +6,12 @@ import { ProjectCard } from '../components/ProjectCard';
 import { apiClient } from '../utils/apiClient';
 import { getApiUrl } from '../config/api';
 import { DEMO_PROJECTS } from '../constants/demoProjects';
+import { LaunchPeriodBanner } from '../components/LaunchPeriodBanner';
+import { useFeatureFlags } from '../contexts/FeatureFlagContext';
 
 const ProjectListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { flags } = useFeatureFlags();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -277,6 +280,9 @@ const ProjectListing = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        {/* Launch Period Banner */}
+        {flags.REFERRAL_ONLY_MODE && <LaunchPeriodBanner />}
+        
         {/* Filters */}
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30 dark:border-slate-700/30 relative z-10 transition-colors">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 overflow-visible">
