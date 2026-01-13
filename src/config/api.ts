@@ -51,10 +51,18 @@ export const API_CONFIG = {
     
     // Credit endpoints
     DOWNLOADS_CREDITS: '/downloads/credits',
+    CREDITS_BALANCE: '/credits/balance',
+    CREDITS_DOWNLOAD: '/downloads/consume-credit',
+    REFERRALS_STATUS: '/referrals/status',
+    TRACKING_PROJECT_VIEW: '/tracking/project-view',
+    REFERRALS_CONFIRM_WISHLIST: '/referrals/confirm-wishlist',
     
     // Admin referral endpoints
     ADMIN_REFERRAL_STATS: '/admin/referrals/stats',
     ADMIN_REFERRAL_SUSPICIOUS: '/admin/referrals/suspicious',
+    ADMIN_REFERRAL_CONFIRMATION_STATS: '/admin/referrals/confirmation-stats',
+    ADMIN_REFERRAL_APPROVE: (referralId: string) => `/admin/referrals/${referralId}/approve`,
+    ADMIN_REFERRAL_BLOCK: (referralId: string) => `/admin/referrals/${referralId}/block`,
   },
 };
 

@@ -6,11 +6,16 @@ import { useAuth } from "../contexts/AuthContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
 import { useReferralContext } from "../contexts/ReferralContext"
+import { useFeatureFlags } from "../contexts/FeatureFlagContext"
+import { useCredits } from "../hooks/useCredits"
+import { useProjectViewTracking } from "../hooks/useProjectViewTracking"
 import type { Project, Review } from "../types/Project"
 import toast from "react-hot-toast"
 import type { User } from "../types/User"
 import { DownloadFilesModal } from "../components/DownloadFilesModal"
 import { UnlockOptionsModal } from "../components/UnlockOptionsModal"
+import CreditDownloadButton from "../components/CreditDownloadButton"
+import ReferralCTA from "../components/ReferralCTA"
 import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
 import { DEMO_PROJECTS } from "../constants/demoProjects"
@@ -61,8 +66,15 @@ const ProjectDetail = () => {
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
 
-  const navigate = useNavigate(); // Fetch project data on component mount
+  const navigate = useNavigate();
   const { refreshCredits } = useReferralContext();
+  
+  // Feature flags and credit system
+  const { showPaymentUI, showCreditUI } = useFeatureFlags();
+  const { availableCredits, loading: creditsLoading } = useCredits();
+  
+  // Track project view time for referral confirmation
+  useProjectViewTracking(id || '');
 
   useEffect(() => {
     if (project && user) {
@@ -1561,33 +1573,35 @@ const ProjectDetail = () => {
           <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-2 lg:order-2">
             {/* Purchase Card */}
             <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/30 dark:border-slate-700/30 animate-slideInRight transition-colors">
-              {/* Pricing */}
-              <div className="text-center mb-4 sm:mb-8">
-                <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4 animate-slideInUp">
-                  {project.isDemo ? (
-                    <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                      FREE
-                    </div>
-                  ) : (
-                    <>
-                      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
-                        ₹{project.pricing?.sale_price || 0}
+              {/* Pricing - Hide when in referral-only mode */}
+              {showPaymentUI && (
+                <div className="text-center mb-4 sm:mb-8">
+                  <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4 animate-slideInUp">
+                    {project.isDemo ? (
+                      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                        FREE
                       </div>
-                      {project.pricing?.original_price &&
-                        project.pricing.original_price > (project.pricing?.sale_price || 0) && (
-                          <div className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 line-through">
-                            ₹{project.pricing.original_price}
-                          </div>
-                        )}
-                    </>
+                    ) : (
+                      <>
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
+                          ₹{project.pricing?.sale_price || 0}
+                        </div>
+                        {project.pricing?.original_price &&
+                          project.pricing.original_price > (project.pricing?.sale_price || 0) && (
+                            <div className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 line-through">
+                              ₹{project.pricing.original_price}
+                            </div>
+                          )}
+                      </>
+                    )}
+                  </div>
+                  {!project.isDemo && project.discount_percentage && project.discount_percentage > 0 && (
+                    <div className="text-xs sm:text-sm text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full inline-block animate-pulse">
+                      Save {project.discount_percentage}%
+                    </div>
                   )}
                 </div>
-                {!project.isDemo && project.discount_percentage && project.discount_percentage > 0 && (
-                  <div className="text-xs sm:text-sm text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full inline-block animate-pulse">
-                    Save {project.discount_percentage}%
-                  </div>
-                )}
-              </div>
+              )}
 
               {/* Stats */}
               <div
@@ -1609,80 +1623,96 @@ const ProjectDetail = () => {
               {/* Buy / Wishlist / Cart Buttons */}
               {!isPurchased ? (
                 <div className="flex flex-col space-y-2 sm:space-y-3 mb-4 sm:mb-8">
-                  {/* Buy Now / Checkout Button */}
-                  <button
-                    onClick={async () => {
-                      if (!isAuthenticated) {
-                        openAuthModal(true);
-                        return;
-                      }
+                  {/* Credit-based download for referral-only mode */}
+                  {showCreditUI && isAuthenticated && !project.isDemo ? (
+                    <>
+                      {availableCredits > 0 ? (
+                        <CreditDownloadButton projectId={project.id} />
+                      ) : (
+                        <ReferralCTA />
+                      )}
+                    </>
+                  ) : null}
 
-                      if (cartStatus) {
-                        navigate("/cart")
-                      } else {
-                        // If not in cart, add to cart then open cart
-                        const added = await addToCart(project);
-                        if (added) {
-                          navigate("/cart")
-                        }
-                      }
-                    }}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-2 sm:py-3 lg:py-4 rounded-xl font-bold text-xs sm:text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ animationDelay: "300ms" }}
-                  >
-                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" />
-                    <span className="line-clamp-1">
-                      {project.isDemo
-                        ? "View Demo (Free)"
-                        : isAuthenticated
-                          ? loading
-                            ? "Processing..."
-                            : cartStatus
-                              ? "Checkout"
-                              : `Buy (₹${project.pricing?.sale_price || 0})`
-                          : "Login to Buy"}
-                    </span>
-                  </button>
+                  {/* Payment UI - only show when showPaymentUI is true */}
+                  {showPaymentUI && (
+                    <>
+                      {/* Buy Now / Checkout Button */}
+                      <button
+                        onClick={async () => {
+                          if (!isAuthenticated) {
+                            openAuthModal(true);
+                            return;
+                          }
 
-                  {/* Wishlist Button */}
-                  <button
-                    onClick={handleToggleWishlist}
-                    disabled={project.isDemo}
-                    className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
-                      ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
-                      : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105"
-                      }`}
-                    style={{ animationDelay: "350ms" }}
-                  >
-                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                    <span className="line-clamp-1">{wishlistStatus ? "Remove from Wishlist" : "Add to Wishlist"}</span>
-                  </button>
+                          if (cartStatus) {
+                            navigate("/cart")
+                          } else {
+                            // If not in cart, add to cart then open cart
+                            const added = await addToCart(project);
+                            if (added) {
+                              navigate("/cart")
+                            }
+                          }
+                        }}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-2 sm:py-3 lg:py-4 rounded-xl font-bold text-xs sm:text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ animationDelay: "300ms" }}
+                      >
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" />
+                        <span className="line-clamp-1">
+                          {project.isDemo
+                            ? "View Demo (Free)"
+                            : isAuthenticated
+                              ? loading
+                                ? "Processing..."
+                                : cartStatus
+                                  ? "Checkout"
+                                  : `Buy (₹${project.pricing?.sale_price || 0})`
+                              : "Login to Buy"}
+                        </span>
+                      </button>
 
-                  {/* Add/Remove Cart Button */}
-                  <button
-                    onClick={() => {
-                      if (project.isDemo) {
-                        toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase!");
-                        return;
-                      }
-                      if (!isAuthenticated) {
-                        toast.error("Please login to manage your cart");
-                        return;
-                      }
-                      if (cartStatus) removeFromCart(project.id);
-                      else addToCart(project);
-                    }}
-                    disabled={loading}
-                    className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
-                      ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
-                      : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                      }`}
-                    style={{ animationDelay: "380ms" }}
-                  >
-                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                    <span className="line-clamp-1">{cartStatus ? "Remove from Cart" : "Add to Cart"}</span>
-                  </button>
+                      {/* Wishlist Button */}
+                      <button
+                        onClick={handleToggleWishlist}
+                        disabled={project.isDemo}
+                        className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
+                          ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                          : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105"
+                          }`}
+                        style={{ animationDelay: "350ms" }}
+                      >
+                        <Heart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <span className="line-clamp-1">{wishlistStatus ? "Remove from Wishlist" : "Add to Wishlist"}</span>
+                      </button>
+
+                      {/* Add/Remove Cart Button */}
+                      <button
+                        onClick={() => {
+                          if (project.isDemo) {
+                            toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase!");
+                            return;
+                          }
+                          if (!isAuthenticated) {
+                            toast.error("Please login to manage your cart");
+                            return;
+                          }
+                          if (cartStatus) removeFromCart(project.id);
+                          else addToCart(project);
+                        }}
+                        disabled={loading}
+                        className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
+                          ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                          : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          }`}
+                        style={{ animationDelay: "380ms" }}
+                      >
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <span className="line-clamp-1">{cartStatus ? "Remove from Cart" : "Add to Cart"}</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">

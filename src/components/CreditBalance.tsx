@@ -11,7 +11,7 @@ const CreditBalance: React.FC<CreditBalanceProps> = ({
   showLabel = true, 
   size = 'md' 
 }) => {
-  const { credits, loading, error } = useCredits();
+  const { availableCredits, loading, error } = useCredits();
 
   // Size variants
   const sizeClasses = {
@@ -72,13 +72,13 @@ const CreditBalance: React.FC<CreditBalanceProps> = ({
 
   return (
     <div 
-      className={`flex items-center space-x-2 ${sizeClasses[size].container} rounded-full border ${getCreditStateClasses(credits)} font-medium transition-all duration-200`}
+      className={`flex items-center space-x-2 ${sizeClasses[size].container} rounded-full border ${getCreditStateClasses(availableCredits)} font-medium transition-all duration-200`}
       data-testid="credit-balance"
     >
       <Coins className={sizeClasses[size].icon} />
       <span className={sizeClasses[size].text}>
         {showLabel && 'Credits: '}
-        {credits}
+        {availableCredits}
       </span>
     </div>
   );

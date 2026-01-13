@@ -36,6 +36,7 @@ import { getApiUrl } from "../config/api"
 import ProjectDetailsModalNew from "../components/ProjectDetailsModalNew"
 import ReferralStatsPanel from "../components/admin/ReferralStatsPanel"
 import SuspiciousReferralsPanel from "../components/admin/SuspiciousReferralsPanel"
+import ReferralConfirmationStats from "../components/admin/ReferralConfirmationStats"
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
@@ -1935,6 +1936,7 @@ const AdminDashboard = () => {
             {activeTab === "referrals" && (
               <div className="animate-slideInUp space-y-8">
                 <ReferralStatsPanel />
+                <ReferralConfirmationStats />
                 <SuspiciousReferralsPanel />
               </div>
             )}

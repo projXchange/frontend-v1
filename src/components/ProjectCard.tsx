@@ -6,6 +6,7 @@ import type { Project } from "../types/Project"
 import { useWishlist } from "../contexts/WishlistContext"
 import { useCart } from "../contexts/CartContext"
 import { useAuth } from "../contexts/AuthContext"
+import { useFeatureFlags } from "../contexts/FeatureFlagContext"
 import toast from "react-hot-toast"
 
 interface ProjectCardProps {
@@ -17,6 +18,8 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
   const { addToCart, isInCart, removeFromCart } = useCart()
   const { isAuthenticated, openAuthModal } = useAuth()
+  const { flags } = useFeatureFlags()
+  
   // Calculate discount from consolidated project data
   const discount =
     project.pricing?.original_price && project.pricing?.sale_price
@@ -214,23 +217,25 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
-            <div className="flex items-center space-x-2">
-              {project.isDemo ? (
-                <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  FREE
-                </span>
-              ) : (
-                <>
-                  <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">₹{project.pricing?.sale_price || 0}</span>
-                  {discount && project.pricing?.original_price && (
-                    <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-through">₹{project.pricing.original_price}</span>
-                  )}
-                </>
-              )}
+          {!flags.REFERRAL_ONLY_MODE && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
+              <div className="flex items-center space-x-2">
+                {project.isDemo ? (
+                  <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    FREE
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">₹{project.pricing?.sale_price || 0}</span>
+                    {discount && project.pricing?.original_price && (
+                      <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-through">₹{project.pricing.original_price}</span>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{project.purchase_count} sales</div>
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{project.purchase_count} sales</div>
-          </div>
+          )}
           <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
             {project.description.length > 100 ? `${project.description.substring(0, 100)}...` : project.description}
           </p>

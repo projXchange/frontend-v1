@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 import { getApiUrl } from '../config/api';
 import { apiClient } from '../utils/apiClient';
+import { creditService } from '../services/creditService';
 
 interface WishlistContextType {
   wishlist: WishlistItem[];
@@ -100,6 +101,15 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const newItem: WishlistItem = { ...wishlistItem, id: data.id };
         setWishlist(prev => [...prev, newItem]);
         toast.success('Added to wishlist!');
+        
+        // Silently trigger referral confirmation via wishlist
+        // This happens in the background without notifying the user
+        try {
+          await creditService.confirmReferralViaWishlist(project.id);
+        } catch (error) {
+          // Silent failure - log but don't show error to user
+          console.error('Failed to confirm referral via wishlist:', error);
+        }
       } else {
         // If backend fails, save to localStorage
         const newItem: WishlistItem = { ...wishlistItem, id: Date.now().toString() };

@@ -29,6 +29,7 @@ import {
   Wallet,
   Settings,
   AlertCircle,
+  Coins,
 } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 import { apiClient } from "../utils/apiClient"
@@ -43,6 +44,12 @@ import LoadingNumber from "../components/LoadingNumber"
 import ProjectDetailsModalNew from "../components/ProjectDetailsModalNew"
 import ReferralDashboard from "../components/ReferralDashboard"
 import ReferralHistory from "../components/ReferralHistory"
+import ReferralStatusList from "../components/ReferralStatusList"
+import CreditDashboard from "../components/CreditDashboard"
+import HowToEarnCredits from "../components/HowToEarnCredits"
+import { LaunchPeriodBanner } from "../components/LaunchPeriodBanner"
+import { useFeatureFlags } from "../contexts/FeatureFlagContext"
+import WelcomeModal, { useShouldShowWelcomeModal } from "../components/WelcomeModal"
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview")
@@ -50,6 +57,9 @@ const StudentDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const { user } = useAuth()
+  const { flags } = useFeatureFlags()
+  const shouldShowWelcome = useShouldShowWelcomeModal()
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false) // reviews loading
@@ -419,6 +429,13 @@ const StudentDashboard = () => {
     return matchesSearch && matchesFilter
   })
 
+  // Show welcome modal for new users in referral-only mode
+  useEffect(() => {
+    if (shouldShowWelcome) {
+      setIsWelcomeModalOpen(true)
+    }
+  }, [shouldShowWelcome])
+
   useEffect(() => {
     // Fetch dashboard stats on mount to get profile data
     if (!dashboardStats && !statsLoading) {
@@ -444,6 +461,12 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors">
+      {/* Welcome Modal for new users */}
+      <WelcomeModal 
+        isOpen={isWelcomeModalOpen} 
+        onClose={() => setIsWelcomeModalOpen(false)} 
+      />
+      
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-8 sm:py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
@@ -497,6 +520,9 @@ const StudentDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Launch Period Banner */}
+        {flags.REFERRAL_ONLY_MODE && <LaunchPeriodBanner />}
+        
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:-mt-16 relative z-10">
           <StatCard
@@ -571,6 +597,15 @@ const StudentDashboard = () => {
                 transition={{ duration: 0.5 }}
               >
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">Dashboard Overview</h2>
+
+                {/* Credit Dashboard Section */}
+                <div className="mb-8">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                    Credit System
+                  </h3>
+                  <CreditDashboard />
+                </div>
 
                 <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
                   {/* Left section (main overview cards) */}
@@ -1006,6 +1041,16 @@ const StudentDashboard = () => {
                       Dashboard
                     </button>
                     <button
+                      onClick={() => setReferralSubTab("status")}
+                      className={`px-4 py-2 font-semibold text-sm transition-all duration-200 border-b-2 ${
+                        referralSubTab === "status"
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      }`}
+                    >
+                      Status
+                    </button>
+                    <button
                       onClick={() => setReferralSubTab("history")}
                       className={`px-4 py-2 font-semibold text-sm transition-all duration-200 border-b-2 ${
                         referralSubTab === "history"
@@ -1020,6 +1065,12 @@ const StudentDashboard = () => {
 
                 {/* Render sub-tab content */}
                 {referralSubTab === "dashboard" && <ReferralDashboard />}
+                {referralSubTab === "status" && (
+                  <div className="space-y-6">
+                    <ReferralStatusList />
+                    <HowToEarnCredits />
+                  </div>
+                )}
                 {referralSubTab === "history" && <ReferralHistory />}
               </div>
             )}
