@@ -73,6 +73,23 @@ const ProjectDetail = () => {
   const { showPaymentUI, showCreditUI } = useFeatureFlags();
   const { availableCredits, loading: creditsLoading } = useCredits();
   
+  // Debug: Log the values to understand what's happening
+  useEffect(() => {
+    console.log('🔍 Button Logic Debug:', {
+      isAuthenticated,
+      isDemo: project?.isDemo,
+      availableCredits,
+      creditsLoading,
+      showPaymentUI,
+      showCreditUI,
+      isPurchased: Boolean(
+        project?.isPurchased ||
+        userStatus?.has_purchased ||
+        (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false),
+      )
+    });
+  }, [isAuthenticated, project, availableCredits, creditsLoading, showPaymentUI, showCreditUI, userStatus, user]);
+  
   // Track project view time for referral confirmation
   useProjectViewTracking(id || '');
 
@@ -1623,19 +1640,14 @@ const ProjectDetail = () => {
               {/* Buy / Wishlist / Cart Buttons */}
               {!isPurchased ? (
                 <div className="flex flex-col space-y-2 sm:space-y-3 mb-4 sm:mb-8">
-                  {/* Credit-based download for referral-only mode */}
-                  {showCreditUI && isAuthenticated && !project.isDemo ? (
-                    <>
-                      {availableCredits > 0 ? (
-                        <CreditDownloadButton projectId={project.id} />
-                      ) : (
-                        <ReferralCTA />
-                      )}
-                    </>
-                  ) : null}
-
-                  {/* Payment UI - only show when showPaymentUI is true */}
-                  {showPaymentUI && (
+                  {/* Priority 1: Credit download if user has credits */}
+                  {isAuthenticated && !project.isDemo && availableCredits > 0 ? (
+                    <CreditDownloadButton projectId={project.id} />
+                  ) : isAuthenticated && !project.isDemo && availableCredits === 0 && showCreditUI ? (
+                    /* Priority 2: Referral CTA if no credits in credit mode */
+                    <ReferralCTA />
+                  ) : showPaymentUI ? (
+                    /* Priority 3: Payment UI only if no credits available */
                     <>
                       {/* Buy Now / Checkout Button */}
                       <button
@@ -1712,7 +1724,7 @@ const ProjectDetail = () => {
                         <span className="line-clamp-1">{cartStatus ? "Remove from Cart" : "Add to Cart"}</span>
                       </button>
                     </>
-                  )}
+                  ) : null}
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">

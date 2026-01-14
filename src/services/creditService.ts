@@ -2,7 +2,7 @@
 
 import { apiClient } from '../utils/apiClient';
 import { getApiUrl } from '../config/api';
-import { CreditBalance, CreditDownloadResponse } from '../types/Credit';
+import { CreditBalance, CreditBalanceResponse, CreditDownloadResponse } from '../types/Credit';
 import { ReferralWithStatus } from '../types/Referral';
 import { parseCreditError } from '../utils/creditErrors';
 
@@ -24,7 +24,8 @@ class CreditService {
 
   /**
    * Fetch the user's current credit balance
-   * @returns Promise resolving to CreditBalance object
+   * Calls GET /credits/balance endpoint and normalizes the response
+   * @returns Promise resolving to CreditBalance object with normalized data
    * @throws Error if the request fails or user is not authenticated
    */
   async getCreditBalance(): Promise<CreditBalance> {
@@ -41,12 +42,43 @@ class CreditService {
         throw new Error(errorMessage);
       }
 
-      return await response.json();
+      const responseData: CreditBalanceResponse = await response.json();
+      
+      // Normalize the response to internal CreditBalance format
+      return this.normalizeCreditBalance(responseData.data);
     } catch (error) {
       // Parse and re-throw with user-friendly message
       const creditError = parseCreditError(error);
       throw new Error(creditError.userMessage);
     }
+  }
+
+  /**
+   * Normalize API response to internal CreditBalance format
+   * Adds computed values and aliases for backward compatibility
+   * @param data - Raw data from API response
+   * @returns Normalized CreditBalance object
+   */
+  private normalizeCreditBalance(data: CreditBalanceResponse['data']): CreditBalance {
+    const totalUsed = data.lifetime_monthly_credits + data.lifetime_referral_credits;
+    const signupBonusUsed = data.download_credits > 0 ? 1 : 0;
+    
+    return {
+      user_id: data.user_id,
+      download_credits: data.download_credits,
+      lifetime_monthly_credits: data.lifetime_monthly_credits,
+      lifetime_referral_credits: data.lifetime_referral_credits,
+      total_available_credits: data.total_available_credits,
+      // Computed values for UI
+      available_credits: data.total_available_credits,
+      credits_used: totalUsed + signupBonusUsed,
+      signup_bonus_received: signupBonusUsed > 0,
+      monthly_credits_received: data.lifetime_monthly_credits,
+      referral_credits_earned: data.lifetime_referral_credits,
+      max_monthly_credits: 3,
+      max_referral_credits: 6,
+      max_total_credits: 10,
+    };
   }
 
   /**
@@ -92,10 +124,32 @@ class CreditService {
 
   /**
    * Get the status of all user referrals
-   * @returns Promise resolving to array of ReferralWithStatus objects
+   * NOTE: This endpoint returns aggregate statistics, not individual referral details
+   * For individual referral history, use referralService.getReferralHistory() instead
+   * @returns Promise resolving to referral status summary
    * @throws Error if the request fails
    */
-  async getReferralStatus(): Promise<{ referrals: ReferralWithStatus[] }> {
+  async getReferralStatus(): Promise<{
+    can_create_referral: boolean;
+    monthly_referrals: {
+      created: number;
+      max: number;
+      remaining: number;
+    };
+    lifetime_referral_credits: {
+      earned: number;
+      max: number;
+      remaining: number;
+      can_earn_more: boolean;
+    };
+    total_referrals: {
+      all: number;
+      qualified: number;
+      pending: number;
+    };
+    has_active_referral_code: boolean;
+    latest_referral_code: string;
+  }> {
     try {
       const response = await apiClient(getApiUrl('/referrals/status'), {
         method: 'GET',

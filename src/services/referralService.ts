@@ -157,7 +157,7 @@ export async function getReferralHistory(): Promise<{
 // ============================================================================
 
 /**
- * Get user's current download credits
+ * Get user's current download credits (simplified endpoint)
  * @returns Credit balance and download eligibility
  */
 export async function getUserCredits(): Promise<{
@@ -167,6 +167,42 @@ export async function getUserCredits(): Promise<{
   try {
     const response = await apiClient(
       getApiUrl(API_CONFIG.ENDPOINTS.DOWNLOADS_CREDITS),
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      }
+    );
+
+    return handleResponse(response);
+  } catch (error) {
+    if (error instanceof Error && (error as any).code) {
+      throw error;
+    }
+    const mappedError = mapReferralError(error);
+    const newError = new Error(mappedError.userMessage);
+    (newError as any).code = mappedError.code;
+    (newError as any).retryable = mappedError.retryable;
+    throw newError;
+  }
+}
+
+/**
+ * Get comprehensive credit balance with all credit types
+ * @returns Detailed credit balance including monthly, referral, and download credits
+ */
+export async function getDetailedCreditBalance(): Promise<{
+  success: boolean;
+  data: {
+    user_id: string;
+    download_credits: number;
+    lifetime_monthly_credits: number;
+    lifetime_referral_credits: number;
+    total_available_credits: number;
+  };
+}> {
+  try {
+    const response = await apiClient(
+      getApiUrl(API_CONFIG.ENDPOINTS.CREDITS_BALANCE),
       {
         method: 'GET',
         headers: getAuthHeaders(),

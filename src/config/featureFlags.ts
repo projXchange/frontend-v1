@@ -15,8 +15,10 @@ export const FEATURE_FLAGS: FeatureFlags = {
 };
 
 // Computed flags for UI rendering
-export const SHOW_PAYMENT_UI = !FEATURE_FLAGS.REFERRAL_ONLY_MODE && FEATURE_FLAGS.ENABLE_PAYMENTS;
-export const SHOW_CREDIT_UI = FEATURE_FLAGS.REFERRAL_ONLY_MODE;
+// IMPORTANT: Both payment and credit systems can coexist!
+// Users should be able to use credits if they have them, OR pay if they don't
+export const SHOW_PAYMENT_UI = FEATURE_FLAGS.ENABLE_PAYMENTS;
+export const SHOW_CREDIT_UI = true; // Always show credit UI - let the component decide based on credits available
 
 // Debug logging for feature flag state
 console.log('[Feature Flags]', {

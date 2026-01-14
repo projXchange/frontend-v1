@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Users, Gift, TrendingUp, Calendar, Share2, Loader } from "lucide-react";
 import { useReferrals } from "../hooks/useReferrals";
 import { SharingModal } from "./SharingModal";
+import LifetimeLimitsCard from "./LifetimeLimitsCard";
+import LimitReachedBanners from "./LimitReachedBanners";
 
 const ReferralDashboard = () => {
   const { dashboardData, loading, error, generateReferral } = useReferrals();
@@ -71,6 +73,9 @@ const ReferralDashboard = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Limit Reached Banners */}
+      {credits && <LimitReachedBanners credits={credits} />}
+
       {/* Credit Summary Card */}
       <div className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-2xl p-4 sm:p-6 shadow-xl border border-blue-100 dark:border-slate-700">
         <h3 className="text-base sm:text-lg font-bold mb-4 flex items-center gap-2 sm:gap-3 text-gray-900 dark:text-white">
@@ -101,6 +106,9 @@ const ReferralDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Lifetime Limits Card */}
+      {credits && <LifetimeLimitsCard credits={credits} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Referral Stats Card */}

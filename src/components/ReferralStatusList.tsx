@@ -1,7 +1,6 @@
 import React from 'react';
-import { Users, Calendar, Loader, AlertCircle } from 'lucide-react';
+import { Users, Calendar, Loader, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useReferralStatus } from '../hooks/useReferralStatus';
-import ReferralStatusBadge from './ReferralStatusBadge';
 
 const ReferralStatusList: React.FC = () => {
   const { referrals, loading, error, refresh } = useReferralStatus();
@@ -130,9 +129,21 @@ const ReferralStatusList: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1 sm:mb-2">
                     <h4 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">
-                      {referral.referred_user?.name || 'Unknown User'}
+                      {referral.referred_user?.name || 'Pending User'}
                     </h4>
-                    <ReferralStatusBadge status={referral.status} />
+                    {/* Status Badge */}
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+                      referral.status === 'qualified' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                        : referral.status === 'pending'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                        : 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {referral.status === 'qualified' && <CheckCircle className="w-3 h-3" />}
+                      {referral.status === 'pending' && <Clock className="w-3 h-3" />}
+                      {referral.status === 'unused' && <XCircle className="w-3 h-3" />}
+                      {referral.status.charAt(0).toUpperCase() + referral.status.slice(1)}
+                    </span>
                   </div>
                   
                   {referral.referred_user?.email && (
@@ -141,36 +152,26 @@ const ReferralStatusList: React.FC = () => {
                     </p>
                   )}
 
-                  {/* Action Needed for PENDING status */}
-                  {referral.status === 'PENDING' && referral.action_needed && (
+                  {/* Status Messages */}
+                  {referral.status === 'pending' && (
                     <div className="mt-2 sm:mt-3 p-2.5 sm:p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                       <p className="text-xs sm:text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
-                        Action Needed:
+                        Pending Qualification
                       </p>
                       <p className="text-xs sm:text-sm text-yellow-700 dark:text-yellow-300">
-                        {referral.action_needed}
+                        This user has signed up but hasn't completed the required actions yet.
                       </p>
-                      {referral.confirmation_progress && (
-                        <div className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-                          <p className="font-medium">Progress:</p>
-                          <ul className="list-disc list-inside mt-1 space-y-0.5">
-                            <li>Downloads: {referral.confirmation_progress.downloads_completed}/1</li>
-                            <li>Wishlist adds: {referral.confirmation_progress.wishlist_adds_completed}/1</li>
-                            <li>Qualified views: {referral.confirmation_progress.qualified_views_completed}/2</li>
-                          </ul>
-                        </div>
-                      )}
                     </div>
                   )}
 
-                  {/* Confirmation Date for CONFIRMED status */}
-                  {referral.status === 'CONFIRMED' && referral.confirmed_at && (
+                  {/* Qualification Date for qualified status */}
+                  {referral.status === 'qualified' && referral.qualified_at && (
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600 dark:text-green-400 mt-2">
                       <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" aria-hidden="true" />
                       <span className="break-words">
-                        Confirmed on{' '}
-                        <time dateTime={referral.confirmed_at}>
-                          {new Date(referral.confirmed_at).toLocaleDateString('en-US', {
+                        Qualified on{' '}
+                        <time dateTime={referral.qualified_at}>
+                          {new Date(referral.qualified_at).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -180,20 +181,11 @@ const ReferralStatusList: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Review Status Message */}
-                  {referral.status === 'REVIEW' && (
-                    <div className="mt-2 sm:mt-3 p-2.5 sm:p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-                      <p className="text-xs sm:text-sm text-orange-800 dark:text-orange-200">
-                        This referral is under review by our team. We'll notify you once the review is complete.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Blocked Status Message */}
-                  {referral.status === 'BLOCKED' && (
-                    <div className="mt-2 sm:mt-3 p-2.5 sm:p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                      <p className="text-xs sm:text-sm text-red-800 dark:text-red-200">
-                        This referral has been blocked and will not earn credits.
+                  {/* Unused Status Message */}
+                  {referral.status === 'unused' && (
+                    <div className="mt-2 sm:mt-3 p-2.5 sm:p-3 bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg">
+                      <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200">
+                        This referral code hasn't been used yet. Share it to earn credits!
                       </p>
                     </div>
                   )}
@@ -205,6 +197,9 @@ const ReferralStatusList: React.FC = () => {
                       <span className="font-mono font-semibold text-gray-700 dark:text-gray-300">
                         {referral.referral_code}
                       </span>
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      Created on {new Date(referral.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight, Shield, Info } from 'lucide-react';
+import { ShoppingCart, Trash2, Eye, Star, Tag, CreditCard, ArrowRight, Shield, Info, Download } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useRazorpayCheckout } from '../hooks/useRazorpayCheckout';
 import { useFeatureFlags } from '../contexts/FeatureFlagContext';
+import { useCreditContext } from '../contexts/CreditContext';
 
 const CartPage = () => {
   const { cart, removeFromCart, getCartTotal, getCartCount, clearCart, loading } = useCart();
   const { isAuthenticated } = useAuth();
   const { initiateCheckout, isProcessing } = useRazorpayCheckout();
-  const { flags } = useFeatureFlags();
+  const { flags, showCreditUI } = useFeatureFlags();
+  const { creditBalance, downloadWithCredit, loading: creditLoading } = useCreditContext();
 
   const handleRemoveFromCart = async (projectId: string) => {
     await removeFromCart(projectId);
@@ -24,6 +26,50 @@ const CartPage = () => {
 
     await initiateCheckout();
   };
+
+  const handleCreditCheckout = async () => {
+    if (!isAuthenticated || cart.length === 0) {
+      toast.error('Please login and add items to cart.');
+      return;
+    }
+
+    const availableCredits = creditBalance?.total_available_credits || 0;
+    const requiredCredits = cart.length;
+
+    if (availableCredits < requiredCredits) {
+      toast.error(`Insufficient credits. You need ${requiredCredits} credits but have ${availableCredits}.`);
+      return;
+    }
+
+    try {
+      // Download each project with credits
+      for (const item of cart) {
+        const downloadUrl = await downloadWithCredit(item.project.id);
+        // Trigger download
+        window.open(downloadUrl, '_blank');
+      }
+      
+      toast.success(`Successfully downloaded ${cart.length} project(s) with credits!`);
+      clearCart();
+    } catch (error) {
+      console.error('Credit checkout failed:', error);
+      // Error already handled by downloadWithCredit
+    }
+  };
+
+  // Check if user has enough credits for all cart items
+  const availableCredits = creditBalance?.total_available_credits || 0;
+  const requiredCredits = cart.length;
+  const hasEnoughCredits = availableCredits >= requiredCredits;
+  const showCreditUIForCart = showCreditUI && isAuthenticated;
+
+  console.log('Cart Credit Check:', {
+    availableCredits,
+    requiredCredits,
+    hasEnoughCredits,
+    showCreditUIForCart,
+    cartLength: cart.length
+  });
 
   if (loading) {
     return (
@@ -171,8 +217,44 @@ const CartPage = () => {
                 </div>
 
                 <div className="space-y-2 sm:space-y-3">
-                  {!flags.REFERRAL_ONLY_MODE ? (
+                  {/* Show credit download option if user has enough credits */}
+                  {showCreditUIForCart && hasEnoughCredits ? (
                     <>
+                      <button
+                        onClick={handleCreditCheckout}
+                        disabled={creditLoading || loading}
+                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="truncate">
+                          {creditLoading ? 'Processing...' : `Download with ${requiredCredits} Credit${requiredCredits > 1 ? 's' : ''}`}
+                        </span>
+                      </button>
+
+                      <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/30">
+                        <p className="text-xs text-green-800 dark:text-green-300 text-center">
+                          You have {availableCredits} credit{availableCredits !== 1 ? 's' : ''} available
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={clearCart}
+                        className="w-full border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-105 transition-all duration-200"
+                      >
+                        Clear Cart
+                      </button>
+                    </>
+                  ) : !flags.REFERRAL_ONLY_MODE ? (
+                    <>
+                      {/* Show insufficient credits warning if credit UI is enabled but not enough credits */}
+                      {showCreditUIForCart && !hasEnoughCredits && (
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800/30 mb-2">
+                          <p className="text-xs text-yellow-800 dark:text-yellow-300 text-center">
+                            Need {requiredCredits} credits. You have {availableCredits}. Use payment below.
+                          </p>
+                        </div>
+                      )}
+
                       <button
                         onClick={handleCheckout}
                         disabled={isProcessing || loading}
@@ -205,6 +287,14 @@ const CartPage = () => {
                           </div>
                         </div>
                       </div>
+
+                      {showCreditUIForCart && !hasEnoughCredits && (
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800/30">
+                          <p className="text-xs text-yellow-800 dark:text-yellow-300 text-center">
+                            Need {requiredCredits} credits. You have {availableCredits}. Earn more through referrals!
+                          </p>
+                        </div>
+                      )}
 
                       <button
                         onClick={clearCart}

@@ -35,6 +35,7 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   /**
    * Load credit balance from API
    * Sets loading state and handles errors with toast notifications
+   * Uses the new /credits/balance endpoint for comprehensive credit data
    */
   const loadCreditBalance = useCallback(async () => {
     if (!user) {
@@ -47,6 +48,7 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     try {
       const balance = await creditService.getCreditBalance();
       setCreditBalance(balance);
+      setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load credit balance';
       setError(errorMessage);
@@ -86,13 +88,15 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         prev
           ? {
               ...prev,
+              total_available_credits: response.remaining_credits,
+              download_credits: Math.max(0, prev.download_credits - 1),
               available_credits: response.remaining_credits,
               credits_used: prev.credits_used + 1,
             }
           : null
       );
 
-      toast.success('Download started! Credit used.');
+      toast.success(`Download started! ${response.remaining_credits} credit(s) remaining.`);
       return response.download_url;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to download with credit';
