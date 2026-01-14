@@ -83,18 +83,9 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     try {
       const response = await creditService.downloadWithCredit(projectId);
 
-      // Update credit balance optimistically
-      setCreditBalance((prev) =>
-        prev
-          ? {
-              ...prev,
-              total_available_credits: response.remaining_credits,
-              download_credits: Math.max(0, prev.download_credits - 1),
-              available_credits: response.remaining_credits,
-              credits_used: prev.credits_used + 1,
-            }
-          : null
-      );
+      // Refresh credit balance from backend to get accurate updated values
+      // This ensures we have the correct breakdown of which credits were used
+      await loadCreditBalance();
 
       toast.success(`Download started! ${response.remaining_credits} credit(s) remaining.`);
       return response.download_url;
@@ -119,7 +110,7 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadCreditBalance]);
 
   /**
    * Refresh credit balance from API

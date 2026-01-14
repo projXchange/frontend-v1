@@ -43,7 +43,7 @@ class CreditService {
       }
 
       const responseData: CreditBalanceResponse = await response.json();
-      
+
       // Normalize the response to internal CreditBalance format
       return this.normalizeCreditBalance(responseData.data);
     } catch (error) {
@@ -62,7 +62,7 @@ class CreditService {
   private normalizeCreditBalance(data: CreditBalanceResponse['data']): CreditBalance {
     const totalUsed = data.lifetime_monthly_credits + data.lifetime_referral_credits;
     const signupBonusUsed = data.download_credits > 0 ? 1 : 0;
-    
+
     return {
       user_id: data.user_id,
       download_credits: data.download_credits,
@@ -83,23 +83,28 @@ class CreditService {
 
   /**
    * Download a project using a credit
+   * Uses the dedicated credit download endpoint for direct downloads
    * @param projectId - The ID of the project to download
    * @returns Promise resolving to CreditDownloadResponse with download URL
    * @throws Error if download fails, insufficient credits, or network error
    */
   async downloadWithCredit(projectId: string): Promise<CreditDownloadResponse> {
     try {
-      const response = await apiClient(getApiUrl('/downloads/consume-credit'), {
+      // Use the dedicated credit download endpoint for direct downloads
+      // This bypasses the cart system and creates a zero-amount transaction
+      const response = await apiClient(getApiUrl('/downloads/credits'), {
         method: 'POST',
         headers: this.getAuthHeaders(),
-        body: JSON.stringify({ project_id: projectId }),
+        body: JSON.stringify({
+          project_id: projectId
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage =
           errorData.message || errorData.error || 'Failed to download with credit';
-        
+
         // Provide specific error messages for common scenarios
         if (response.status === 400 && errorMessage.toLowerCase().includes('insufficient')) {
           throw new Error('You do not have enough credits to download this project');
@@ -110,11 +115,19 @@ class CreditService {
         if (response.status === 401) {
           throw new Error('Please log in to download projects');
         }
-        
+
         throw new Error(errorMessage);
       }
 
-      return await response.json();
+      const data = await response.json();
+
+      // The response should match CreditDownloadResponse format
+      return {
+        success: data.success ?? true,
+        download_url: data.download_url || '',
+        remaining_credits: data.remaining_credits ?? 0,
+        message: data.message || 'Download successful'
+      };
     } catch (error) {
       // Parse and re-throw with user-friendly message
       const creditError = parseCreditError(error);
