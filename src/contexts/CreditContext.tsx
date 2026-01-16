@@ -87,7 +87,8 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       // This ensures we have the correct breakdown of which credits were used
       await loadCreditBalance();
 
-      toast.success(`Download started! ${response.remaining_credits} credit(s) remaining.`);
+      // Don't show success toast here - let the download button handle it after file is fetched
+      // toast.success(`Download started! ${response.remaining_credits} credit(s) remaining.`);
       return response.download_url;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to download with credit';

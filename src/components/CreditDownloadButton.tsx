@@ -59,23 +59,47 @@ const CreditDownloadButton: React.FC<CreditDownloadButtonProps> = ({
     
     try {
       // Call downloadWithCredit which returns the download URL (Requirements: 6.4)
-      // Note: downloadWithCredit already shows success toast
       const downloadUrl = await downloadWithCredit(projectId);
       
       // Initiate file download (Requirements: 6.5)
       if (downloadUrl) {
+        // Fetch the file as a blob to avoid 401 errors from direct navigation
+        toast.loading('Preparing your download...', { id: 'download-prep' });
+        
+        const response = await fetch(downloadUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Download failed with status: ${response.status}`);
+        }
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        // Extract filename from URL or use default
+        const urlParts = downloadUrl.split('/');
+        const filename = urlParts[urlParts.length - 1].split('?')[0] || 'project-download.zip';
+        
         // Create a temporary anchor element to trigger download
         const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = ''; // Let the server specify the filename
+        link.href = url;
+        link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Clean up the blob URL
+        window.URL.revokeObjectURL(url);
+        
+        toast.success(`Download complete! ${availableCredits - 1} credit(s) remaining.`, { id: 'download-prep' });
       }
     } catch (error) {
       // Error handling (Requirements: 20.1)
-      // Note: downloadWithCredit already shows error toast, but we log for debugging
       console.error('Credit download error:', error);
+      toast.dismiss('download-prep');
+      // Only show error if downloadWithCredit didn't already show one
+      if (error instanceof Error && !error.message.includes('credit')) {
+        toast.error('Failed to download file. Please try again.');
+      }
     } finally {
       setIsDownloading(false);
     }
