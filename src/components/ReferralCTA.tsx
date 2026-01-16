@@ -17,7 +17,7 @@ const ReferralCTA: React.FC = () => {
   const { balance } = useCredits();
 
   // Check if user has reached the referral credit cap (Requirements: 7.5)
-  const hasReachedReferralCap = 
+  const hasReachedReferralCap =
     (balance?.referral_credits_earned ?? 0) >= (balance?.max_referral_credits ?? 6);
 
   /**
@@ -33,7 +33,7 @@ const ReferralCTA: React.FC = () => {
   };
 
   return (
-    <div 
+    <div
       className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg"
       data-testid="referral-cta"
     >
@@ -54,7 +54,7 @@ const ReferralCTA: React.FC = () => {
               Maximum referral credits earned
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-md px-2">
-              You've earned the maximum {balance?.max_referral_credits} referral credits! 
+              You've earned the maximum {balance?.max_referral_credits} referral credits!
               Wait for your monthly credit or check back later for more ways to earn.
             </p>
           </>
@@ -64,8 +64,7 @@ const ReferralCTA: React.FC = () => {
               Invite a friend to unlock more projects
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-md px-2">
-              You're out of credits! Share your referral link with friends. 
-              When they engage with the platform, you'll earn credits to download more projects.
+              You're out of credits! Share your referral link with friends.
             </p>
           </>
         )}

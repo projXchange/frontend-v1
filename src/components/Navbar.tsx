@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
+import { useWishlist } from "../contexts/WishlistContext";
 import AuthModal from "./AuthModal";
 import ThemeToggle from "./ThemeToggle";
 import CreditBalance from "./CreditBalance";
@@ -43,6 +44,12 @@ const Navbar = () => {
   try {
     const cart = useCart();
     getCartCount = cart.getCartCount;
+  } catch { }
+
+  let getWishlistCount = () => 0;
+  try {
+    const wishlistContext = useWishlist();
+    getWishlistCount = () => wishlistContext.wishlist.length;
   } catch { }
 
   const isActive = (path: string) => location.pathname === path;
@@ -161,6 +168,11 @@ const Navbar = () => {
                       className={`w-5 h-5 transition ${isActive("/wishlist") ? "text-blue-600 dark:text-blue-400" : "group-hover:text-blue-600 dark:group-hover:text-blue-400"
                         }`}
                     />
+                    {getWishlistCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 dark:bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                        {getWishlistCount()}
+                      </span>
+                    )}
                     <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs bg-gray-800 dark:bg-slate-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
                       Wishlist
                     </span>
@@ -346,6 +358,11 @@ const Navbar = () => {
                   >
                     <Heart className={`w-5 h-5 mr-2 ${isActive("/wishlist") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
                     Wishlist
+                    {getWishlistCount() > 0 && (
+                      <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold bg-red-500 dark:bg-red-600 text-white rounded-full">
+                        {getWishlistCount()}
+                      </span>
+                    )}
                   </Link>
 
                   {/* ✅ Cart */}

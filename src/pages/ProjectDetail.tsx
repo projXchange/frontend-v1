@@ -68,11 +68,11 @@ const ProjectDetail = () => {
 
   const navigate = useNavigate();
   const { refreshCredits } = useReferralContext();
-  
+
   // Feature flags and credit system
   const { showPaymentUI, showCreditUI } = useFeatureFlags();
   const { availableCredits, loading: creditsLoading } = useCredits();
-  
+
   // Debug: Log the values to understand what's happening
   useEffect(() => {
     console.log('🔍 Button Logic Debug:', {
@@ -89,7 +89,7 @@ const ProjectDetail = () => {
       )
     });
   }, [isAuthenticated, project, availableCredits, creditsLoading, showPaymentUI, showCreditUI, userStatus, user]);
-  
+
   // Track project view time for referral confirmation
   useProjectViewTracking(id || '');
 
@@ -422,7 +422,7 @@ const ProjectDetail = () => {
     try {
       // Check user credits before initiating download
       const creditData = await getUserCredits();
-      
+
       if (creditData.download_credits <= 0 && !isPurchased) {
         // Show unlock options modal if insufficient credits
         setIsUnlockModalOpen(true);
@@ -448,7 +448,7 @@ const ProjectDetail = () => {
           setIsUnlockModalOpen(true);
           return;
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Download failed: ${response.status}`);
       }
@@ -464,7 +464,7 @@ const ProjectDetail = () => {
       window.URL.revokeObjectURL(url);
 
       toast.success("File downloaded successfully!", { id: "download" });
-      
+
       // Refresh credit balance after successful download
       await refreshCredits();
     } catch (error: any) {
@@ -1640,14 +1640,104 @@ const ProjectDetail = () => {
               {/* Buy / Wishlist / Cart Buttons */}
               {!isPurchased ? (
                 <div className="flex flex-col space-y-2 sm:space-y-3 mb-4 sm:mb-8">
-                  {/* Priority 1: Credit download if user has credits */}
+                  {/* Priority 1: Credit download if authenticated user has credits */}
                   {isAuthenticated && !project.isDemo && availableCredits > 0 ? (
                     <CreditDownloadButton projectId={project.id} />
                   ) : isAuthenticated && !project.isDemo && availableCredits === 0 && showCreditUI ? (
-                    /* Priority 2: Referral CTA if no credits in credit mode */
-                    <ReferralCTA />
-                  ) : showPaymentUI ? (
-                    /* Priority 3: Payment UI only if no credits available */
+                    /* Priority 2: Show payment options FIRST, then referral CTA when out of credits */
+                    <>
+                      {/* Buy Now / Checkout Button */}
+                      <button
+                        onClick={async () => {
+                          if (!isAuthenticated) {
+                            openAuthModal(true);
+                            return;
+                          }
+
+                          if (cartStatus) {
+                            navigate("/cart")
+                          } else {
+                            // If not in cart, add to cart then open cart
+                            const added = await addToCart(project);
+                            if (added) {
+                              navigate("/cart")
+                            }
+                          }
+                        }}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white py-2 sm:py-3 lg:py-4 rounded-xl font-bold text-xs sm:text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-slideInUp disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ animationDelay: "300ms" }}
+                      >
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" />
+                        <span className="line-clamp-1">
+                          {loading
+                            ? "Processing..."
+                            : cartStatus
+                              ? "Checkout"
+                              : `Buy Now (₹${project.pricing?.sale_price || 0})`}
+                        </span>
+                      </button>
+
+                      {/* Wishlist Button */}
+                      <button
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            openAuthModal(true);
+                            return;
+                          }
+                          handleToggleWishlist();
+                        }}
+                        disabled={project.isDemo}
+                        className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
+                          ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                          : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105"
+                          }`}
+                        style={{ animationDelay: "350ms" }}
+                      >
+                        <Heart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <span className="line-clamp-1">{wishlistStatus ? "Remove from Wishlist" : "Add to Wishlist"}</span>
+                      </button>
+
+                      {/* Add/Remove Cart Button */}
+                      <button
+                        onClick={() => {
+                          if (project.isDemo) {
+                            toast.error("🎁 Demo projects are for preview only. Explore our full catalog to purchase!");
+                            return;
+                          }
+                          if (!isAuthenticated) {
+                            openAuthModal(true);
+                            return;
+                          }
+                          if (cartStatus) removeFromCart(project.id);
+                          else addToCart(project);
+                        }}
+                        disabled={loading}
+                        className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
+                          ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                          : "bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          }`}
+                        style={{ animationDelay: "380ms" }}
+                      >
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <span className="line-clamp-1">{cartStatus ? "Remove from Cart" : "Add to Cart"}</span>
+                      </button>
+
+                      {/* Divider with "OR" text */}
+                      <div className="relative flex items-center justify-center my-2">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300 dark:border-slate-600"></div>
+                        </div>
+                        <div className="relative px-4 bg-white dark:bg-slate-900 text-sm text-gray-500 dark:text-gray-400 font-semibold">
+                          OR
+                        </div>
+                      </div>
+
+                      {/* Referral CTA at the bottom */}
+                      <ReferralCTA />
+                    </>
+                  ) : (
+                    /* Priority 3: Always show payment UI for unauthenticated users or when payment is enabled */
                     <>
                       {/* Buy Now / Checkout Button */}
                       <button
@@ -1687,7 +1777,13 @@ const ProjectDetail = () => {
 
                       {/* Wishlist Button */}
                       <button
-                        onClick={handleToggleWishlist}
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            openAuthModal(true);
+                            return;
+                          }
+                          handleToggleWishlist();
+                        }}
                         disabled={project.isDemo}
                         className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 rounded-xl font-semibold transition-all duration-200 animate-slideInUp text-xs sm:text-base ${project.isDemo
                           ? "bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
@@ -1707,7 +1803,7 @@ const ProjectDetail = () => {
                             return;
                           }
                           if (!isAuthenticated) {
-                            toast.error("Please login to manage your cart");
+                            openAuthModal(true);
                             return;
                           }
                           if (cartStatus) removeFromCart(project.id);
@@ -1724,7 +1820,7 @@ const ProjectDetail = () => {
                         <span className="line-clamp-1">{cartStatus ? "Remove from Cart" : "Add to Cart"}</span>
                       </button>
                     </>
-                  ) : null}
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">
