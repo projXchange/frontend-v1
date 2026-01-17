@@ -70,7 +70,7 @@ const HowToEarnCredits: React.FC = () => {
               Referral Credits
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Earn <span className="font-bold text-purple-600 dark:text-purple-400">1 credit</span> for each friend who signs up using your referral link and gets confirmed.
+              Earn <span className="font-bold text-purple-600 dark:text-purple-400">1 credit</span> for each friend who signs up using your referral link and downloads 1 project.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Maximum: 6 referral credits
@@ -87,22 +87,12 @@ const HowToEarnCredits: React.FC = () => {
             </h4>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-            Your referred friend needs to complete <span className="font-semibold">one</span> of the following actions:
+            Your referred friend needs to complete the following action:
           </p>
-          <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-            <li className="flex items-start">
-              <span className="text-green-600 dark:text-green-400 mr-2">•</span>
-              <span>Download 1 project</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-600 dark:text-green-400 mr-2">•</span>
-              <span>Add 1 project to their wishlist</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-600 dark:text-green-400 mr-2">•</span>
-              <span>View 2 different projects for at least 60 seconds each</span>
-            </li>
-          </ul>
+          <div className="flex items-start text-sm text-gray-600 dark:text-gray-300">
+            <span className="text-green-600 dark:text-green-400 mr-2">•</span>
+            <span>Download 1 project</span>
+          </div>
         </div>
 
         {/* Total Credits Info */}

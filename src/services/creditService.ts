@@ -185,7 +185,9 @@ class CreditService {
   }
 
   /**
-   * Track a project view for referral confirmation purposes
+   * Track a project view for analytics purposes
+   * Note: As of the latest update, only downloads qualify referrals.
+   * This tracking is kept for analytics and potential future use.
    * @param projectId - The ID of the project being viewed
    * @param durationSeconds - How long the user viewed the project (in seconds)
    * @returns Promise that resolves when tracking is complete

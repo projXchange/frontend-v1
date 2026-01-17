@@ -26,9 +26,9 @@ const LimitReachedBanners: React.FC<LimitReachedBannersProps> = ({ credits }) =>
     setDismissedBanners((prev) => new Set(prev).add(bannerId));
   };
 
-  const monthlyLimitReached = credits.lifetimeMonthlyCredits >= 3;
-  const referralLimitReached = credits.lifetimeReferralCredits >= 6;
-  const totalLimitReached = credits.totalFreeDownloadsUsed >= 10;
+  const monthlyLimitReached = (credits.monthly_credits?.used ?? 0) >= (credits.monthly_credits?.max ?? 3);
+  const referralLimitReached = (credits.referral_credits?.used ?? 0) >= (credits.referral_credits?.max ?? 6);
+  const totalLimitReached = (credits.total_free_downloads?.used ?? 0) >= (credits.total_free_downloads?.max ?? 10);
 
   return (
     <div className="space-y-3">

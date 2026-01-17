@@ -8,6 +8,7 @@ interface CreditDownloadButtonProps {
   projectId: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  onSuccess?: () => void | Promise<void>;
 }
 
 /**
@@ -26,7 +27,8 @@ interface CreditDownloadButtonProps {
 const CreditDownloadButton: React.FC<CreditDownloadButtonProps> = ({ 
   projectId, 
   className = '',
-  size = 'md'
+  size = 'md',
+  onSuccess
 }) => {
   const { availableCredits, downloadWithCredit } = useCredits();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -91,6 +93,11 @@ const CreditDownloadButton: React.FC<CreditDownloadButtonProps> = ({
         window.URL.revokeObjectURL(url);
         
         toast.success(`Download complete! ${availableCredits - 1} credit(s) remaining.`, { id: 'download-prep' });
+        
+        // Call onSuccess callback if provided (e.g., to refresh project data)
+        if (onSuccess) {
+          await onSuccess();
+        }
       }
     } catch (error) {
       // Error handling (Requirements: 20.1)

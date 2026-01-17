@@ -229,8 +229,6 @@ describe('Task 22: Core Functionality Verification', () => {
             confirmed_at: '2026-01-05T00:00:00Z',
             confirmation_progress: {
               downloads_completed: 1,
-              wishlist_adds_completed: 0,
-              qualified_views_completed: 0,
               is_confirmed: true,
               confirmation_method: 'download' as const,
             },
@@ -249,12 +247,10 @@ describe('Task 22: Core Functionality Verification', () => {
             confirmed_at: null,
             confirmation_progress: {
               downloads_completed: 0,
-              wishlist_adds_completed: 0,
-              qualified_views_completed: 1,
               is_confirmed: false,
               confirmation_method: null,
             },
-            action_needed: 'Needs to download a project or add to wishlist',
+            action_needed: 'Needs to download a project',
           },
         ],
       };

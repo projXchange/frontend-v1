@@ -15,7 +15,8 @@ export const useReferrals = () => {
     if (!context.dashboardData && !context.loading) {
       context.loadDashboard();
     }
-  }, [context]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [context.dashboardData, context.loading]);
 
   return context;
 };

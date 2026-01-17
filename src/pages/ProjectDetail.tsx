@@ -105,6 +105,28 @@ const ProjectDetail = () => {
     }
   }, [activeTab, id])
 
+  // Calculate isPurchased status
+  const isPurchased = Boolean(
+    project?.isPurchased ||
+    userStatus?.has_purchased ||
+    (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false),
+  )
+
+  // Debug logging for purchase status
+  useEffect(() => {
+    if (project) {
+      console.log('💳 Purchase Status Check:', {
+        projectId: id,
+        isPurchased,
+        'project.isPurchased': project?.isPurchased,
+        'userStatus.has_purchased': userStatus?.has_purchased,
+        'buyers check': Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false,
+        userId: user?.id,
+        availableCredits
+      });
+    }
+  }, [isPurchased, project, userStatus, user, id, availableCredits])
+
   const fetchProjectData = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -142,6 +164,11 @@ const ProjectDetail = () => {
       }
 
       const data = await res.json()
+      console.log('📦 Fetched project data:', { 
+        projectId: id, 
+        isPurchased: data.project?.isPurchased,
+        userStatus: data.user_status 
+      });
       setProject(data.project || null);
       setUserStatus(data.user_status || { has_purchased: false, in_wishlist: false, in_cart: false });
       setAuthorDetails(data.author_details || null);
@@ -506,12 +533,6 @@ const ProjectDetail = () => {
     )
   }
 
-  // Use isPurchased from backend (project.isPurchased) or fallback to userStatus
-  const isPurchased = Boolean(
-    project?.isPurchased ||
-    userStatus?.has_purchased ||
-    (Array.isArray((project as any)?.buyers) && user?.id ? (project as any).buyers.includes(user.id) : false),
-  )
   const wishlistStatus = project ? userStatus?.in_wishlist || isInWishlist(project.id) : false
   const cartStatus = project ? userStatus?.in_cart || isInCart(project.id) : false
 
@@ -1642,7 +1663,15 @@ const ProjectDetail = () => {
                 <div className="flex flex-col space-y-2 sm:space-y-3 mb-4 sm:mb-8">
                   {/* Priority 1: Credit download if authenticated user has credits */}
                   {isAuthenticated && !project.isDemo && availableCredits > 0 ? (
-                    <CreditDownloadButton projectId={project.id} />
+                    <CreditDownloadButton 
+                      projectId={project.id} 
+                      onSuccess={async () => {
+                        // Refresh project data to update purchase status
+                        await fetchProjectData();
+                        // Also refresh credits
+                        await refreshCredits();
+                      }}
+                    />
                   ) : isAuthenticated && !project.isDemo && availableCredits === 0 && showCreditUI ? (
                     /* Priority 2: Show payment options FIRST, then referral CTA when out of credits */
                     <>

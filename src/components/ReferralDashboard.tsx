@@ -71,6 +71,13 @@ const ReferralDashboard = () => {
   const recentReferrals = dashboardData?.recent_qualified_referrals || [];
   const canCreate = dashboardData?.can_create_referral ?? false;
 
+  // Extract values from new credit structure
+  const downloadCredits = credits?.current_credits ?? 0;
+  const monthlyReferrals = credits?.monthly_referrals?.current ?? 0;
+  const remainingReferralSlots = credits?.monthly_referrals?.remaining ?? 0;
+  const lifetimeReferralCredits = credits?.referral_credits?.used ?? 0;
+  const maxLifetimeReferralCredits = credits?.referral_credits?.max ?? 6;
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Limit Reached Banners */}
@@ -86,21 +93,21 @@ const ReferralDashboard = () => {
           <div className="text-center p-3 sm:p-0">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Download Credits</p>
             <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
-              {credits?.downloadCredits ?? 0}
+              {downloadCredits}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Available to use</p>
           </div>
           <div className="text-center p-3 sm:p-0">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Monthly Referrals</p>
             <p className="text-2xl sm:text-3xl font-bold text-teal-600 dark:text-teal-400">
-              {credits?.monthlyReferrals ?? 0}/3
+              {monthlyReferrals}/3
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">This month</p>
           </div>
           <div className="text-center p-3 sm:p-0">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Remaining Slots</p>
             <p className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">
-              {credits?.remainingReferralSlots ?? 0}
+              {remainingReferralSlots}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Available this month</p>
           </div>
@@ -148,10 +155,10 @@ const ReferralDashboard = () => {
           <div className="space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Share your referral code with friends and earn download credits when they sign up and make their first
-              purchase or upload!
+              purchase or download one project!
             </p>
 
-            {!canCreate && credits?.remainingReferralSlots === 0 && (
+            {!canCreate && remainingReferralSlots === 0 && (
               <div 
                 className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3"
                 role="status"
@@ -163,14 +170,14 @@ const ReferralDashboard = () => {
               </div>
             )}
 
-            {!canCreate && credits?.lifetimeReferralCredits !== undefined && credits.lifetimeReferralCredits >= 6 && (
+            {!canCreate && lifetimeReferralCredits >= maxLifetimeReferralCredits && (
               <div 
                 className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3"
                 role="status"
                 aria-live="polite"
               >
                 <p className="text-xs sm:text-sm text-orange-800 dark:text-orange-200">
-                  You've reached the maximum lifetime referral credits (6/6). No more credits can be earned from
+                  You've reached the maximum lifetime referral credits ({lifetimeReferralCredits}/{maxLifetimeReferralCredits}). No more credits can be earned from
                   referrals.
                 </p>
               </div>

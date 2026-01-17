@@ -52,12 +52,12 @@ const LifetimeLimitsCard: React.FC<LifetimeLimitsCardProps> = ({ credits }) => {
     return 'Limit Reached';
   };
 
-  const monthlyUsed = credits.lifetimeMonthlyCredits;
-  const monthlyMax = 3;
-  const referralUsed = credits.lifetimeReferralCredits;
-  const referralMax = 6;
-  const totalUsed = credits.totalFreeDownloadsUsed;
-  const totalMax = 10;
+  const monthlyUsed = credits.monthly_credits?.used ?? 0;
+  const monthlyMax = credits.monthly_credits?.max ?? 3;
+  const referralUsed = credits.referral_credits?.used ?? 0;
+  const referralMax = credits.referral_credits?.max ?? 6;
+  const totalUsed = credits.total_free_downloads?.used ?? 0;
+  const totalMax = credits.total_free_downloads?.max ?? 10;
 
   return (
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-4 sm:p-6 shadow-xl border border-purple-200 dark:border-purple-800">

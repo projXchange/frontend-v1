@@ -21,15 +21,39 @@ export interface ReferralStats {
 }
 
 export interface CreditInfo {
-  downloadCredits: number;
-  monthlyReferrals: number;
-  remainingReferralSlots: number;
-  lastCreditReset: string;
-  lifetimeMonthlyCredits: number;
-  lifetimeReferralCredits: number;
-  canReceiveMonthly: boolean;
-  canReceiveReferral: boolean;
-  totalFreeDownloadsUsed: number;
+  current_credits: number;
+  monthly_credits: {
+    used: number;
+    max: number;
+    remaining: number;
+    display: string;
+    can_receive_more: boolean;
+  };
+  referral_credits: {
+    used: number;
+    max: number;
+    remaining: number;
+    display: string;
+    can_receive_more: boolean;
+  };
+  total_free_downloads: {
+    used: number;
+    max: number;
+    display: string;
+  };
+  monthly_referrals: {
+    current: number;
+    remaining: number;
+  };
+  // Legacy fields for backward compatibility (computed from new structure)
+  downloadCredits?: number;
+  monthlyReferrals?: number;
+  remainingReferralSlots?: number;
+  lifetimeMonthlyCredits?: number;
+  lifetimeReferralCredits?: number;
+  canReceiveMonthly?: boolean;
+  canReceiveReferral?: boolean;
+  totalFreeDownloadsUsed?: number;
 }
 
 export interface ReferralDashboardData {
@@ -147,10 +171,8 @@ export type ReferralStatus = 'PENDING' | 'CONFIRMED' | 'REVIEW' | 'BLOCKED';
 
 export interface ReferralConfirmationProgress {
   downloads_completed: number;
-  wishlist_adds_completed: number;
-  qualified_views_completed: number;
   is_confirmed: boolean;
-  confirmation_method: 'download' | 'wishlist' | 'views' | null;
+  confirmation_method: 'download' | null;
 }
 
 export interface ReferralWithStatus {

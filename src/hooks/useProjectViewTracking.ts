@@ -3,7 +3,8 @@ import { creditService } from '../services/creditService';
 
 /**
  * Custom hook for tracking project view duration
- * Automatically tracks views that exceed 60 seconds for referral confirmation
+ * Tracks views that exceed 60 seconds for analytics purposes.
+ * Note: As of the latest update, only downloads qualify referrals.
  * 
  * Requirements: 13.1, 13.2, 13.3
  * 

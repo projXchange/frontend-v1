@@ -30,7 +30,8 @@ export const ReferralProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       const data = await referralService.getReferralDashboard();
       setDashboardData(data);
-      setCredits(data.credits.downloadCredits);
+      // Extract current_credits from new structure
+      setCredits(data.credits.current_credits || 0);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard';
       setError(errorMessage);
