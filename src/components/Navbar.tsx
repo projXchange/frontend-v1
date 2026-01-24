@@ -323,7 +323,7 @@ const Navbar = () => {
 
               {/* Credit Balance - Only for authenticated users */}
               {isAuthenticated && (
-                <div className="flex items-center justify-center px-4 py-3 border-t border-b border-gray-200 dark:border-slate-700">
+                <div className="flex items-center justify-center px-4 py-3">
                   <CreditBalance showLabel={true} size="md" />
                 </div>
               )}

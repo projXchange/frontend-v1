@@ -1,5 +1,5 @@
-import React from 'react';
-import { Coins } from 'lucide-react';
+import React, { useState } from 'react';
+import { Coins, Info } from 'lucide-react';
 import { useCredits } from '../hooks/useCredits';
 
 interface CreditBalanceProps {
@@ -7,11 +7,12 @@ interface CreditBalanceProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const CreditBalance: React.FC<CreditBalanceProps> = ({ 
-  showLabel = true, 
-  size = 'md' 
+const CreditBalance: React.FC<CreditBalanceProps> = ({
+  showLabel = true,
+  size = 'md'
 }) => {
   const { availableCredits, loading, error } = useCredits();
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Size variants
   const sizeClasses = {
@@ -46,7 +47,7 @@ const CreditBalance: React.FC<CreditBalanceProps> = ({
   // Loading skeleton
   if (loading) {
     return (
-      <div 
+      <div
         className={`flex items-center space-x-2 ${sizeClasses[size].container} rounded-full border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 animate-pulse`}
         data-testid="credit-balance-loading"
       >
@@ -59,7 +60,7 @@ const CreditBalance: React.FC<CreditBalanceProps> = ({
   // Error state
   if (error) {
     return (
-      <div 
+      <div
         className={`flex items-center space-x-2 ${sizeClasses[size].container} rounded-full border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400`}
         data-testid="credit-balance-error"
         title={error}
@@ -71,15 +72,62 @@ const CreditBalance: React.FC<CreditBalanceProps> = ({
   }
 
   return (
-    <div 
-      className={`flex items-center space-x-2 ${sizeClasses[size].container} rounded-full border ${getCreditStateClasses(availableCredits)} font-medium transition-all duration-200`}
-      data-testid="credit-balance"
+    <div
+      className="relative group"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onClick={() => setShowTooltip(!showTooltip)}
     >
-      <Coins className={sizeClasses[size].icon} />
-      <span className={sizeClasses[size].text}>
-        {showLabel && 'Credits: '}
-        {availableCredits}
-      </span>
+      <div
+        className={`flex items-center space-x-2 ${sizeClasses[size].container} rounded-full border ${getCreditStateClasses(availableCredits)} font-medium transition-all duration-200 cursor-help hover:scale-105`}
+        data-testid="credit-balance"
+      >
+        <Coins className={`${sizeClasses[size].icon} animate-pulse`} />
+        <span className={sizeClasses[size].text}>
+          {showLabel && 'Credits: '}
+          {availableCredits}
+        </span>
+        <Info className={`${sizeClasses[size].icon} opacity-60`} />
+      </div>
+
+      {/* Tooltip */}
+      {showTooltip && (
+        <>
+          {/* Backdrop for mobile - close on click */}
+          <div
+            className="fixed inset-0 z-40 lg:hidden"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowTooltip(false);
+            }}
+          />
+
+          <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-200 dark:border-slate-700 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200 top-full lg:top-full">
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <Coins className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-sm text-gray-900 dark:text-gray-100 mb-1">
+                    Download Credits
+                  </h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Use credits to download projects. 1 credit = 1 download.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
+                <p className="text-xs text-blue-800 dark:text-blue-300 text-center font-medium">
+                  Balance: <span className="font-bold">{availableCredits} credit{availableCredits !== 1 ? 's' : ''}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Arrow - hidden on mobile */}
+            <div className="hidden lg:block absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-slate-800 border-l border-t border-gray-200 dark:border-slate-700 rotate-45"></div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
