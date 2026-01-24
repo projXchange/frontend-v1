@@ -205,49 +205,58 @@ const ProfilePage = () => {
             </div>
           )}
 
+          {/* Profile Completion Banner */}
+          {!isLoading && (
+            (() => {
+              const incompleteFields = [];
+              if (!profileForm.bio) incompleteFields.push('Bio');
+              if (!profileForm.location) incompleteFields.push('Location');
+              if (!profileForm.website) incompleteFields.push('Website');
+              if (!profileForm.social_links.linkedin) incompleteFields.push('LinkedIn');
+              if (!profileForm.social_links.github) incompleteFields.push('GitHub');
+              if (!profileForm.social_links.twitter) incompleteFields.push('Twitter/X');
+              if (profileForm.skills.length === 0) incompleteFields.push('Skills');
+
+              const completionPercentage = Math.round(((7 - incompleteFields.length) / 7) * 100);
+
+              // Only show if profile is incomplete
+              if (incompleteFields.length === 0) return null;
+
+              return (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 sm:p-5 shadow-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">
+                      Complete Your Profile
+                    </h3>
+                    <span className="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400">
+                      {completionPercentage}%
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-2.5 mb-3">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 sm:h-2.5 rounded-full transition-all duration-500"
+                      style={{ width: `${completionPercentage}%` }}
+                    ></div>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    A complete profile helps buyers trust your projects and increases your visibility on the platform.
+                    <span className="font-semibold text-blue-600 dark:text-blue-400"> Your social links as a seller are only visible to logged-in users.</span>
+                  </p>
+                </div>
+              );
+            })()
+          )}
+
           {/* Profile Header */}
           <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-8">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">Profile Settings</h2>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400">
-                  Manage your account information and preferences
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                {isEditingProfile ? (
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button
-                      onClick={handleSaveProfile}
-                      disabled={isLoading}
-                      className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
-                    >
-                      {isLoading ? (
-                        <Loader className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                      )}
-                      {isLoading ? "Saving..." : "Save Changes"}
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      disabled={isLoading}
-                      className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all duration-200 text-sm"
-                    >
-                      <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setIsEditingProfile(true)}
-                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
-                  >
-                    <Edit3 className="w-4 h-4 sm:w-5 sm:h-5" />
-                    Edit Profile
-                  </button>
-                )}
-              </div>
+            <div className="mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">Profile Settings</h2>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400">
+                Manage your account information and preferences
+              </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
@@ -339,38 +348,20 @@ const ProfilePage = () => {
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-                        Location
-                      </label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input
-                          type="text"
-                          value={profileForm.location}
-                          onChange={(e) => handleInputChange("location", e.target.value)}
-                          disabled={!isEditingProfile}
-                          placeholder="Your location"
-                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-                        Website
-                      </label>
-                      <div className="relative">
-                        <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input
-                          type="url"
-                          value={profileForm.website}
-                          onChange={(e) => handleInputChange("website", e.target.value)}
-                          disabled={!isEditingProfile}
-                          placeholder="https://yourwebsite.com"
-                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-                        />
-                      </div>
+                  <div>
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                      Location
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <input
+                        type="text"
+                        value={profileForm.location}
+                        onChange={(e) => handleInputChange("location", e.target.value)}
+                        disabled={!isEditingProfile}
+                        placeholder="Your location"
+                        className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
+                      />
                     </div>
                   </div>
                 </div>
@@ -419,58 +410,79 @@ const ProfilePage = () => {
               <div>
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Skills</h3>
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    {profileForm.skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs sm:text-sm font-medium"
-                      >
-                        {skill}
-                        {isEditingProfile && (
-                          <button
-                            onClick={() => handleRemoveSkill(index)}
-                            className="text-blue-500 hover:text-blue-700"
-                            type="button"
-                          >
-                            <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                          </button>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                  {isEditingProfile && (
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <input
-                        type="text"
-                        value={newSkill}
-                        onChange={(e) => setNewSkill(e.target.value)}
-                        placeholder="Add a skill"
-                        className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault()
-                            handleAddSkill()
-                          }
-                        }}
-                      />
+                  {/* Skills Display */}
+                  {profileForm.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {profileForm.skills.map((skill, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs sm:text-sm font-medium"
+                        >
+                          {skill}
+                          {isEditingProfile && (
+                            <button
+                              onClick={() => handleRemoveSkill(index)}
+                              className="text-blue-500 hover:text-blue-700"
+                              type="button"
+                            >
+                              <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                            </button>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Skills Input Field - Always visible like other fields */}
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      disabled={!isEditingProfile}
+                      placeholder="Add skills (e.g., React, Python, UI/UX)"
+                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && isEditingProfile) {
+                          e.preventDefault()
+                          handleAddSkill()
+                        }
+                      }}
+                    />
+                    {isEditingProfile && (
                       <button
                         onClick={handleAddSkill}
-                        className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors text-sm"
+                        disabled={!newSkill.trim()}
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         type="button"
                       >
                         Add
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Social Links */}
               <div>
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Social Links</h3>
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                    <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300 mt-2.5 sm:mt-0 flex-shrink-0" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  {/* Website */}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300 flex-shrink-0" />
+                    <input
+                      type="url"
+                      value={profileForm.website}
+                      onChange={(e) => handleInputChange("website", e.target.value)}
+                      disabled={!isEditingProfile}
+                      placeholder="https://yourwebsite.com"
+                      className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                  {/* GitHub */}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Github className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-300 flex-shrink-0" />
                     <input
                       type="url"
                       value={profileForm.social_links.github}
@@ -480,8 +492,9 @@ const ProfilePage = () => {
                       className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mt-2.5 sm:mt-0 flex-shrink-0" />
+                  {/* LinkedIn */}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
                     <input
                       type="url"
                       value={profileForm.social_links.linkedin}
@@ -491,8 +504,9 @@ const ProfilePage = () => {
                       className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                    <Twitter className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400 mt-2.5 sm:mt-0 flex-shrink-0" />
+                  {/* Twitter */}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Twitter className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400 flex-shrink-0" />
                     <input
                       type="url"
                       value={profileForm.social_links.twitter}
@@ -503,6 +517,42 @@ const ProfilePage = () => {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Action Buttons - At Bottom */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-6 border-t border-gray-200 dark:border-gray-700">
+                {isEditingProfile ? (
+                  <>
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={isLoading}
+                      className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base"
+                    >
+                      {isLoading ? (
+                        <Loader className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Save className="w-5 h-5" />
+                      )}
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      disabled={isLoading}
+                      className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all duration-200 text-sm sm:text-base"
+                    >
+                      <X className="w-5 h-5" />
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingProfile(true)}
+                    className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm sm:text-base"
+                  >
+                    <Edit3 className="w-5 h-5" />
+                    Edit Profile
+                  </button>
+                )}
               </div>
             </div>
           </div>
