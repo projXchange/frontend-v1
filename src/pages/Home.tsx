@@ -671,7 +671,7 @@ const Home = () => {
 
 
 
-      {/* Testimonials */}
+      {/* Testimonials (Commented out)
       <section className="py-10 bg-white dark:bg-slate-900 transition-colors">
         <motion.div
           initial="hidden"
@@ -679,7 +679,6 @@ const Home = () => {
           viewport={{ once: true }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -694,7 +693,6 @@ const Home = () => {
             </p>
           </motion.div>
 
-          {/* Testimonials */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {testimonials.map((testimonial, i) => (
               <motion.div
@@ -706,7 +704,6 @@ const Home = () => {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                {/* Stars */}
                 <div className="flex mb-3 sm:mb-4">
                   {[...Array(5)].map((_, idx) => (
                     <Star
@@ -719,12 +716,10 @@ const Home = () => {
                   ))}
                 </div>
 
-                {/* Testimonial Text */}
                 <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 dark:text-gray-300 italic leading-relaxed mb-4 sm:mb-6">
                   "{testimonial.text}"
                 </p>
 
-                {/* Student Info */}
                 <div className="flex items-center">
                   <img
                     src={testimonial.avatar}
@@ -738,7 +733,6 @@ const Home = () => {
                   </div>
                 </div>
 
-                {/* Project Info */}
                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
                   <p className="text-xs sm:text-sm text-gray-500">
                     Worked on:{' '}
@@ -752,6 +746,7 @@ const Home = () => {
           </div>
         </motion.div>
       </section>
+      */}
 
       {/* Everything Students Need Section */}
       <section className="py-12 sm:py-16 lg:py-20 bg-white dark:bg-slate-900 transition-colors">
