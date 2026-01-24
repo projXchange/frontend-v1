@@ -48,7 +48,7 @@ const CartPage = () => {
         // Trigger download
         window.open(downloadUrl, '_blank');
       }
-      
+
       toast.success(`Successfully downloaded ${cart.length} project(s) with credits!`);
       clearCart();
     } catch (error) {
@@ -103,19 +103,34 @@ const CartPage = () => {
         </div>
 
         {cart.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShoppingCart className="w-16 h-16 text-gray-400 dark:text-gray-500" />
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center max-w-md mx-auto px-4">
+              {/* Animated Cart Icon */}
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                <div className="relative w-40 h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-800 dark:to-slate-700 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                  <ShoppingCart className="w-20 h-20 text-gray-400 dark:text-gray-500" strokeWidth={1.5} />
+                </div>
+              </div>
+
+              {/* Text Content */}
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                Your Cart is Empty
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+                Discover amazing projects and start building your collection!
+              </p>
+
+              {/* CTA Button */}
+              <Link
+                to="/projects"
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group"
+              >
+                <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                Browse Projects
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">No items in cart</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">Start exploring projects and add them to your cart!</p>
-            <Link
-              to="/projects"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              <Eye className="w-5 h-5" />
-              Browse Projects
-            </Link>
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
