@@ -321,6 +321,20 @@ const UploadProject = () => {
     }))
   }
 
+  const handleArrayKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+    field: "features" | "techStack" | "systemRequirements" | "dependenciesArr" | "installationSteps",
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      // If this is the last item and it has content, add a new item
+      if (index === formData[field].length - 1 && formData[field][index].trim()) {
+        addArrayItem(field)
+      }
+    }
+  }
+
   const addArrayItem = (
     field: "features" | "techStack" | "systemRequirements" | "dependenciesArr" | "installationSteps",
   ) => {
@@ -882,6 +896,7 @@ const UploadProject = () => {
                                 type="text"
                                 value={feature}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "features")}
+                                onKeyDown={(e) => handleArrayKeyDown(e, index, "features")}
                                 placeholder="e.g., Real-time collaboration"
                                 className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
@@ -899,12 +914,14 @@ const UploadProject = () => {
                           <button
                             type="button"
                             onClick={() => addArrayItem("features")}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
+                            className="flex items-center justify-center px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
                           >
                             <Plus className="w-4 h-4" />
-                            Add Feature
                           </button>
                         </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          Press Enter to add another feature
+                        </p>
                         {errors.features && (
                           <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
                             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -928,6 +945,7 @@ const UploadProject = () => {
                                 type="text"
                                 value={tech}
                                 onChange={(e) => handleArrayChange(index, e.target.value, "techStack")}
+                                onKeyDown={(e) => handleArrayKeyDown(e, index, "techStack")}
                                 placeholder="e.g., React, Node.js, MongoDB"
                                 className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                               />
@@ -945,12 +963,14 @@ const UploadProject = () => {
                           <button
                             type="button"
                             onClick={() => addArrayItem("techStack")}
-                            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
+                            className="flex items-center justify-center px-3 sm:px-4 py-2 sm:py-3 text-blue-600 border border-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base"
                           >
                             <Plus className="w-4 h-4" />
-                            Add Technology
                           </button>
                         </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          Press Enter to add another technology
+                        </p>
                         {errors.techStack && (
                           <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-2 animate-shake">
                             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -1022,6 +1042,7 @@ const UploadProject = () => {
                                       type="text"
                                       value={req}
                                       onChange={(e) => handleArrayChange(index, e.target.value, "systemRequirements")}
+                                      onKeyDown={(e) => handleArrayKeyDown(e, index, "systemRequirements")}
                                       placeholder="e.g., Windows 10, 8GB RAM"
                                       className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                                     />
@@ -1039,12 +1060,14 @@ const UploadProject = () => {
                                 <button
                                   type="button"
                                   onClick={() => addArrayItem("systemRequirements")}
-                                  className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
+                                  className="flex items-center justify-center px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
                                 >
                                   <Plus className="w-4 h-4" />
-                                  Add Requirement
                                 </button>
                               </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                Press Enter to add another requirement
+                              </p>
                             </div>
 
                             <div>
@@ -1061,6 +1084,7 @@ const UploadProject = () => {
                                       type="text"
                                       value={dep}
                                       onChange={(e) => handleArrayChange(index, e.target.value, "dependenciesArr")}
+                                      onKeyDown={(e) => handleArrayKeyDown(e, index, "dependenciesArr")}
                                       placeholder="e.g., Node 18, MongoDB, Redis"
                                       className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                                     />
@@ -1078,12 +1102,14 @@ const UploadProject = () => {
                                 <button
                                   type="button"
                                   onClick={() => addArrayItem("dependenciesArr")}
-                                  className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
+                                  className="flex items-center justify-center px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
                                 >
                                   <Plus className="w-4 h-4" />
-                                  Add Dependency
                                 </button>
                               </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                Press Enter to add another dependency
+                              </p>
                             </div>
 
                             <div>
@@ -1100,6 +1126,7 @@ const UploadProject = () => {
                                       type="text"
                                       value={step}
                                       onChange={(e) => handleArrayChange(index, e.target.value, "installationSteps")}
+                                      onKeyDown={(e) => handleArrayKeyDown(e, index, "installationSteps")}
                                       placeholder="e.g., Clone repo, Install deps, Run app"
                                       className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
                                     />
@@ -1117,12 +1144,14 @@ const UploadProject = () => {
                                 <button
                                   type="button"
                                   onClick={() => addArrayItem("installationSteps")}
-                                  className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
+                                  className="flex items-center justify-center px-3 sm:px-4 py-2 sm:py-3 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-slate-700 rounded-lg sm:rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm sm:text-base"
                                 >
                                   <Plus className="w-4 h-4" />
-                                  Add Step
                                 </button>
                               </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                Press Enter to add another step
+                              </p>
                             </div>
                           </div>
                         )}

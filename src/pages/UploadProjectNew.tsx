@@ -81,6 +81,14 @@ const UploadProjectNew = () => {
   const [screenshotPreviews, setScreenshotPreviews] = useState<string[]>([])
   const [showPreview, setShowPreview] = useState(true)
   const [techStackInput, setTechStackInput] = useState("")
+  const [keyFeatureInput, setKeyFeatureInput] = useState("")
+  const [keyFeatures, setKeyFeatures] = useState<string[]>([])
+  const [systemRequirementInput, setSystemRequirementInput] = useState("")
+  const [systemRequirements, setSystemRequirements] = useState<string[]>([])
+  const [dependencyInput, setDependencyInput] = useState("")
+  const [dependencies, setDependencies] = useState<string[]>([])
+  const [installationStepInput, setInstallationStepInput] = useState("")
+  const [installationSteps, setInstallationSteps] = useState<string[]>([])
 
   const categories = [
     { label: "Web Development", value: "web_development" },
@@ -151,7 +159,7 @@ const UploadProjectNew = () => {
     }
   }
   const handleTechStackKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
+    if (e.key === "Enter") {
       e.preventDefault()
       addTechStack()
     }
@@ -173,6 +181,86 @@ const UploadProjectNew = () => {
       ...prev,
       techStack: prev.techStack.filter((_, i) => i !== index),
     }))
+  }
+
+  // Key Features handlers
+  const handleKeyFeatureKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addKeyFeature()
+    }
+  }
+
+  const addKeyFeature = () => {
+    const trimmedInput = keyFeatureInput.trim()
+    if (trimmedInput && !keyFeatures.includes(trimmedInput)) {
+      setKeyFeatures((prev) => [...prev, trimmedInput])
+      setKeyFeatureInput("")
+    }
+  }
+
+  const removeKeyFeature = (index: number) => {
+    setKeyFeatures((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // System Requirements handlers
+  const handleSystemRequirementKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addSystemRequirement()
+    }
+  }
+
+  const addSystemRequirement = () => {
+    const trimmedInput = systemRequirementInput.trim()
+    if (trimmedInput && !systemRequirements.includes(trimmedInput)) {
+      setSystemRequirements((prev) => [...prev, trimmedInput])
+      setSystemRequirementInput("")
+    }
+  }
+
+  const removeSystemRequirement = (index: number) => {
+    setSystemRequirements((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Dependencies handlers
+  const handleDependencyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addDependency()
+    }
+  }
+
+  const addDependency = () => {
+    const trimmedInput = dependencyInput.trim()
+    if (trimmedInput && !dependencies.includes(trimmedInput)) {
+      setDependencies((prev) => [...prev, trimmedInput])
+      setDependencyInput("")
+    }
+  }
+
+  const removeDependency = (index: number) => {
+    setDependencies((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Installation Steps handlers
+  const handleInstallationStepKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addInstallationStep()
+    }
+  }
+
+  const addInstallationStep = () => {
+    const trimmedInput = installationStepInput.trim()
+    if (trimmedInput) {
+      setInstallationSteps((prev) => [...prev, trimmedInput])
+      setInstallationStepInput("")
+    }
+  }
+
+  const removeInstallationStep = (index: number) => {
+    setInstallationSteps((prev) => prev.filter((_, i) => i !== index))
   }
 
   // Handle thumbnail upload
@@ -368,16 +456,6 @@ const UploadProjectNew = () => {
       }
 
       // Prepare initial project data - only include non-empty values
-      const systemReqs = formData.systemRequirementsText
-        ? formData.systemRequirementsText.split("\n").filter((s) => s.trim())
-        : []
-      const deps = formData.dependenciesText
-        ? formData.dependenciesText.split("\n").filter((d) => d.trim())
-        : []
-      const installSteps = formData.installationGuideText
-        ? formData.installationGuideText.split("\n").filter((s) => s.trim())
-        : []
-
       const initialProjectData: any = {
         title: formData.title,
         description: formData.description,
@@ -395,8 +473,8 @@ const UploadProjectNew = () => {
       }
 
       // Only add optional fields if they have values
-      if (formData.keyFeatures && formData.keyFeatures.trim()) {
-        initialProjectData.key_features = formData.keyFeatures.trim()
+      if (keyFeatures.length > 0) {
+        initialProjectData.key_features = keyFeatures.join(", ")
       }
       if (formData.liveDemoUrl && isValidUrl(formData.liveDemoUrl)) {
         initialProjectData.demo_url = formData.liveDemoUrl
@@ -407,11 +485,11 @@ const UploadProjectNew = () => {
       if (formData.deliveryTime) {
         initialProjectData.delivery_time = Number.parseInt(formData.deliveryTime, 10)
       }
-      if (systemReqs.length > 0 || deps.length > 0 || installSteps.length > 0) {
+      if (systemRequirements.length > 0 || dependencies.length > 0 || installationSteps.length > 0) {
         initialProjectData.requirements = {}
-        if (systemReqs.length > 0) initialProjectData.requirements.system_requirements = systemReqs
-        if (deps.length > 0) initialProjectData.requirements.dependencies = deps
-        if (installSteps.length > 0) initialProjectData.requirements.installation_steps = installSteps
+        if (systemRequirements.length > 0) initialProjectData.requirements.system_requirements = systemRequirements
+        if (dependencies.length > 0) initialProjectData.requirements.dependencies = dependencies
+        if (installationSteps.length > 0) initialProjectData.requirements.installation_steps = installationSteps
       }
 
       // Create project
@@ -561,6 +639,14 @@ const UploadProjectNew = () => {
       setThumbnailPreview("")
       setScreenshotPreviews([])
       setTechStackInput("")
+      setKeyFeatureInput("")
+      setKeyFeatures([])
+      setSystemRequirementInput("")
+      setSystemRequirements([])
+      setDependencyInput("")
+      setDependencies([])
+      setInstallationStepInput("")
+      setInstallationSteps([])
       setCurrentStep(1)
 
       // Navigate to dashboard
@@ -977,10 +1063,9 @@ const UploadProjectNew = () => {
                           <button
                             type="button"
                             onClick={addTechStack}
-                            className="px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base"
+                            className="px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center text-sm sm:text-base"
                           >
-                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            <span className="hidden xs:inline">Add</span>
+                            <Plus className="w-4 h-4" />
                           </button>
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -1021,16 +1106,48 @@ const UploadProjectNew = () => {
                         <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                           Key Features <span className="text-gray-500 font-normal">(optional)</span>
                         </label>
-                        <textarea
-                          name="keyFeatures"
-                          value={formData.keyFeatures}
-                          onChange={handleInputChange}
-                          rows={4}
-                          placeholder="List the main features of your project (e.g., User authentication, Real-time updates, Responsive design)"
-                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none"
-                        />
+
+                        {/* Display added features */}
+                        {keyFeatures.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {keyFeatures.map((feature, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm border border-blue-200 dark:border-blue-800"
+                              >
+                                {feature}
+                                <button
+                                  type="button"
+                                  onClick={() => removeKeyFeature(index)}
+                                  className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-colors"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Input field with add button */}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={keyFeatureInput}
+                            onChange={(e) => setKeyFeatureInput(e.target.value)}
+                            onKeyDown={handleKeyFeatureKeyDown}
+                            placeholder="e.g., User authentication"
+                            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={addKeyFeature}
+                            className="px-4 py-2.5 bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center font-semibold text-sm"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Highlight what makes your project special
+                          Press Enter or click Add to include each feature
                         </p>
                       </div>
 
@@ -1287,16 +1404,54 @@ const UploadProjectNew = () => {
                             <div>
                               <label className="block">
                                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
-                                  Installation Guide <span className="text-gray-500 font-normal">(optional)</span>
+                                  Installation Steps <span className="text-gray-500 font-normal">(optional)</span>
                                 </span>
-                                <textarea
-                                  name="installationGuideText"
-                                  value={formData.installationGuideText}
-                                  onChange={handleInputChange}
-                                  rows={3}
-                                  placeholder="1. Clone the repository&#10;2. Install dependencies&#10;3. Run the application"
-                                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none text-sm"
-                                />
+
+                                {/* Display added steps */}
+                                {installationSteps.length > 0 && (
+                                  <div className="space-y-2 mb-3">
+                                    {installationSteps.map((step, index) => (
+                                      <div
+                                        key={index}
+                                        className="flex items-start gap-2 px-3 py-2 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600"
+                                      >
+                                        <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                          {index + 1}
+                                        </span>
+                                        <span className="flex-1 text-sm text-gray-700 dark:text-gray-300">{step}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => removeInstallationStep(index)}
+                                          className="flex-shrink-0 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full p-1 transition-colors"
+                                        >
+                                          <X className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Input field with add button */}
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={installationStepInput}
+                                    onChange={(e) => setInstallationStepInput(e.target.value)}
+                                    onKeyDown={handleInstallationStepKeyDown}
+                                    placeholder="e.g., Clone the repository"
+                                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={addInstallationStep}
+                                    className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center font-semibold text-sm"
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </button>
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  Press Enter or click Add for each step
+                                </p>
                               </label>
                             </div>
 
@@ -1306,14 +1461,49 @@ const UploadProjectNew = () => {
                                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
                                   System Requirements <span className="text-gray-500 font-normal">(optional)</span>
                                 </span>
-                                <textarea
-                                  name="systemRequirementsText"
-                                  value={formData.systemRequirementsText}
-                                  onChange={handleInputChange}
-                                  rows={3}
-                                  placeholder="e.g., Windows 10/11, macOS 12+, Linux&#10;8GB RAM minimum&#10;Node.js 18+ required"
-                                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none text-sm"
-                                />
+
+                                {/* Display added requirements */}
+                                {systemRequirements.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    {systemRequirements.map((req, index) => (
+                                      <span
+                                        key={index}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-sm border border-purple-200 dark:border-purple-800"
+                                      >
+                                        {req}
+                                        <button
+                                          type="button"
+                                          onClick={() => removeSystemRequirement(index)}
+                                          className="hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5 transition-colors"
+                                        >
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Input field with add button */}
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={systemRequirementInput}
+                                    onChange={(e) => setSystemRequirementInput(e.target.value)}
+                                    onKeyDown={handleSystemRequirementKeyDown}
+                                    placeholder="e.g., Windows 10/11, macOS 12+"
+                                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={addSystemRequirement}
+                                    className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center font-semibold text-sm"
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </button>
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  Press Enter or click Add for each requirement
+                                </p>
                               </label>
                             </div>
 
@@ -1323,14 +1513,49 @@ const UploadProjectNew = () => {
                                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
                                   Project Dependencies <span className="text-gray-500 font-normal">(optional)</span>
                                 </span>
-                                <textarea
-                                  name="dependenciesText"
-                                  value={formData.dependenciesText}
-                                  onChange={handleInputChange}
-                                  rows={3}
-                                  placeholder="e.g., Node.js 18+, MongoDB 6.0+, Redis 7.0+&#10;npm or yarn package manager&#10;Git for version control"
-                                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none text-sm"
-                                />
+
+                                {/* Display added dependencies */}
+                                {dependencies.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    {dependencies.map((dep, index) => (
+                                      <span
+                                        key={index}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg text-sm border border-green-200 dark:border-green-800"
+                                      >
+                                        {dep}
+                                        <button
+                                          type="button"
+                                          onClick={() => removeDependency(index)}
+                                          className="hover:bg-green-200 dark:hover:bg-green-800 rounded-full p-0.5 transition-colors"
+                                        >
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Input field with add button */}
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={dependencyInput}
+                                    onChange={(e) => setDependencyInput(e.target.value)}
+                                    onKeyDown={handleDependencyKeyDown}
+                                    placeholder="e.g., Node.js 18+"
+                                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={addDependency}
+                                    className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center font-semibold text-sm"
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </button>
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  Press Enter or click Add for each dependency
+                                </p>
                               </label>
                             </div>
 
