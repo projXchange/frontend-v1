@@ -68,9 +68,21 @@ export const useDownloadFlow = () => {
           openAuthModal();
         } else if ((error as any).status === 404) {
           toast.error('Project not found.');
+        } else if ((error as any).status === 403) {
+          // Handle price limit exceeded (403 Forbidden)
+          const errorMessage = error instanceof Error ? error.message : 'This project exceeds the free download limit.';
+          toast.error(errorMessage, { duration: 5000 });
+          setShowUnlockModal(true);
         } else {
           const errorMessage = error instanceof Error ? error.message : 'Download failed. Please try again.';
-          toast.error(errorMessage);
+          
+          // Check if error is about price limit
+          if (errorMessage.toLowerCase().includes('price limit') || errorMessage.toLowerCase().includes('2000')) {
+            toast.error(errorMessage, { duration: 5000 });
+            setShowUnlockModal(true);
+          } else {
+            toast.error(errorMessage);
+          }
         }
       } finally {
         setIsDownloading(false);

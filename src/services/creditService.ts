@@ -84,6 +84,7 @@ class CreditService {
   /**
    * Download a project using a credit
    * Uses the dedicated credit download endpoint for direct downloads
+   * Note: Projects above ₹2000 cannot be downloaded with free credits to prevent exploitation
    * @param projectId - The ID of the project to download
    * @returns Promise resolving to CreditDownloadResponse with download URL
    * @throws Error if download fails, insufficient credits, or network error
@@ -108,6 +109,12 @@ class CreditService {
         // Provide specific error messages for common scenarios
         if (response.status === 400 && errorMessage.toLowerCase().includes('insufficient')) {
           throw new Error('You do not have enough credits to download this project');
+        }
+        if (response.status === 400 && errorMessage.toLowerCase().includes('price limit')) {
+          throw new Error('This project exceeds the ₹2000 free download limit. Please purchase it to download.');
+        }
+        if (response.status === 403 && errorMessage.toLowerCase().includes('price limit')) {
+          throw new Error('This project exceeds the ₹2000 free download limit. Please purchase it to download.');
         }
         if (response.status === 404) {
           throw new Error('Project not found');

@@ -333,6 +333,16 @@ export const UnlockOptionsModal: React.FC<UnlockOptionsModalProps> = ({
                   <strong>💡 Tip:</strong> Refer friends to earn free credits! Each successful referral gives you 1 credit (up to 6 total).
                 </p>
               </div>
+
+              {/* Price Limit Notice */}
+              {options.unlock_options.use_credits.available === false && 
+               options.current_credits > 0 && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
+                    <strong>⚠️ Note:</strong> Projects above ₹2000 cannot be downloaded with free credits. This limit helps prevent system exploitation while keeping the referral program sustainable for everyone.
+                  </p>
+                </div>
+              )}
             </div>
           ) : null}
         </div>

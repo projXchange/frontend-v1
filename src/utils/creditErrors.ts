@@ -6,6 +6,7 @@
 
 export enum CreditErrorCode {
   INSUFFICIENT_CREDITS = 'INSUFFICIENT_CREDITS',
+  PRICE_LIMIT_EXCEEDED = 'PRICE_LIMIT_EXCEEDED',
   NETWORK_ERROR = 'NETWORK_ERROR',
   API_ERROR = 'API_ERROR',
   UNAUTHORIZED = 'UNAUTHORIZED',
@@ -30,6 +31,10 @@ export interface CreditError {
 const ERROR_MESSAGES: Record<CreditErrorCode, { message: string; retryable: boolean }> = {
   [CreditErrorCode.INSUFFICIENT_CREDITS]: {
     message: "You don't have enough credits to download this project. Invite friends to earn more credits!",
+    retryable: false,
+  },
+  [CreditErrorCode.PRICE_LIMIT_EXCEEDED]: {
+    message: 'This project exceeds the ₹2000 free download limit. Please purchase it to download.',
     retryable: false,
   },
   [CreditErrorCode.NETWORK_ERROR]: {
@@ -85,6 +90,16 @@ export function parseCreditError(error: unknown): CreditError {
         message: error.message,
         userMessage: ERROR_MESSAGES[CreditErrorCode.INSUFFICIENT_CREDITS].message,
         retryable: ERROR_MESSAGES[CreditErrorCode.INSUFFICIENT_CREDITS].retryable,
+      };
+    }
+
+    // Check for price limit exceeded
+    if (errorMessage.includes('price limit') || errorMessage.includes('exceeds') || errorMessage.includes('2000')) {
+      return {
+        code: CreditErrorCode.PRICE_LIMIT_EXCEEDED,
+        message: error.message,
+        userMessage: ERROR_MESSAGES[CreditErrorCode.PRICE_LIMIT_EXCEEDED].message,
+        retryable: ERROR_MESSAGES[CreditErrorCode.PRICE_LIMIT_EXCEEDED].retryable,
       };
     }
 

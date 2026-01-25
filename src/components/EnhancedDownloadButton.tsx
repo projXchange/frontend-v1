@@ -6,6 +6,7 @@ import ButtonSpinner from './ButtonSpinner';
 
 interface EnhancedDownloadButtonProps {
   projectId: string;
+  projectPrice?: number; // Optional project price for validation
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'primary' | 'secondary';
@@ -32,6 +33,7 @@ interface EnhancedDownloadButtonProps {
  */
 const EnhancedDownloadButton: React.FC<EnhancedDownloadButtonProps> = ({
   projectId,
+  projectPrice,
   className = '',
   size = 'md',
   variant = 'primary',
@@ -39,6 +41,11 @@ const EnhancedDownloadButton: React.FC<EnhancedDownloadButtonProps> = ({
 }) => {
   const { handleDownloadAttempt, isDownloading } = useDownloadFlow();
   const { availableCredits } = useCredits();
+
+  // Check if project exceeds free download limit (₹2000)
+  const FREE_DOWNLOAD_LIMIT = 2000;
+  const exceedsPriceLimit = projectPrice !== undefined && projectPrice > FREE_DOWNLOAD_LIMIT;
+  const canUseCredit = availableCredits > 0 && !exceedsPriceLimit;
 
   // Size variants
   const sizeClasses = {
@@ -93,14 +100,14 @@ const EnhancedDownloadButton: React.FC<EnhancedDownloadButtonProps> = ({
           ${className}
         `}
         data-testid="enhanced-download-button"
-        aria-label={`Download project${availableCredits > 0 ? ' using 1 credit' : ''}`}
+        aria-label={`Download project${canUseCredit ? ' using 1 credit' : ''}`}
       >
         {isDownloading ? (
           <>
             <ButtonSpinner />
             <span className="whitespace-nowrap">Downloading...</span>
           </>
-        ) : availableCredits > 0 ? (
+        ) : canUseCredit ? (
           <>
             <Download className={iconSizes[size]} />
             <span className="whitespace-nowrap">Download with Credit</span>
@@ -108,7 +115,9 @@ const EnhancedDownloadButton: React.FC<EnhancedDownloadButtonProps> = ({
         ) : (
           <>
             <Lock className={iconSizes[size]} />
-            <span className="whitespace-nowrap">Unlock to Download</span>
+            <span className="whitespace-nowrap">
+              {exceedsPriceLimit ? 'Purchase to Download' : 'Unlock to Download'}
+            </span>
           </>
         )}
       </button>
@@ -116,7 +125,11 @@ const EnhancedDownloadButton: React.FC<EnhancedDownloadButtonProps> = ({
       {/* Credits Info */}
       {showCreditsInfo && (
         <div className="text-xs text-gray-600 dark:text-gray-400 text-center">
-          {availableCredits > 0 ? (
+          {exceedsPriceLimit ? (
+            <span className="text-amber-600 dark:text-amber-400">
+              <strong>Projects above ₹2000</strong> require purchase
+            </span>
+          ) : availableCredits > 0 ? (
             <span>
               You have <strong>{availableCredits}</strong> credit{availableCredits !== 1 ? 's' : ''} available
             </span>
