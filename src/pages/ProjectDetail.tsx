@@ -770,19 +770,19 @@ const ProjectDetail = () => {
                     allowFullScreen
                   />
                 </div>
-              ) : isPurchased && !project?.youtube_url && (project.thumbnail || (project.images && project.images.length > 0)) ? (
-                // Show thumbnail/images for purchased projects without YouTube video
+              ) : isPurchased && !project?.youtube_url && project.thumbnail ? (
+                // Show thumbnail for purchased projects without YouTube video
                 <div
                   className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp hover:shadow-3xl transition-all duration-300 group"
                   style={{ animationDelay: "600ms" }}
                 >
                   <img
-                    src={(project.images && project.images.length > 0 ? project.images[0] : project.thumbnail) || "/placeholder.svg"}
+                    src={project.thumbnail || "/placeholder.svg"}
                     alt={project.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
-              ) : !isPurchased && (project.thumbnail || (project.images && project.images.length > 0)) ? (
+              ) : !isPurchased && project.thumbnail ? (
                 <div
                   className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-8 shadow-2xl animate-slideInUp relative group cursor-pointer"
                   style={{ animationDelay: "600ms" }}
@@ -790,7 +790,7 @@ const ProjectDetail = () => {
                 >
                   {/* Project Thumbnail - Always visible */}
                   <img
-                    src={(project.images && project.images.length > 0 ? project.images[0] : project.thumbnail) || "/placeholder.svg"}
+                    src={project.thumbnail || "/placeholder.svg"}
                     alt={project.title}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
@@ -1210,6 +1210,7 @@ const ProjectDetail = () => {
                     </h3>
                     {project?.images && project.images.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+                        {/* Display all images including thumbnail */}
                         {project.images.map((image, index) => (
                           <div
                             key={index}

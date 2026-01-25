@@ -500,8 +500,8 @@ const UploadProjectNew = () => {
       }
       if (finalImageUrls.length > 0 || finalThumbnailUrl) {
         // Include thumbnail in images array if it exists
-        const allImages = finalThumbnailUrl 
-          ? [finalThumbnailUrl, ...finalImageUrls] 
+        const allImages = finalThumbnailUrl
+          ? [finalThumbnailUrl, ...finalImageUrls]
           : finalImageUrls
         updateData.images = allImages
       }
