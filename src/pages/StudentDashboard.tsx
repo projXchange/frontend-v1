@@ -253,6 +253,16 @@ const StudentDashboard = () => {
   }
   const handleUpdateProject = async () => {
     if (!selectedProject) return
+    
+    // Validate that at least one of demo_url or youtube_url is provided
+    const demoUrl = projectEditData?.demo_url || selectedProject.demo_url;
+    const youtubeUrl = projectEditData?.youtube_url || selectedProject.youtube_url;
+    
+    if (!demoUrl?.trim() && !youtubeUrl?.trim()) {
+      toast.error('Please provide at least one: Live Demo URL or YouTube URL');
+      return;
+    }
+    
     setUpdatingProjectStatus(true)
 
     try {

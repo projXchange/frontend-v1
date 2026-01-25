@@ -278,6 +278,11 @@ const UploadProjectNew = () => {
           toast.error("Please enter a valid GitHub URL")
           return false
         }
+        // At least one of demo URL or YouTube URL is required
+        if (!formData.liveDemoUrl.trim() && !formData.youtubeUrl.trim()) {
+          toast.error("Please provide at least one: Live Demo URL or YouTube URL")
+          return false
+        }
         if (formData.liveDemoUrl && !isValidUrl(formData.liveDemoUrl)) {
           toast.error("Please enter a valid demo URL")
           return false
@@ -1142,7 +1147,7 @@ const UploadProjectNew = () => {
                       {/* Live Demo URL */}
                       <div>
                         <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                          Live Demo URL <span className="text-gray-500 font-normal">(optional)</span>
+                          Live Demo URL <span className="text-orange-500 font-normal">(at least one required)</span>
                         </label>
                         <input
                           type="url"
@@ -1152,12 +1157,15 @@ const UploadProjectNew = () => {
                           placeholder="https://your-demo.vercel.app"
                           className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                         />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Provide either a live demo URL or YouTube video URL (or both)
+                        </p>
                       </div>
 
                       {/* YouTube Demo Video URL */}
                       <div>
                         <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                          YouTube Demo Video URL <span className="text-gray-500 font-normal">(optional)</span>
+                          YouTube Demo Video URL <span className="text-orange-500 font-normal">(at least one required)</span>
                         </label>
                         <input
                           type="url"
@@ -1167,6 +1175,9 @@ const UploadProjectNew = () => {
                           placeholder="https://youtube.com/watch?v=..."
                           className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                         />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Provide either a YouTube video URL or live demo URL (or both)
+                        </p>
                       </div>
                     </div>
                   </div>

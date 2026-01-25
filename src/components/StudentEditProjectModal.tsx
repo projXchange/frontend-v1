@@ -28,17 +28,17 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'basic' | 'media' | 'pricing'>('basic');
   const [techStackInput, setTechStackInput] = useState('');
-  const { 
-    canEditField, 
-    getFieldUploader, 
-    fetchPermissions, 
-    clearPermissions, 
-    loading: permissionsLoading, 
+  const {
+    canEditField,
+    getFieldUploader,
+    fetchPermissions,
+    clearPermissions,
+    loading: permissionsLoading,
     error: permissionsError,
     isAdmin,
     permissions // Add permissions to get the full permissions object
   } = usePermissions();
-  
+
   // Form state - only fields from UploadProjectNew
   const [formData, setFormData] = useState({
     title: '',
@@ -63,7 +63,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
     if (isOpen && project?.id) {
       fetchPermissions(project.id);
     }
-    
+
     return () => {
       if (!isOpen) {
         clearPermissions();
@@ -152,6 +152,11 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
       toast.error('Description is required');
       return;
     }
+    // At least one of demo URL or YouTube URL is required
+    if (!formData.liveDemoUrl.trim() && !formData.youtubeUrl.trim()) {
+      toast.error('Please provide at least one: Live Demo URL or YouTube URL');
+      return;
+    }
     if (!formData.price) {
       toast.error('Price is required');
       return;
@@ -170,7 +175,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
       images: imageUrls,
       pricing: {
         sale_price: Number.parseFloat(formData.price),
-        original_price: formData.originalPrice 
+        original_price: formData.originalPrice
           ? Number.parseFloat(formData.originalPrice)
           : Number.parseFloat(formData.price),
         currency: formData.currency as 'INR' | 'USD',
@@ -179,8 +184,8 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
     };
 
     // Filter to only include editable fields (unless admin)
-    const updateData = isAdmin 
-      ? allUpdateData 
+    const updateData = isAdmin
+      ? allUpdateData
       : filterEditableFields(allUpdateData, permissions);
 
     // Check if there are any fields to update
@@ -191,7 +196,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
 
     try {
       await onUpdate(updateData);
-      
+
       // Show re-approval notification if project was already approved (only for non-admin users)
       if (!isAdmin && project.status === 'approved') {
         toast.success(
@@ -203,7 +208,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
       } else {
         toast.success('Changes saved successfully!');
       }
-      
+
       // Close modal after successful update
       setTimeout(() => {
         onClose();
@@ -221,12 +226,12 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
   ];
 
   const canEdit = project.status === 'draft' || project.status === 'pending' || project.status === 'approved';
-  
+
   // Helper function to check if a specific field can be edited
   const isFieldEditable = (fieldName: string): boolean => {
     // First check project status - allow editing for draft, pending, and approved
     if (!canEdit) return false;
-    
+
     // Then check field-level permissions
     return canEditField(fieldName);
   };
@@ -234,11 +239,11 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-lg flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden border border-gray-200/20 dark:border-slate-700/50">
-        
+
         {/* Header */}
         <div className="relative flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-slate-700/50 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-          
+
           <div className="relative z-10 flex items-center gap-4">
             <div className="w-14 h-14 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/30">
               <span className="text-white font-bold text-2xl">{project.title?.charAt(0) || 'P'}</span>
@@ -248,7 +253,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
               <p className="text-sm text-white/80">{project.title}</p>
             </div>
           </div>
-          
+
           <div className="relative z-10 flex items-center gap-2">
             {!isAdmin && canEdit && (
               <PermissionHelpTooltip />
@@ -265,26 +270,26 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
         {!canEdit && (
           <ReApprovalNotification status={project.status as any} />
         )}
-        
+
         {permissionsLoading && !isAdmin && canEdit && (
           <PermissionLoadingState />
         )}
-        
+
         {permissionsError && !isAdmin && canEdit && (
-          <PermissionErrorState 
-            error={permissionsError} 
+          <PermissionErrorState
+            error={permissionsError}
             onRetry={() => project?.id && fetchPermissions(project.id)}
           />
         )}
-        
+
         {isAdmin && canEdit && (
           <AdminOverrideBadge />
         )}
-        
+
         {!isAdmin && canEdit && project.status === 'approved' && !permissionsLoading && (
           <ReApprovalNotification status="approved" showReApprovalInfo={true} />
         )}
-        
+
         {!isAdmin && canEdit && !permissionsLoading && !permissionsError && (
           <div className="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
             <div className="flex items-start gap-3">
@@ -310,11 +315,10 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-3 font-semibold text-sm rounded-t-xl transition-all ${
-                  isActive
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-lg'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                className={`flex items-center gap-2 px-4 py-3 font-semibold text-sm rounded-t-xl transition-all ${isActive
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-lg'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label}
@@ -326,7 +330,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
         {/* Content */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
           <div className="max-w-3xl mx-auto space-y-5">
-            
+
             {/* Basic Info Tab */}
             {activeTab === 'basic' && (
               <>
@@ -520,7 +524,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Live Demo URL
+                    Live Demo URL <span className="text-orange-500 text-xs">(at least one required)</span>
                   </label>
                   <input
                     type="url"
@@ -531,6 +535,9 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="https://demo.yourproject.com"
                   />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Provide either a live demo URL or YouTube video URL
+                  </p>
                   {!isFieldEditable('demo_url') && canEdit && (
                     <FieldOwnershipIndicator
                       fieldName="demo_url"
@@ -541,7 +548,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    YouTube URL
+                    YouTube URL <span className="text-orange-500 text-xs">(at least one required)</span>
                   </label>
                   <input
                     type="url"
@@ -552,6 +559,9 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder="https://youtube.com/watch?v=..."
                   />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Provide either a YouTube video URL or live demo URL
+                  </p>
                   {!isFieldEditable('youtube_url') && canEdit && (
                     <FieldOwnershipIndicator
                       fieldName="youtube_url"

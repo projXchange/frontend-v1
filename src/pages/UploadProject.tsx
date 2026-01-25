@@ -352,6 +352,12 @@ const UploadProject = () => {
       }
     })
 
+    // Validate that at least one of demo URL or YouTube URL is provided
+    if (!formData.liveDemo?.trim() && !formData.youtubeUrl?.trim()) {
+      toast.error('Please provide at least one: Live Demo URL or YouTube URL');
+      return;
+    }
+
     if (Object.keys(errors).length === 0) {
       setIsSubmitting(true)
       try {
