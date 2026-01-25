@@ -42,8 +42,7 @@ export const API_CONFIG = {
     PROJECT_PERMISSIONS: (id: string) => `/projects/${id}/permissions`,
     UPDATE_PROJECT_FIELDS: (id: string) => `/projects/${id}`,
     
-    // Referral endpoints
-    REFERRAL_GENERATE: '/referrals/generate',
+    // Referral endpoints (Note: REFERRAL_CODE is generated on frontend, not backend)
     REFERRAL_DASHBOARD: '/referrals/dashboard',
     REFERRAL_HISTORY: '/referrals/history',
     REFERRAL_UNLOCK_OPTIONS: (projectId: string) => `/referrals/unlock-options/${projectId}`,

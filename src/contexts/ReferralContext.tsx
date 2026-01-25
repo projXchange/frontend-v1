@@ -1,25 +1,29 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import * as referralService from '../services/referralService';
 import { ReferralDashboardData, ReferralCode } from '../types/Referral';
+import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 
 interface ReferralContextType {
   dashboardData: ReferralDashboardData | null;
   referralHistory: ReferralCode[];
+  userReferralCode: { referral_code: string; shareable_link: string; created_at: string } | null;
   credits: number;
   loading: boolean;
   error: string | null;
   loadDashboard: () => Promise<void>;
   loadHistory: () => Promise<void>;
-  generateReferral: () => Promise<{ referral_code: string; shareable_link: string }>;
+  loadUserReferralCode: () => void;
   refreshCredits: () => Promise<void>;
 }
 
 const ReferralContext = createContext<ReferralContextType | undefined>(undefined);
 
 export const ReferralProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState<ReferralDashboardData | null>(null);
   const [referralHistory, setReferralHistory] = useState<ReferralCode[]>([]);
+  const [userReferralCode, setUserReferralCode] = useState<{ referral_code: string; shareable_link: string; created_at: string } | null>(null);
   const [credits, setCredits] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,48 +108,22 @@ export const ReferralProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }, []);
 
-  const generateReferral = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await referralService.generateReferralCode();
-      toast.success('Referral code generated successfully!');
-      // Refresh dashboard to update stats
-      await loadDashboard();
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate referral';
-      setError(errorMessage);
-      
-      // Check if error is retryable
-      const isRetryable = (err as any).retryable ?? false;
-      
-      if (isRetryable) {
-        toast.error(
-          (t) => (
-            <div className="flex items-center gap-3">
-              <span>{errorMessage}</span>
-              <button
-                onClick={() => {
-                  toast.dismiss(t.id);
-                  generateReferral();
-                }}
-                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-              >
-                Retry
-              </button>
-            </div>
-          ),
-          { duration: 5000 }
-        );
-      } else {
-        toast.error(errorMessage);
-      }
-      throw err;
-    } finally {
-      setLoading(false);
+  const loadUserReferralCode = useCallback(() => {
+    if (!user) {
+      setError('User not authenticated');
+      return;
     }
-  }, [loadDashboard]);
+
+    try {
+      const result = referralService.getUserReferralCode(user);
+      setUserReferralCode(result);
+      setError(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load referral code';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  }, [user]);
 
   const refreshCredits = useCallback(async () => {
     try {
@@ -170,12 +148,13 @@ export const ReferralProvider: React.FC<{ children: ReactNode }> = ({ children }
   const value: ReferralContextType = {
     dashboardData,
     referralHistory,
+    userReferralCode,
     credits,
     loading,
     error,
     loadDashboard,
     loadHistory,
-    generateReferral,
+    loadUserReferralCode,
     refreshCredits
   };
 

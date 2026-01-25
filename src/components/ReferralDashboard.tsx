@@ -1,4 +1,5 @@
 import { useState } from "react";
+import React from "react";
 import { Users, Gift, TrendingUp, Calendar, Share2, Loader } from "lucide-react";
 import { useReferrals } from "../hooks/useReferrals";
 import { SharingModal } from "./SharingModal";
@@ -6,21 +7,17 @@ import LifetimeLimitsCard from "./LifetimeLimitsCard";
 import LimitReachedBanners from "./LimitReachedBanners";
 
 const ReferralDashboard = () => {
-  const { dashboardData, loading, error, generateReferral } = useReferrals();
-  const [generating, setGenerating] = useState(false);
+  const { dashboardData, loading, error, userReferralCode, loadUserReferralCode } = useReferrals();
   const [showSharingModal, setShowSharingModal] = useState(false);
-  const [newReferralCode, setNewReferralCode] = useState("");
 
-  const handleGenerateCode = async () => {
-    setGenerating(true);
-    try {
-      const result = await generateReferral();
-      setNewReferralCode(result.referral_code);
+  // Load user's referral code on mount
+  React.useEffect(() => {
+    loadUserReferralCode();
+  }, [loadUserReferralCode]);
+
+  const handleShareCode = () => {
+    if (userReferralCode) {
       setShowSharingModal(true);
-    } catch (err) {
-      // Error already handled by context with toast
-    } finally {
-      setGenerating(false);
     }
   };
 
@@ -146,11 +143,11 @@ const ReferralDashboard = () => {
           </div>
         </div>
 
-        {/* Generate Referral Card */}
+        {/* Your Referral Code Card */}
         <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-4 sm:p-6 shadow-xl border border-purple-100 dark:border-slate-700">
           <h3 className="text-base sm:text-lg font-bold mb-4 flex items-center gap-2 sm:gap-3 text-gray-900 dark:text-white">
             <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
-            Generate Referral Code
+            Your Referral Code
           </h3>
           <div className="space-y-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -158,54 +155,33 @@ const ReferralDashboard = () => {
               purchase or download one project!
             </p>
 
-            {!canCreate && remainingReferralSlots === 0 && (
-              <div 
-                className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3"
-                role="status"
-                aria-live="polite"
-              >
-                <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-200">
-                  You've reached your monthly referral limit (3/3). Limit resets next month.
-                </p>
-              </div>
-            )}
+            {userReferralCode ? (
+              <>
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Your Code</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 tracking-wider">
+                    {userReferralCode.referral_code}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Created: {new Date(userReferralCode.created_at).toLocaleDateString()}
+                  </p>
+                </div>
 
-            {!canCreate && lifetimeReferralCredits >= maxLifetimeReferralCredits && (
-              <div 
-                className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3"
-                role="status"
-                aria-live="polite"
-              >
-                <p className="text-xs sm:text-sm text-orange-800 dark:text-orange-200">
-                  You've reached the maximum lifetime referral credits ({lifetimeReferralCredits}/{maxLifetimeReferralCredits}). No more credits can be earned from
-                  referrals.
-                </p>
-              </div>
-            )}
-
-            <button
-              onClick={handleGenerateCode}
-              disabled={!canCreate || generating}
-              className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
-                canCreate && !generating
-                  ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500"
-                  : "bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-              }`}
-              aria-label={canCreate ? "Generate new referral code" : "Cannot generate referral code - limit reached"}
-              aria-disabled={!canCreate || generating}
-            >
-              {generating ? (
-                <>
-                  <Loader className="w-5 h-5 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
+                <button
+                  onClick={handleShareCode}
+                  className="w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500"
+                  aria-label="Share your referral code"
+                >
                   <Share2 className="w-5 h-5" />
-                  Generate Referral Code
-                </>
-              )}
-            </button>
+                  Share Your Code
+                </button>
+              </>
+            ) : (
+              <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 text-center">
+                <Loader className="w-8 h-8 animate-spin text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-600 dark:text-gray-400">Loading your referral code...</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -258,7 +234,7 @@ const ReferralDashboard = () => {
       <SharingModal
         isOpen={showSharingModal}
         onClose={() => setShowSharingModal(false)}
-        referralCode={newReferralCode}
+        referralCode={userReferralCode?.referral_code || ''}
       />
     </div>
   );

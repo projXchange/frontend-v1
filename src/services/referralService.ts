@@ -1,6 +1,7 @@
 import { apiClient } from '../utils/apiClient';
 import { API_CONFIG, getApiUrl } from '../config/api';
 import { mapReferralError } from '../utils/referralErrors';
+import { ensureReferralCode } from '../utils/referralCodeGenerator';
 import type {
   ReferralDashboardData,
   ReferralCode,
@@ -9,6 +10,7 @@ import type {
   AdminReferralStats,
   SuspiciousReferral,
 } from '../types/Referral';
+import type { User } from '../types/User';
 
 /**
  * Get authentication token from localStorage
@@ -62,37 +64,31 @@ async function handleResponse<T>(response: Response): Promise<T> {
 // ============================================================================
 
 /**
- * Generate a new referral code
- * @returns Referral code data with shareable link
+ * Get user's static referral code (generated locally on frontend)
+ * @param user - Current user object
+ * @returns User's referral code data with shareable link
  */
-export async function generateReferralCode(): Promise<{
+export function getUserReferralCode(user: User): {
   referral_code: string;
   shareable_link: string;
   created_at: string;
-  message: string;
-}> {
-  try {
-    const response = await apiClient(
-      getApiUrl(API_CONFIG.ENDPOINTS.REFERRAL_GENERATE),
-      {
-        method: 'POST',
-        headers: getAuthHeaders(),
-      }
-    );
+} {
+  // Generate or retrieve the referral code
+  const referralCode = ensureReferralCode(
+    user.id,
+    user.full_name || user.email.split('@')[0],
+    user.created_at
+  );
 
-    return handleResponse(response);
-  } catch (error) {
-    // If error is already mapped, rethrow it
-    if (error instanceof Error && (error as any).code) {
-      throw error;
-    }
-    // Otherwise, map it
-    const mappedError = mapReferralError(error);
-    const newError = new Error(mappedError.userMessage);
-    (newError as any).code = mappedError.code;
-    (newError as any).retryable = mappedError.retryable;
-    throw newError;
-  }
+  // Create shareable link
+  const baseUrl = window.location.origin;
+  const shareableLink = `${baseUrl}/signup?ref=${referralCode}`;
+
+  return {
+    referral_code: referralCode,
+    shareable_link: shareableLink,
+    created_at: user.created_at,
+  };
 }
 
 /**
