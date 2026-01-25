@@ -22,7 +22,7 @@ import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
 
 const ProfilePage = () => {
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
   const navigate = useNavigate()
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -128,6 +128,21 @@ const ProfilePage = () => {
         },
         skills: data.profile.skills || [],
       })
+      
+      // Update user object in AuthContext and localStorage
+      updateUser({
+        avatar: data.profile.avatar || null,
+        bio: data.profile.bio || null,
+        location: data.profile.location || null,
+        website: data.profile.website || null,
+        social_links: data.profile.social_links || null,
+        skills: data.profile.skills || [],
+        experience_level: data.profile.experience_level || 'beginner',
+        rating: data.profile.rating || 0,
+        total_sales: data.profile.total_sales || 0,
+        total_purchases: data.profile.total_purchases || 0
+      })
+      
       setAvatarFile(null)
       setAvatarPreview("")
       setIsEditingProfile(false)

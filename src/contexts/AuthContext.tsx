@@ -15,6 +15,7 @@ interface AuthContextType {
   verifyEmail: (token: string) => Promise<{ success: boolean; message?: string }>;
   resendVerificationEmail: (email: string) => Promise<void>;
   handleTokenExpiration: () => void;
+  updateUser: (userData: Partial<User>) => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isStudent: boolean;
@@ -93,8 +94,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const loggedInUser = data.user;
-      setUser(loggedInUser);
-      localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
+      
+      // Fetch full profile data to merge with auth data
+      try {
+        const profileRes = await fetch(getApiUrl('/users/profile/me'), {
+          headers: {
+            'Authorization': `Bearer ${data.refreshToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          // Merge profile data into user object
+          const fullUserData = {
+            ...loggedInUser,
+            avatar: profileData.profile?.avatar || loggedInUser.avatar || null,
+            bio: profileData.profile?.bio || null,
+            location: profileData.profile?.location || null,
+            website: profileData.profile?.website || null,
+            social_links: profileData.profile?.social_links || null,
+            skills: profileData.profile?.skills || [],
+            experience_level: profileData.profile?.experience_level || 'beginner',
+            rating: profileData.profile?.rating || 0,
+            total_sales: profileData.profile?.total_sales || 0,
+            total_purchases: profileData.profile?.total_purchases || 0
+          };
+          
+          setUser(fullUserData);
+          localStorage.setItem('studystack_user', JSON.stringify(fullUserData));
+        } else {
+          // If profile fetch fails, use basic auth data
+          setUser(loggedInUser);
+          localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
+        }
+      } catch (profileError) {
+        console.error('Failed to fetch profile data:', profileError);
+        // Fallback to basic auth data
+        setUser(loggedInUser);
+        localStorage.setItem('studystack_user', JSON.stringify(loggedInUser));
+      }
+
       localStorage.setItem('token', data.refreshToken);
 
       
@@ -296,6 +336,15 @@ const resendVerificationEmail = async (email: string): Promise<void> => {
 
   const closeAuthModal = () => setAuthModalOpen(false);
 
+  // Update user data (useful for profile updates)
+  const updateUser = (userData: Partial<User>) => {
+    if (!user) return;
+    
+    const updatedUser = { ...user, ...userData };
+    setUser(updatedUser);
+    localStorage.setItem('studystack_user', JSON.stringify(updatedUser));
+  };
+
   const value: AuthContextType = {
     user,
     login,
@@ -306,6 +355,7 @@ const resendVerificationEmail = async (email: string): Promise<void> => {
     verifyEmail,
     resendVerificationEmail,
     handleTokenExpiration,
+    updateUser,
     isAuthenticated: !!user,
     isAdmin: user?.user_type === 'admin',
     isStudent: user?.user_type === 'student',
