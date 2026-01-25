@@ -7,13 +7,18 @@ import { useCredits } from '../hooks/useCredits';
  * 
  * Displays comprehensive credit statistics including:
  * - Available credits
- * - Credits used
+ * - Total downloads
  * - Monthly credit timer
  * - Referral credit stats
  * 
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6
  */
-const CreditDashboard: React.FC = () => {
+
+interface CreditDashboardProps {
+  totalDownloads?: number;
+}
+
+const CreditDashboard: React.FC<CreditDashboardProps> = ({ totalDownloads }) => {
   const { balance, loading, error } = useCredits();
 
   // Loading skeleton
@@ -55,13 +60,15 @@ const CreditDashboard: React.FC = () => {
 
   const {
     available_credits,
-    credits_used,
     referral_credits_earned,
     max_referral_credits,
     monthly_credits_received,
     max_monthly_credits,
     days_until_next_credit,
   } = balance;
+
+  // Use totalDownloads from props if available, otherwise fall back to computed value
+  const displayDownloads = totalDownloads ?? balance.credits_used ?? 0;
 
   // Determine if all monthly credits have been received
   const allMonthlyCreditsReceived = monthly_credits_received >= max_monthly_credits;
@@ -88,15 +95,15 @@ const CreditDashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Credits Used Card */}
+      {/* Total Downloads Card */}
       <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg sm:shadow-xl border border-blue-100 dark:border-blue-800 hover:shadow-2xl hover:scale-[1.02] sm:hover:scale-105 transition-all duration-300 group">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex-1 min-w-0">
             <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 font-medium mb-1 truncate">
-              Credits Used
+              Total Downloads
             </p>
             <p className="text-3xl sm:text-4xl font-bold text-blue-900 dark:text-blue-100">
-              {credits_used}
+              {displayDownloads}
             </p>
           </div>
           <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0 ml-2">
@@ -104,7 +111,7 @@ const CreditDashboard: React.FC = () => {
           </div>
         </div>
         <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 truncate">
-          Total downloads
+          Using free credits
         </p>
       </div>
 

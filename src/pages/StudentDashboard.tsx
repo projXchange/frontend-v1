@@ -610,7 +610,7 @@ const StudentDashboard = () => {
                     <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                     Credit System
                   </h3>
-                  <CreditDashboard />
+                  <CreditDashboard totalDownloads={dashboardStats?.credits?.total_free_downloads?.allocated} />
                 </div>
 
                 <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">

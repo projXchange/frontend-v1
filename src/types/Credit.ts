@@ -31,6 +31,7 @@ export interface CreditBalance {
   signup_bonus_received: boolean; // Computed from download_credits > 0
   monthly_credits_received: number; // Alias for lifetime_monthly_credits
   referral_credits_earned: number; // Alias for lifetime_referral_credits
+  days_until_next_credit: number | null; // Days until next monthly credit
   max_monthly_credits: 3;
   max_referral_credits: 6;
   max_total_credits: 10; // 1 signup + 3 monthly + 6 referral
