@@ -498,8 +498,12 @@ const UploadProjectNew = () => {
       if (finalThumbnailUrl) {
         updateData.thumbnail = finalThumbnailUrl
       }
-      if (finalImageUrls.length > 0) {
-        updateData.images = finalImageUrls
+      if (finalImageUrls.length > 0 || finalThumbnailUrl) {
+        // Include thumbnail in images array if it exists
+        const allImages = finalThumbnailUrl 
+          ? [finalThumbnailUrl, ...finalImageUrls] 
+          : finalImageUrls
+        updateData.images = allImages
       }
       if (finalDocFileUrls.length > 0) {
         updateData.files = {
