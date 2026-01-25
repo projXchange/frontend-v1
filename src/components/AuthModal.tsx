@@ -28,6 +28,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -85,6 +86,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setEmail('');
       setName('');
       setPassword('');
+      setPhoneNumber('');
       setShowPassword(false);
       setErrorMsg('');
       setSuccessMsg('');
@@ -189,7 +191,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     try {
       if (mode === 'signup') {
-        const result: AuthResult = await signup(name, email, password, 'student', referralCode || undefined);
+        const result: AuthResult = await signup(name, email, password, 'student', referralCode || undefined, phoneNumber || undefined);
         if (result.success) {
           setPendingVerificationEmail(email);
           setMode('verify-pending');
@@ -436,6 +438,23 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Enter your full name"
                         required
+                        className="w-full px-4 py-4 border border-gray-300 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                      />
+                    </div>
+                  )}
+
+                  {/* Phone Number - Only for signup */}
+                  {mode === 'signup' && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Phone Number <span className="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Enter your phone number"
+                        maxLength={20}
                         className="w-full px-4 py-4 border border-gray-300 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
                       />
                     </div>

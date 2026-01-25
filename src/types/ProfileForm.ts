@@ -15,6 +15,7 @@ export interface ProfileForm {
   bio?: string;
   location?: string;
   website?: string;
+  phone_number?: string;
   social_links: SocialLinks;
   skills: string[];
   status?: 'active' | 'inactive';

@@ -41,6 +41,7 @@ const ProfilePage = () => {
     bio: "",
     location: "",
     website: "",
+    phone_number: "",
     social_links: { github: "", linkedin: "", twitter: "" },
     skills: [],
     status: "active",
@@ -74,6 +75,7 @@ const ProfilePage = () => {
           bio: profile.bio ?? "",
           location: profile.location ?? "",
           website: profile.website ?? "",
+          phone_number: profile.phone_number ?? "",
           social_links: normalizedSocialLinks as any,
           skills: profile.skills || [],
           status: profile.status || "active",
@@ -102,6 +104,7 @@ const ProfilePage = () => {
         bio: profileForm.bio ?? "",
         location: profileForm.location ?? "",
         website: profileForm.website ?? "",
+        phone_number: profileForm.phone_number ?? "",
         social_links: Object.fromEntries(Object.entries(profileForm.social_links || {}).map(([k, v]) => [k, v ?? ""])),
         skills: profileForm.skills || [],
       }
@@ -117,6 +120,7 @@ const ProfilePage = () => {
       const data = await res.json()
       setProfileForm({
         ...data.profile,
+        phone_number: data.profile.phone_number || "",
         social_links: {
           github: data.profile.social_links?.github || "",
           linkedin: data.profile.social_links?.linkedin || "",
@@ -348,19 +352,35 @@ const ProfilePage = () => {
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-                      Location
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <div className="space-y-4 sm:space-y-6">
+                    <div>
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                        Location
+                      </label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                          type="text"
+                          value={profileForm.location}
+                          onChange={(e) => handleInputChange("location", e.target.value)}
+                          disabled={!isEditingProfile}
+                          placeholder="Your location"
+                          className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                        Phone Number <span className="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                      </label>
                       <input
-                        type="text"
-                        value={profileForm.location}
-                        onChange={(e) => handleInputChange("location", e.target.value)}
+                        type="tel"
+                        value={profileForm.phone_number}
+                        onChange={(e) => handleInputChange("phone_number", e.target.value)}
                         disabled={!isEditingProfile}
-                        placeholder="Your location"
-                        className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
+                        placeholder="Your phone number"
+                        maxLength={20}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm border border-gray-300 dark:border-slate-600 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>

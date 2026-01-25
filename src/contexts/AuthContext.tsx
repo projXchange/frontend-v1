@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
-  signup: (name: string, email: string, password: string, role: 'student' | 'admin', referralCode?: string) => Promise<{ success: boolean; message?: string }>;
+  signup: (name: string, email: string, password: string, role: 'student' | 'admin', referralCode?: string, phoneNumber?: string) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<boolean>;
   confirmResetPassword: (token: string, password: string) => Promise<boolean>;
   verifyEmail: (token: string) => Promise<{ success: boolean; message?: string }>;
@@ -111,7 +111,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string,
     password: string,
     role: 'student' | 'admin',
-    referralCode?: string
+    referralCode?: string,
+    phoneNumber?: string
   ): Promise<AuthResult> => {
     try {
       const requestBody: any = {
@@ -124,6 +125,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Include referral_code if provided
       if (referralCode) {
         requestBody.referral_code = referralCode;
+      }
+
+      // Include phone_number if provided
+      if (phoneNumber) {
+        requestBody.phone_number = phoneNumber;
       }
 
       const res = await fetch(getApiUrl('/auth/signup'), {

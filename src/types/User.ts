@@ -2,6 +2,7 @@ export interface User {
   id: string;
   email: string;
   full_name: string;
+  phone_number: string | null;
   user_type: string; 
   verification_status: string;
   status: string;
