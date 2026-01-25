@@ -278,6 +278,12 @@ const UploadProjectNew = () => {
           toast.error("Please enter a valid GitHub URL")
           return false
         }
+        return true
+      case 2:
+        if (!formData.thumbnailFile) {
+          toast.error("Thumbnail image is required")
+          return false
+        }
         // At least one of demo URL or YouTube URL is required
         if (!formData.liveDemoUrl.trim() && !formData.youtubeUrl.trim()) {
           toast.error("Please provide at least one: Live Demo URL or YouTube URL")
@@ -289,12 +295,6 @@ const UploadProjectNew = () => {
         }
         if (formData.youtubeUrl && !formData.youtubeUrl.includes("youtube.com") && !formData.youtubeUrl.includes("youtu.be")) {
           toast.error("Please enter a valid YouTube URL")
-          return false
-        }
-        return true
-      case 2:
-        if (!formData.thumbnailFile) {
-          toast.error("Thumbnail image is required")
           return false
         }
         return true
