@@ -51,6 +51,7 @@ const UploadProjectNew = () => {
     customCategory: "",
     techStack: [] as string[],
     description: "",
+    keyFeatures: "",
     githubUrl: "",
     thumbnailFile: null as File | null,
     screenshots: [] as File[],
@@ -394,6 +395,9 @@ const UploadProjectNew = () => {
       }
 
       // Only add optional fields if they have values
+      if (formData.keyFeatures && formData.keyFeatures.trim()) {
+        initialProjectData.key_features = formData.keyFeatures.trim()
+      }
       if (formData.liveDemoUrl && isValidUrl(formData.liveDemoUrl)) {
         initialProjectData.demo_url = formData.liveDemoUrl
       }
@@ -534,6 +538,7 @@ const UploadProjectNew = () => {
         customCategory: "",
         techStack: [],
         description: "",
+        keyFeatures: "",
         githubUrl: "",
         thumbnailFile: null,
         screenshots: [],
@@ -1005,6 +1010,24 @@ const UploadProjectNew = () => {
                             Description must be at least 100 characters ({100 - formData.description.length} more needed)
                           </p>
                         )}
+                      </div>
+
+                      {/* Key Features */}
+                      <div>
+                        <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          Key Features <span className="text-gray-500 font-normal">(optional)</span>
+                        </label>
+                        <textarea
+                          name="keyFeatures"
+                          value={formData.keyFeatures}
+                          onChange={handleInputChange}
+                          rows={4}
+                          placeholder="List the main features of your project (e.g., User authentication, Real-time updates, Responsive design)"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Highlight what makes your project special
+                        </p>
                       </div>
 
                       {/* GitHub Repository URL */}

@@ -45,6 +45,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
     category: '',
     techStack: [] as string[],
     description: '',
+    keyFeatures: '',
     githubUrl: '',
     liveDemoUrl: '',
     youtubeUrl: '',
@@ -78,6 +79,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
         category: project.category || '',
         techStack: project.tech_stack || [],
         description: project.description || '',
+        keyFeatures: project.key_features || '',
         githubUrl: project.github_url || '',
         liveDemoUrl: project.demo_url || '',
         youtubeUrl: project.youtube_url || '',
@@ -168,6 +170,7 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
       category: formData.category,
       tech_stack: formData.techStack,
       description: formData.description,
+      key_features: formData.keyFeatures,
       github_url: formData.githubUrl,
       demo_url: formData.liveDemoUrl,
       youtube_url: formData.youtubeUrl,
@@ -447,6 +450,27 @@ const StudentEditProjectModal: React.FC<StudentEditProjectModalProps> = ({
                     <FieldOwnershipIndicator
                       fieldName="description"
                       uploadedBy={getFieldUploader('description')}
+                    />
+                  )}
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Key Features <span className="text-gray-500 font-normal">(optional)</span>
+                  </label>
+                  <textarea
+                    name="keyFeatures"
+                    rows={4}
+                    value={formData.keyFeatures}
+                    onChange={handleInputChange}
+                    disabled={!isFieldEditable('key_features')}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none disabled:cursor-not-allowed disabled:opacity-70"
+                    placeholder="List the main features of your project"
+                  />
+                  {!isFieldEditable('key_features') && canEdit && (
+                    <FieldOwnershipIndicator
+                      fieldName="key_features"
+                      uploadedBy={getFieldUploader('key_features')}
                     />
                   )}
                 </div>
