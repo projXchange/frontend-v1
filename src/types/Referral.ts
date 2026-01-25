@@ -37,7 +37,7 @@ export interface CreditInfo {
     can_receive_more: boolean;
   };
   total_free_downloads: {
-    used: number;
+    allocated: number;
     max: number;
     display: string;
   };

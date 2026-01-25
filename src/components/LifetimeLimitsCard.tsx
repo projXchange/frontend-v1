@@ -56,7 +56,7 @@ const LifetimeLimitsCard: React.FC<LifetimeLimitsCardProps> = ({ credits }) => {
   const monthlyMax = credits.monthly_credits?.max ?? 3;
   const referralUsed = credits.referral_credits?.used ?? 0;
   const referralMax = credits.referral_credits?.max ?? 6;
-  const totalUsed = credits.total_free_downloads?.used ?? 0;
+  const totalUsed = credits.total_free_downloads?.allocated ?? 0;
   const totalMax = credits.total_free_downloads?.max ?? 10;
 
   return (
