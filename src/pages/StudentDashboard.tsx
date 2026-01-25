@@ -447,12 +447,8 @@ const StudentDashboard = () => {
   }, [shouldShowWelcome])
 
   useEffect(() => {
-    // Fetch dashboard stats on mount to get profile data
-    if (!dashboardStats && !statsLoading) {
-      fetchDashboardStats()
-    }
-    
-    if (activeTab === "overview" && !dashboardStats && !statsLoading) {
+    // Fetch dashboard stats on mount or when switching to overview tab
+    if ((activeTab === "overview") && !dashboardStats && !statsLoading) {
       fetchDashboardStats()
     }
     if (activeTab === "my-projects" && myProjects.length === 0 && !projectsLoading) {
