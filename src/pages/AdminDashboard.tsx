@@ -923,8 +923,8 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 overflow-hidden">
-          <div className="border-b border-gray-200 overflow-x-auto">
-            <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-8 min-w-max sm:min-w-0">
+          <div className="border-b border-gray-200 dark:border-slate-700 overflow-x-auto scrollbar-hide">
+            <nav className="flex space-x-2 sm:space-x-4 px-4 sm:px-6 lg:px-8 min-w-max sm:min-w-0">
               {[
                 { id: "overview", label: "Overview", icon: BarChart3 },
                 { id: "analytics", label: "Analytics", icon: TrendingUp },
@@ -939,10 +939,11 @@ const AdminDashboard = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 sm:gap-3 py-4 sm:py-6 px-2 border-b-2 font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
-                    ? "border-blue-500 text-blue-600 scale-105"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:scale-105"
-                    }`}
+                  className={`relative flex items-center gap-2 sm:gap-3 py-4 sm:py-5 px-3 sm:px-4 font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  }`}
                 >
                   <tab.icon className="w-4 sm:w-5 h-4 sm:h-5" />
                   {tab.label}
@@ -950,6 +951,10 @@ const AdminDashboard = () => {
                     <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse ml-1">
                       {stats.pendingApproval}
                     </span>
+                  )}
+                  {/* Active tab indicator */}
+                  {activeTab === tab.id && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></span>
                   )}
                 </button>
               ))}
@@ -1251,7 +1256,7 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 transition-colors">
                           <tr>
@@ -1413,7 +1418,7 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 transition-colors">
                           <tr>
@@ -1538,7 +1543,7 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700 transition-colors">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 transition-colors">
                           <tr>
@@ -1663,7 +1668,7 @@ const AdminDashboard = () => {
                     <div className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-4">No transactions found</div>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-x-auto">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-x-auto scrollbar-hide">
                     <table className="min-w-full text-left text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                       <thead className="bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-semibold transition-colors">
                         <tr>
@@ -1772,7 +1777,7 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-700">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full text-sm">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 transition-colors">
                           <tr>

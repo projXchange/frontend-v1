@@ -40,6 +40,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [verifyStatus, setVerifyStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [referralCode, setReferralCode] = useState('');
   const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState<number>(0);
 
   // Handle email verification when token is provided
   useEffect(() => {
@@ -117,6 +119,28 @@ const AuthModal: React.FC<AuthModalProps> = ({
     const upperValue = value.toUpperCase();
     setReferralCode(upperValue);
     validateReferralCode(upperValue);
+  };
+
+  const calculatePasswordStrength = (pass: string): number => {
+    let strength = 0;
+    if (pass.length >= 6) strength += 25;
+    if (pass.length >= 10) strength += 25;
+    if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) strength += 25;
+    if (/\d/.test(pass)) strength += 15;
+    if (/[^a-zA-Z0-9]/.test(pass)) strength += 10;
+    return Math.min(strength, 100);
+  };
+
+  const getPasswordStrengthColor = (strength: number): string => {
+    if (strength < 40) return 'bg-red-500';
+    if (strength < 70) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+
+  const getPasswordStrengthText = (strength: number): string => {
+    if (strength < 40) return 'Weak';
+    if (strength < 70) return 'Medium';
+    return 'Strong';
   };
 
   const handleEmailVerification = async (token: string) => {
@@ -249,51 +273,61 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 sm:px-4 transition-opacity duration-300 ease-out ${isClosing ? 'opacity-0' : 'opacity-100'
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 sm:px-4 transition-all duration-300 ease-out ${isClosing ? 'opacity-0' : 'opacity-100'
         }`}
       onClick={handleClose}
     >
       <div
-        className={`bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden relative transform transition-all duration-500 ease-in-out ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+        className={`bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col lg:flex-row overflow-hidden relative transform transition-all duration-300 ease-out ${isClosing ? 'scale-90 opacity-0 translate-y-4' : 'scale-100 opacity-100 translate-y-0'
           }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left Panel */}
-        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-teal-600/90 z-10" />
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-teal-600/90 z-10 transition-all duration-500 group-hover:from-blue-700/90 group-hover:to-teal-700/90" />
+          {/* Animated gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 via-transparent to-pink-500/20 z-10 animate-pulse" />
           <img
             src="https://res.cloudinary.com/dmfh4f4yg/image/upload/v1761589602/users/0e34d7e5-2380-4c69-a536-5e22a0868004/jugtaeylh0aizw101pts.jpg"
             alt="Join Community"
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 z-20 flex flex-col justify-center items-center text-white px-8 py-12 text-center space-y-6">
-            <h2 className="text-3xl xl:text-4xl font-bold leading-tight">
-              {mode === 'signup'
-                ? 'Join the Future of'
-                : mode === 'reset'
-                  ? 'Secure Your Account'
-                  : mode === 'verify-pending' || mode === 'verify-email'
-                    ? 'Almost There!'
-                    : 'Welcome Back to'}
-              <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                Academic Success
-              </span>
-            </h2>
-            <p className="text-lg xl:text-xl text-blue-100 leading-relaxed">
+            <div className="transform transition-all duration-500 group-hover:scale-105">
+              <h2 className="text-3xl xl:text-4xl font-bold leading-tight animate-fadeIn">
+                {mode === 'signup'
+                  ? 'Join the Future of'
+                  : mode === 'reset'
+                    ? 'Secure Your Account'
+                    : mode === 'verify-pending' || mode === 'verify-email'
+                      ? 'Almost There!'
+                      : 'Welcome Back to'}
+                <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent animate-shimmer">
+                  Academic Success
+                </span>
+              </h2>
+            </div>
+            <p className="text-lg xl:text-xl text-blue-100 leading-relaxed animate-fadeIn animation-delay-200">
               {mode === 'reset'
                 ? 'Set a new password to regain access to your account.'
                 : mode === 'verify-pending' || mode === 'verify-email'
                   ? 'Verify your email to unlock your academic journey.'
                   : 'Access your projects, connect, and grow together.'}
             </p>
+            {/* Floating particles effect */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute w-2 h-2 bg-white/30 rounded-full animate-float" style={{ top: '20%', left: '15%', animationDelay: '0s' }} />
+              <div className="absolute w-3 h-3 bg-white/20 rounded-full animate-float" style={{ top: '60%', left: '80%', animationDelay: '2s' }} />
+              <div className="absolute w-2 h-2 bg-white/25 rounded-full animate-float" style={{ top: '80%', left: '30%', animationDelay: '4s' }} />
+            </div>
           </div>
         </div>
 
         {/* Right Panel */}
-        <div className="w-full lg:w-1/2 px-6 py-10 sm:px-10 relative">
+        <div className="w-full lg:w-1/2 px-6 py-8 sm:px-10 sm:py-10 relative overflow-y-auto max-h-[95vh] lg:max-h-none scrollbar-hide">
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all"
+            className="absolute top-4 right-4 p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all hover:rotate-90 duration-300 z-10"
           >
             <X className="w-5 h-5" />
           </button>
@@ -416,7 +450,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
             {!['verify-pending', 'verify-email'].includes(mode) && (
               <>
                 <div className="text-center mb-6 sm:mb-8">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 capitalize">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 capitalize animate-fadeIn">
                     {mode === 'reset'
                       ? 'Reset Password'
                       : mode === 'forgot'
@@ -425,85 +459,136 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           ? 'Create Account'
                           : 'Login'}
                   </h2>
+                  <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 mx-auto rounded-full animate-slideIn" />
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Signup fields */}
                   {mode === 'signup' && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                    <div className="animate-slideIn">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        onFocus={() => setFocusedField('name')}
+                        onBlur={() => setFocusedField(null)}
                         placeholder="Enter your full name"
                         required
-                        className="w-full px-4 py-4 border border-gray-300 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                        className={`w-full px-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-all duration-300 ${
+                          focusedField === 'name'
+                            ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-500 dark:ring-blue-400 scale-[1.02]'
+                            : 'border-gray-300 dark:border-slate-700'
+                        }`}
                       />
                     </div>
                   )}
 
                   {/* Phone Number - Only for signup */}
                   {mode === 'signup' && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div className="animate-slideIn animation-delay-100">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                         Phone Number <span className="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
                       </label>
                       <input
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
+                        onFocus={() => setFocusedField('phone')}
+                        onBlur={() => setFocusedField(null)}
                         placeholder="Enter your phone number"
                         maxLength={20}
-                        className="w-full px-4 py-4 border border-gray-300 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                        className={`w-full px-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-all duration-300 ${
+                          focusedField === 'phone'
+                            ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-500 dark:ring-blue-400 scale-[1.02]'
+                            : 'border-gray-300 dark:border-slate-700'
+                        }`}
                       />
                     </div>
                   )}
 
                   {/* Email */}
                   {mode !== 'reset' && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                    <div className="animate-slideIn animation-delay-200">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
                         placeholder="Enter your email"
                         required
-                        className="w-full px-4 py-4 border border-gray-300 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                        className={`w-full px-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-all duration-300 ${
+                          focusedField === 'email'
+                            ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-500 dark:ring-blue-400 scale-[1.02]'
+                            : 'border-gray-300 dark:border-slate-700'
+                        }`}
                       />
                     </div>
                   )}
 
                   {/* Password */}
                   {mode !== 'forgot' && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div className="animate-slideIn animation-delay-300">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                         {mode === 'reset' ? 'New Password' : 'Password'}
                       </label>
                       <div className="relative">
                         <input
                           type={showPassword ? 'text' : 'password'}
                           value={password}
-                          onChange={(e) => setPassword(e.target.value)}
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                            if (mode === 'signup' || mode === 'reset') {
+                              setPasswordStrength(calculatePasswordStrength(e.target.value));
+                            }
+                          }}
+                          onFocus={() => setFocusedField('password')}
+                          onBlur={() => setFocusedField(null)}
                           placeholder={mode === 'reset' ? 'Enter new password' : 'Enter your password'}
                           required
-                          className="w-full px-4 py-4 pr-12 border border-gray-300 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                          className={`w-full px-4 py-3 pr-12 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-all duration-300 ${
+                            focusedField === 'password'
+                              ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-500 dark:ring-blue-400 scale-[1.02]'
+                              : 'border-gray-300 dark:border-slate-700'
+                          }`}
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-all hover:scale-110"
                         >
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
+                      {/* Password Strength Indicator */}
+                      {(mode === 'signup' || mode === 'reset') && password && (
+                        <div className="mt-2 animate-fadeIn">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">Password Strength:</span>
+                            <span className={`text-xs font-semibold ${
+                              passwordStrength < 40 ? 'text-red-600 dark:text-red-400' :
+                              passwordStrength < 70 ? 'text-yellow-600 dark:text-yellow-400' :
+                              'text-green-600 dark:text-green-400'
+                            }`}>
+                              {getPasswordStrengthText(passwordStrength)}
+                            </span>
+                          </div>
+                          <div className="h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${getPasswordStrengthColor(passwordStrength)} transition-all duration-500 ease-out`}
+                              style={{ width: `${passwordStrength}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
                       {mode === 'login' && (
-                        <div className="text-right mt-2">
+                        <div className="text-right mt-1.5">
                           <button
                             type="button"
                             onClick={() => setMode('forgot')}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline transition-all hover:scale-105 inline-block"
                           >
                             Forgot Password?
                           </button>
@@ -515,7 +600,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   {/* Referral Code - Only for signup */}
                   {mode === 'signup' && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                         Referral Code (Optional)
                       </label>
                       <div className="relative">
@@ -525,7 +610,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           onChange={(e) => handleReferralCodeChange(e.target.value)}
                           placeholder="Enter referral code"
                           maxLength={8}
-                          className={`w-full px-4 py-4 pr-12 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-colors ${
+                          className={`w-full px-4 py-3 pr-12 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 transition-colors ${
                             referralCodeValid === true
                               ? 'border-green-500 dark:border-green-400 focus:ring-green-500 dark:focus:ring-green-400'
                               : referralCodeValid === false
@@ -541,12 +626,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         )}
                       </div>
                       {referralCodeValid === true && (
-                        <p className="mt-2 text-sm text-green-600 dark:text-green-400 font-medium">
+                        <p className="mt-1.5 text-xs text-green-600 dark:text-green-400 font-medium">
                           🎉 Valid referral code! You'll receive bonus credits after your first purchase or upload.
                         </p>
                       )}
                       {referralCodeValid === false && referralCode && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                        <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
                           Referral code must be 8 alphanumeric characters
                         </p>
                       )}
@@ -568,17 +653,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 text-white font-bold rounded-xl shadow-lg hover:scale-105 disabled:opacity-70 transition-transform"
+                    className="group relative w-full py-3.5 bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 text-white font-bold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 disabled:opacity-70 disabled:hover:scale-100 transition-all duration-300 overflow-hidden"
                   >
-                    {loading
-                      ? 'Please wait...'
-                      : mode === 'signup'
-                        ? 'Create Account'
-                        : mode === 'login'
-                          ? 'Login'
-                          : mode === 'forgot'
-                            ? 'Send Reset Link'
-                            : 'Reset Password'}
+                    <span className="relative z-10">
+                      {loading
+                        ? 'Please wait...'
+                        : mode === 'signup'
+                          ? 'Create Account'
+                          : mode === 'login'
+                            ? 'Login'
+                            : mode === 'forgot'
+                              ? 'Send Reset Link'
+                              : 'Reset Password'}
+                    </span>
+                    {/* Animated shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
                   </button>
 
                   {/* Back to login */}
