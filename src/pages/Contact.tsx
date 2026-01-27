@@ -203,8 +203,8 @@ const Contact = () => {
                       Office
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">
-                      Pune, Maharashtra<br />
-                      India - 411001
+                      Malegaon, Maharashtra<br />
+                      India - 423203
                     </p>
                   </div>
                 </div>
