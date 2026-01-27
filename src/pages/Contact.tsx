@@ -246,6 +246,21 @@ const Contact = () => {
                       → How It Works
                     </a>
                   </li>
+                  <li>
+                    <a href="/terms" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      → Terms of Service
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      → Privacy Policy
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/refund" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      → Refund Policy
+                    </a>
+                  </li>
                 </ul>
               </div>
             </motion.div>
