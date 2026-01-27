@@ -209,7 +209,7 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start">
+                {/* <div className="flex items-start">
                   <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
                     <MessageCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                   </div>
@@ -222,7 +222,7 @@ const Contact = () => {
                       Get instant support
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Quick Links */}
