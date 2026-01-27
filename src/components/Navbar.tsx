@@ -15,6 +15,7 @@ import {
   FolderOpenDot,
   LogIn,
   UserPlus,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
@@ -132,6 +133,16 @@ const Navbar = () => {
                   }`}
               >
                 <span>Projects</span>
+              </Link>
+
+              <Link
+                to="/contact"
+                className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive("/contact")
+                  ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                  : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
+                  }`}
+              >
+                <span>Contact Us</span>
               </Link>
 
               {/* Credit Balance - Only for authenticated users */}
@@ -321,6 +332,18 @@ const Navbar = () => {
               >
                 <FolderOpenDot className={`w-5 h-5 mr-2 ${isActive("/projects") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
                 Projects
+              </Link>
+
+              <Link
+                to="/contact"
+                className={`flex items-center px-4 py-3 transition-colors ${isActive("/contact")
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                  }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <MessageSquare className={`w-5 h-5 mr-2 ${isActive("/contact") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
+                Contact Us
               </Link>
 
               {/* Credit Balance - Only for authenticated users */}
