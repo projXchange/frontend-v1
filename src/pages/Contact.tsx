@@ -187,7 +187,7 @@ const Contact = () => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
                       Phone
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">+91 98765 43210</p>
+                    <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">+91 7249379579</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       Mon-Fri, 9am-6pm IST
                     </p>
