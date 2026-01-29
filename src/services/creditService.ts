@@ -86,6 +86,7 @@ class CreditService {
    * Download a project using a credit
    * Uses the dedicated credit download endpoint for direct downloads
    * Note: Projects above ₹2000 cannot be downloaded with free credits to prevent exploitation
+   * This is the ONLY method that qualifies referrals - no other actions count
    * @param projectId - The ID of the project to download
    * @returns Promise resolving to CreditDownloadResponse with download URL
    * @throws Error if download fails, insufficient credits, or network error
@@ -193,9 +194,9 @@ class CreditService {
   }
 
   /**
-   * Track a project view for analytics purposes
-   * Note: As of the latest update, only downloads qualify referrals.
-   * This tracking is kept for analytics and potential future use.
+   * Track a project view for analytics purposes only
+   * NOTE: Project views DO NOT qualify referrals - only downloads do
+   * This tracking is kept purely for analytics and user engagement metrics
    * @param projectId - The ID of the project being viewed
    * @param durationSeconds - How long the user viewed the project (in seconds)
    * @returns Promise that resolves when tracking is complete
@@ -227,37 +228,7 @@ class CreditService {
     }
   }
 
-  /**
-   * Trigger referral confirmation via wishlist add
-   * This is called silently when a referred user adds a project to their wishlist
-   * @param projectId - The ID of the project added to wishlist
-   * @returns Promise that resolves when confirmation is processed
-   * @throws Error if confirmation fails (should be handled silently in UI)
-   */
-  async confirmReferralViaWishlist(projectId: string): Promise<void> {
-    try {
-      const response = await apiClient(getApiUrl('/referrals/confirm-wishlist'), {
-        method: 'POST',
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify({
-          project_id: projectId,
-        }),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.message || errorData.error || 'Failed to confirm referral via wishlist';
-        throw new Error(errorMessage);
-      }
-
-      // No return value needed - confirmation happens silently
-    } catch (error) {
-      // Silent failure - log but don't disrupt user experience
-      console.error('[Credit Service] Failed to confirm referral via wishlist:', error);
-      // Don't re-throw - confirmation failures should not affect user experience
-    }
-  }
 }
 
 // Export singleton instance

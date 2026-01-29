@@ -3,8 +3,8 @@ import { creditService } from '../services/creditService';
 
 /**
  * Custom hook for tracking project view duration
- * Tracks views that exceed 60 seconds for analytics purposes.
- * Note: As of the latest update, only downloads qualify referrals.
+ * Tracks views that exceed 60 seconds for analytics purposes only.
+ * NOTE: Project views DO NOT qualify referrals - only downloads do.
  * 
  * Requirements: 13.1, 13.2, 13.3
  * 
@@ -20,13 +20,14 @@ export const useProjectViewTracking = (projectId: string) => {
     hasTrackedRef.current = false;
 
     /**
-     * Track the project view if duration >= 60 seconds
+     * Track the project view for analytics only
+     * NOTE: This does NOT qualify referrals - only downloads do
      * Silently fails to avoid disrupting user experience
      */
     const trackView = async () => {
       const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
 
-      // Only track if >= 60 seconds and not already tracked
+      // Only track if >= 60 seconds and not already tracked (analytics only)
       if (duration >= 60 && !hasTrackedRef.current) {
         hasTrackedRef.current = true;
         try {
@@ -41,7 +42,7 @@ export const useProjectViewTracking = (projectId: string) => {
     // Set timer to track after 60 seconds
     const timer = setTimeout(trackView, 60000);
 
-    // Cleanup: track on unmount if >= 60 seconds
+    // Cleanup: track on unmount if >= 60 seconds (analytics only)
     return () => {
       clearTimeout(timer);
       const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);

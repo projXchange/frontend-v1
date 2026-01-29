@@ -8,7 +8,6 @@ import { useCart } from "../contexts/CartContext"
 import { useReferralContext } from "../contexts/ReferralContext"
 import { useFeatureFlags } from "../contexts/FeatureFlagContext"
 import { useCredits } from "../hooks/useCredits"
-import { useProjectViewTracking } from "../hooks/useProjectViewTracking"
 import type { Project, Review } from "../types/Project"
 import toast from "react-hot-toast"
 import type { User } from "../types/User"
@@ -90,8 +89,8 @@ const ProjectDetail = () => {
     });
   }, [isAuthenticated, project, availableCredits, creditsLoading, showPaymentUI, showCreditUI, userStatus, user]);
 
-  // Track project view time for referral confirmation
-  useProjectViewTracking(id || '');
+  // No longer tracking project views for referral qualification
+  // Only downloads qualify referrals now
 
   useEffect(() => {
     if (project && user) {

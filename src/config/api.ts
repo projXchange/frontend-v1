@@ -54,7 +54,6 @@ export const API_CONFIG = {
     CREDITS_DOWNLOAD: '/downloads/consume-credit',
     REFERRALS_STATUS: '/referrals/status',
     TRACKING_PROJECT_VIEW: '/tracking/project-view',
-    REFERRALS_CONFIRM_WISHLIST: '/referrals/confirm-wishlist',
     
     // Admin referral endpoints
     ADMIN_REFERRAL_STATS: '/admin/referrals/stats',
