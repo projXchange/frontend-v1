@@ -21,6 +21,19 @@ const WishlistPage = () => {
     await addToCart(project);
   };
 
+  // Generate a placeholder image based on category
+  const getPlaceholderImage = (category: string) => {
+    const images = {
+      React: "https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400",
+      Java: "https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=400",
+      Python: "https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=400",
+      PHP: "https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "Node.js": "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=400",
+      Mobile: "https://images.pexels.com/photos/1181676/pexels-photo-1181676.jpeg?auto=compress&cs=tinysrgb&w=400",
+    };
+    return images[category as keyof typeof images] || images["React"];
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors flex items-center justify-center">
@@ -75,7 +88,7 @@ const WishlistPage = () => {
                 {/* Image */}
                 <div className="relative overflow-hidden">
                   <img
-                    src={item.project.thumbnail}
+                    src={item.project.thumbnail || getPlaceholderImage(item.project.category)}
                     alt={item.project.title}
                     className="w-full h-48 sm:h-56 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
