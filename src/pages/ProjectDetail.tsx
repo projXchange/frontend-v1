@@ -2139,6 +2139,18 @@ const ProjectDetail = () => {
         isOpen={isUnlockModalOpen}
         onClose={() => setIsUnlockModalOpen(false)}
         projectId={id || ''}
+        onPurchase={() => {
+          // Navigate to cart/checkout
+          navigate('/cart');
+        }}
+        onNavigateToReferrals={() => {
+          // Navigate to referrals page
+          navigate('/student-dashboard?tab=referrals');
+        }}
+        onCreditUsed={async () => {
+          // Refresh project data to show purchased state
+          await fetchProjectData();
+        }}
       />
 
       {/* Animations */}
