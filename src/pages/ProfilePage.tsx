@@ -86,20 +86,8 @@ const ProfilePage = () => {
         }
         setProfileForm(profileData)
 
-        // Also update the AuthContext to keep it in sync
-        updateUser({
-          avatar: profile.avatar || null,
-          bio: profile.bio || null,
-          location: profile.location || null,
-          website: profile.website || null,
-          social_links: profile.social_links || null,
-          skills: profile.skills || [],
-          experience_level: profile.experience_level || 'beginner',
-          rating: profile.rating || 0,
-          total_sales: profile.total_sales || 0,
-          total_purchases: profile.total_purchases || 0,
-          phone_number: profile.phone_number || null
-        })
+        // Note: Removed updateUser call to prevent infinite loop
+        // The profile data is stored in profileForm state for UI display
       }
     } catch (err: any) {
       console.error("Profile fetch error:", err)
