@@ -58,14 +58,17 @@ const ProfilePage = () => {
           "Content-Type": "application/json",
         },
       })
-      if (!res.ok) throw new Error("Failed to fetch profile")
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.message || errorData.error || "Failed to fetch profile")
+      }
       const data = await res.json()
       if (data.profile) {
         const profile = data.profile
         const normalizedSocialLinks = Object.fromEntries(
           Object.entries(profile.social_links || {}).map(([k, v]) => [k, v ?? ""]),
         )
-        setProfileForm({
+        const profileData = {
           id: profile.id || "",
           rating: profile.rating ?? 0,
           total_sales: profile.total_sales ?? 0,
@@ -80,10 +83,29 @@ const ProfilePage = () => {
           skills: profile.skills || [],
           status: profile.status || "active",
           created_at: profile.created_at || "",
+        }
+        setProfileForm(profileData)
+
+        // Also update the AuthContext to keep it in sync
+        updateUser({
+          avatar: profile.avatar || null,
+          bio: profile.bio || null,
+          location: profile.location || null,
+          website: profile.website || null,
+          social_links: profile.social_links || null,
+          skills: profile.skills || [],
+          experience_level: profile.experience_level || 'beginner',
+          rating: profile.rating || 0,
+          total_sales: profile.total_sales || 0,
+          total_purchases: profile.total_purchases || 0,
+          phone_number: profile.phone_number || null
         })
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load profile")
+      console.error("Profile fetch error:", err)
+      const errorMessage = err.message || "Failed to load profile"
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -116,8 +138,13 @@ const ProfilePage = () => {
         },
         body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error("Failed to save profile")
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.message || errorData.error || "Failed to save profile")
+      }
       const data = await res.json()
+
+      // Update local state with response
       setProfileForm({
         ...data.profile,
         phone_number: data.profile.phone_number || "",
@@ -128,7 +155,7 @@ const ProfilePage = () => {
         },
         skills: data.profile.skills || [],
       })
-      
+
       // Update user object in AuthContext and localStorage
       updateUser({
         avatar: data.profile.avatar || null,
@@ -140,15 +167,19 @@ const ProfilePage = () => {
         experience_level: data.profile.experience_level || 'beginner',
         rating: data.profile.rating || 0,
         total_sales: data.profile.total_sales || 0,
-        total_purchases: data.profile.total_purchases || 0
+        total_purchases: data.profile.total_purchases || 0,
+        phone_number: data.profile.phone_number || null
       })
-      
+
       setAvatarFile(null)
       setAvatarPreview("")
       setIsEditingProfile(false)
       toast.success("Profile updated successfully!")
     } catch (err: any) {
-      setError(err.message || "Failed to save profile")
+      console.error("Profile save error:", err)
+      const errorMessage = err.message || "Failed to save profile"
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -198,6 +229,7 @@ const ProfilePage = () => {
       navigate("/")
       return
     }
+    fetchUserProfile()
     fetchUserProfile()
   }, [user, navigate])
 
