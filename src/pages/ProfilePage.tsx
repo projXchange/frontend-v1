@@ -230,7 +230,6 @@ const ProfilePage = () => {
       return
     }
     fetchUserProfile()
-    fetchUserProfile()
   }, [user, navigate])
 
   if (!user) return null
