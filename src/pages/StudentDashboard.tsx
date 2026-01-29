@@ -474,7 +474,7 @@ const StudentDashboard = () => {
       />
       
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-8 sm:py-12 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 text-white py-8 sm:py-12 relative overflow-hidden sticky top-0 z-40">
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0 opacity-10">
           <div
@@ -525,12 +525,12 @@ const StudentDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative">
         {/* Launch Period Banner
         {flags.REFERRAL_ONLY_MODE && <LaunchPeriodBanner />} */}
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:-mt-16 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:-mt-16 relative z-50">
           <StatCard
             title="Projects Owned"
             value={dashboardStats?.user_performance?.projects_owned || 0}
@@ -566,9 +566,9 @@ const StudentDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 dark:border-slate-700/30 mb-8 transition-colors">
-          <div className="border-b border-gray-200">
-            <nav className="flex overflow-x-auto sm:overflow-visible sm:overflow-y-hidden space-x-2 sm:space-x-8 px-4 sm:px-8 -mx-4 sm:mx-0">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-2xl shadow-xl border border-white/30 dark:border-slate-700/30 mb-8 transition-colors relative z-30">
+          <div className="border-b border-gray-200 dark:border-slate-700">
+            <nav className="flex overflow-x-auto scrollbar-hide space-x-2 sm:space-x-8 px-4 sm:px-8 -mx-4 sm:mx-0">
               {[
                 { id: "overview", label: "Overview", icon: BarChart3 },
                 { id: "my-projects", label: "My Uploads", icon: ShoppingBag },

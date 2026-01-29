@@ -56,14 +56,17 @@ const Community = () => {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Connect With Us</h2>
             <div className="flex justify-center gap-6">
               {[
-                { icon: Github, label: "GitHub", color: "hover:bg-gray-800" },
-                { icon: Twitter, label: "Twitter", color: "hover:bg-blue-400" },
-                { icon: Linkedin, label: "LinkedIn", color: "hover:bg-blue-700" }
+                { icon: Github, label: "GitHub", color: "hover:bg-gray-800", url: "#" },
+                { icon: Twitter, label: "Twitter", color: "hover:bg-blue-400", url: "#" },
+                { icon: Linkedin, label: "LinkedIn", color: "hover:bg-blue-700", url: "https://www.linkedin.com/company/projxchange" }
               ].map((social, i) => (
                 <a
                   key={i}
-                  href="#"
-                  className={`w-14 h-14 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center transition-all duration-300 ${social.color} hover:text-white`}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-14 h-14 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center transition-all duration-300 ${social.color} hover:text-white hover:scale-110`}
+                  aria-label={social.label}
                 >
                   <social.icon className="w-6 h-6" />
                 </a>

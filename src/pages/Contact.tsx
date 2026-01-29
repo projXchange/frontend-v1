@@ -187,7 +187,7 @@ const Contact = () => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
                       Phone
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">+91 98765 43210</p>
+                    <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">+91 7249379579</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       Mon-Fri, 9am-6pm IST
                     </p>
@@ -203,13 +203,13 @@ const Contact = () => {
                       Office
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400">
-                      Pune, Maharashtra<br />
-                      India - 411001
+                      Malegaon, Maharashtra<br />
+                      India - 423203
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start">
+                {/* <div className="flex items-start">
                   <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
                     <MessageCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                   </div>
@@ -222,7 +222,7 @@ const Contact = () => {
                       Get instant support
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Quick Links */}
@@ -244,6 +244,21 @@ const Contact = () => {
                   <li>
                     <a href="/how-it-works" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
                       → How It Works
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/terms" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      → Terms of Service
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      → Privacy Policy
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/refund" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      → Refund Policy
                     </a>
                   </li>
                 </ul>

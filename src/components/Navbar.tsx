@@ -15,6 +15,7 @@ import {
   FolderOpenDot,
   LogIn,
   UserPlus,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
@@ -86,52 +87,62 @@ const Navbar = () => {
             </Link>
 
             {/* Desktop Menu */}
-            <div className="hidden lg:flex items-center space-x-4 ml-auto">
+            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4 ml-auto">
               <Link
                 to="/"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/")
+                className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/")
                   ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                   : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
                   }`}
               >
                 <Home className="w-5 h-5" />
-                <span>Home</span>
+                <span className="hidden xl:inline">Home</span>
               </Link>
 
               {isAuthenticated && (
                 <Link
                   to="/dashboard"
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/dashboard")
+                  className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/dashboard")
                     ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                     : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
                     }`}
                 >
                   <Gauge className="w-5 h-5" />
-                  <span>Dashboard</span>
+                  <span className="hidden xl:inline">Dashboard</span>
                 </Link>
               )}
 
               {isAuthenticated && isAdmin && (
                 <Link
                   to="/admin"
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/admin")
+                  className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/admin")
                     ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                     : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
                     }`}
                 >
                   <Gauge className="w-5 h-5" />
-                  <span>Admin</span>
+                  <span className="hidden xl:inline">Admin</span>
                 </Link>
               )}
 
               <Link
                 to="/projects"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/projects")
+                className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive("/projects")
                   ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                   : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
                   }`}
               >
                 <span>Projects</span>
+              </Link>
+
+              <Link
+                to="/contact"
+                className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive("/contact")
+                  ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                  : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
+                  }`}
+              >
+                <span>Contact Us</span>
               </Link>
 
               {/* Credit Balance - Only for authenticated users */}
@@ -147,13 +158,13 @@ const Navbar = () => {
                   {/* Sell */}
                   <Link
                     to="/upload"
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/upload")
+                    className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/upload")
                       ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                       : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
                       }`}
                   >
                     <Upload className="w-5 h-5" />
-                    <span>Sell</span>
+                    <span className="hidden xl:inline">Sell</span>
                   </Link>
 
                   {/* Wishlist */}
@@ -173,7 +184,7 @@ const Navbar = () => {
                         {getWishlistCount()}
                       </span>
                     )}
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs bg-gray-800 dark:bg-slate-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs bg-gray-800 dark:bg-slate-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-50">
                       Wishlist
                     </span>
                   </Link>
@@ -195,7 +206,7 @@ const Navbar = () => {
                         {getCartCount()}
                       </span>
                     )}
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs bg-gray-800 dark:bg-slate-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs bg-gray-800 dark:bg-slate-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-50">
                       Cart
                     </span>
                   </Link>
@@ -204,7 +215,7 @@ const Navbar = () => {
                   <div className="relative">
                     <button
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="flex items-center space-x-2 px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-full hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-center space-x-2 px-2 xl:px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-full hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors max-w-[200px]"
                     >
                       <img
                         src={
@@ -212,16 +223,16 @@ const Navbar = () => {
                           "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?w=740&q=80"
                         }
                         alt={user?.full_name}
-                        className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900 flex-shrink-0"
                       />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate hidden xl:inline-block">
                         {user?.full_name}
                       </span>
                     </button>
 
                     {isProfileOpen && (
                       <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 z-50 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+                        <div className="px-4 py-4 border-b border-gray-100 dark:border-slate-700">
                           <div className="flex items-center space-x-3">
                             <img
                               src={
@@ -229,13 +240,13 @@ const Navbar = () => {
                                 "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?w=740&q=80"
                               }
                               alt={user?.full_name}
-                              className="w-10 h-10 rounded-full object-cover"
+                              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                             />
-                            <div>
-                              <p className="font-semibold text-gray-800 dark:text-gray-100">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">
                                 {user?.full_name}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                               <p className="text-xs text-blue-600 dark:text-blue-400 font-medium capitalize">
                                 {user?.user_type}
                               </p>
@@ -247,18 +258,20 @@ const Navbar = () => {
                           <Link
                             to="/profile"
                             onClick={() => setIsProfileOpen(false)}
-                            className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${isActive("/profile")
+                            className={`flex items-center px-4 py-3 text-sm font-medium transition-colors ${isActive("/profile")
                               ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
                               }`}
                           >
-                            <User className="w-4 h-4 mr-3" /> Profile
+                            <User className="w-4 h-4 mr-3 flex-shrink-0" /> 
+                            <span className="truncate">Profile</span>
                           </Link>
                           <button
                             onClick={handleLogout}
-                            className="flex items-center w-full px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                           >
-                            <LogOut className="w-4 h-4 mr-3" /> Logout
+                            <LogOut className="w-4 h-4 mr-3 flex-shrink-0" /> 
+                            <span className="truncate">Logout</span>
                           </button>
                         </div>
                       </div>
@@ -319,6 +332,18 @@ const Navbar = () => {
               >
                 <FolderOpenDot className={`w-5 h-5 mr-2 ${isActive("/projects") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
                 Projects
+              </Link>
+
+              <Link
+                to="/contact"
+                className={`flex items-center px-4 py-3 transition-colors ${isActive("/contact")
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                  }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <MessageSquare className={`w-5 h-5 mr-2 ${isActive("/contact") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
+                Contact Us
               </Link>
 
               {/* Credit Balance - Only for authenticated users */}
