@@ -44,7 +44,7 @@ class CreditService {
 
       const responseData: CreditBalanceResponse = await response.json();
 
-      // Normalize the response to internal CreditBalance format
+      // Use backend's structured data directly with minimal normalization
       return this.normalizeCreditBalance(responseData.data);
     } catch (error) {
       // Parse and re-throw with user-friendly message

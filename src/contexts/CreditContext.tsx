@@ -15,7 +15,7 @@ interface CreditContextType {
   loading: boolean;
   error: string | null;
   loadCreditBalance: () => Promise<void>;
-  downloadWithCredit: (projectId: string) => Promise<string>; // returns download URL
+  downloadWithCredit: (projectId: string, onSuccess?: () => void) => Promise<string>; // returns download URL
   refreshBalance: () => Promise<void>;
 }
 
@@ -74,10 +74,11 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
    * Download a project using a credit
    * Updates balance optimistically and handles errors
    * @param projectId - The ID of the project to download
+   * @param onSuccess - Optional callback to execute after successful download (e.g., refresh other contexts)
    * @returns Promise resolving to download URL
    * @throws Error if download fails
    */
-  const downloadWithCredit = useCallback(async (projectId: string): Promise<string> => {
+  const downloadWithCredit = useCallback(async (projectId: string, onSuccess?: () => void): Promise<string> => {
     setLoading(true);
     setError(null);
     try {
@@ -86,6 +87,11 @@ export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       // Refresh credit balance from backend to get accurate updated values
       // This ensures we have the correct breakdown of which credits were used
       await loadCreditBalance();
+
+      // Call success callback to refresh other contexts (e.g., ReferralContext)
+      if (onSuccess) {
+        onSuccess();
+      }
 
       // Don't show success toast here - let the download button handle it after file is fetched
       // toast.success(`Download started! ${response.remaining_credits} credit(s) remaining.`);

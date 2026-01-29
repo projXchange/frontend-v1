@@ -448,8 +448,10 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     // Fetch dashboard stats on mount or when switching to overview tab
-    if ((activeTab === "overview") && !dashboardStats && !statsLoading) {
-      fetchDashboardStats()
+    if (activeTab === "overview") {
+      if (!dashboardStats && !statsLoading) {
+        fetchDashboardStats()
+      }
     }
     if (activeTab === "my-projects" && myProjects.length === 0 && !projectsLoading) {
       fetchMyProjects()
@@ -610,7 +612,7 @@ const StudentDashboard = () => {
                     <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                     Credit System
                   </h3>
-                  <CreditDashboard totalDownloads={dashboardStats?.credits?.total_free_downloads?.allocated} />
+                  <CreditDashboard />
                 </div>
 
                 <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">

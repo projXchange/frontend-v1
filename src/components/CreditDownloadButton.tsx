@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Download } from 'lucide-react';
 import { useCredits } from '../hooks/useCredits';
+import { useRefreshAllStats } from '../hooks/useRefreshAllStats';
 import toast from 'react-hot-toast';
 import ButtonSpinner from './ButtonSpinner';
 
@@ -31,6 +32,7 @@ const CreditDownloadButton: React.FC<CreditDownloadButtonProps> = ({
   onSuccess
 }) => {
   const { availableCredits, downloadWithCredit } = useCredits();
+  const { refreshAll } = useRefreshAllStats();
   const [isDownloading, setIsDownloading] = useState(false);
 
   // Size variants - Enhanced for mobile touch targets
@@ -61,7 +63,8 @@ const CreditDownloadButton: React.FC<CreditDownloadButtonProps> = ({
     
     try {
       // Call downloadWithCredit which returns the download URL (Requirements: 6.4)
-      const downloadUrl = await downloadWithCredit(projectId);
+      // Pass refreshAll as callback to refresh all stats after successful download
+      const downloadUrl = await downloadWithCredit(projectId, refreshAll);
       
       // Initiate file download (Requirements: 6.5)
       if (downloadUrl) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Coins, TrendingUp, Clock, Users } from 'lucide-react';
 import { useCredits } from '../hooks/useCredits';
+import { useReferrals } from '../hooks/useReferrals';
 
 /**
  * CreditDashboard Component
@@ -14,12 +15,12 @@ import { useCredits } from '../hooks/useCredits';
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6
  */
 
-interface CreditDashboardProps {
-  totalDownloads?: number;
-}
-
-const CreditDashboard: React.FC<CreditDashboardProps> = ({ totalDownloads }) => {
-  const { balance, loading, error } = useCredits();
+const CreditDashboard: React.FC = () => {
+  const { balance, loading: creditsLoading, error: creditsError } = useCredits();
+  const { dashboardData, loading: referralsLoading } = useReferrals();
+  
+  const loading = creditsLoading || referralsLoading;
+  const error = creditsError;
 
   // Loading skeleton
   if (loading) {
@@ -67,8 +68,9 @@ const CreditDashboard: React.FC<CreditDashboardProps> = ({ totalDownloads }) => 
     days_until_next_credit,
   } = balance;
 
-  // Use totalDownloads from props if available, otherwise fall back to computed value
-  const displayDownloads = totalDownloads ?? balance.credits_used ?? 0;
+  // Get accurate download count from ReferralContext
+  // This comes from the backend's total_free_downloads.allocated field
+  const displayDownloads = dashboardData?.credits?.total_free_downloads?.allocated ?? 0;
 
   // Determine if all monthly credits have been received
   const allMonthlyCreditsReceived = monthly_credits_received >= max_monthly_credits;
