@@ -82,7 +82,10 @@ export async function addPaymentMethod(
     }
   );
 
-  return handleResponse<PaymentMethod>(response);
+  const data = await handleResponse<{ message: string; payment_method: PaymentMethod }>(
+    response
+  );
+  return data.payment_method;
 }
 
 /**
@@ -92,12 +95,15 @@ export async function setPrimaryPaymentMethod(id: string): Promise<PaymentMethod
   const response = await apiClient(
     getApiUrl(API_CONFIG.ENDPOINTS.SET_PRIMARY_PAYMENT(id)),
     {
-      method: 'PATCH',
+      method: 'PUT',
       headers: getAuthHeaders(),
     }
   );
 
-  return handleResponse<PaymentMethod>(response);
+  const data = await handleResponse<{ message: string; payment_method: PaymentMethod }>(
+    response
+  );
+  return data.payment_method;
 }
 
 /**
@@ -154,7 +160,10 @@ export async function updatePayoutSettings(
     }
   );
 
-  return handleResponse<PayoutSettings>(response);
+  const data = await handleResponse<{ message: string; settings: PayoutSettings }>(
+    response
+  );
+  return data.settings;
 }
 
 // ============================================================================
@@ -176,7 +185,8 @@ export async function requestPayout(
     }
   );
 
-  return handleResponse<Payout>(response);
+  const data = await handleResponse<{ message: string; payout: Payout }>(response);
+  return data.payout;
 }
 
 /**
@@ -191,7 +201,8 @@ export async function verifyPayout(token: string): Promise<Payout> {
     }
   );
 
-  return handleResponse<Payout>(response);
+  const data = await handleResponse<{ message: string; payout: Payout }>(response);
+  return data.payout;
 }
 
 /**
@@ -328,7 +339,8 @@ export async function retryPayout(payoutId: string): Promise<Payout> {
     }
   );
 
-  return handleResponse<Payout>(response);
+  const data = await handleResponse<{ message: string; payout: Payout }>(response);
+  return data.payout;
 }
 
 /**
@@ -347,7 +359,8 @@ export async function cancelPayout(
     }
   );
 
-  return handleResponse<Payout>(response);
+  const data = await handleResponse<{ message: string; payout: Payout }>(response);
+  return data.payout;
 }
 
 /**
@@ -365,5 +378,6 @@ export async function createManualPayout(
     }
   );
 
-  return handleResponse<Payout>(response);
+  const data = await handleResponse<{ message: string; payout: Payout }>(response);
+  return data.payout;
 }
