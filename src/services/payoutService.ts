@@ -51,10 +51,12 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 /**
  * Get all payment methods for the authenticated user
+ * Or for a specific user if admin
  */
-export async function getPaymentMethods(): Promise<PaymentMethod[]> {
+export async function getPaymentMethods(userId?: string): Promise<PaymentMethod[]> {
+  const queryParams = userId ? `?user_id=${userId}` : '';
   const response = await apiClient(
-    getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT_METHODS),
+    `${getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT_METHODS)}${queryParams}`,
     {
       method: 'GET',
       headers: getAuthHeaders(),
@@ -223,16 +225,15 @@ export async function getPayouts(params?: {
   end_date?: string;
 }): Promise<PayoutsResponse> {
   const queryParams = new URLSearchParams();
-  
+
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
   if (params?.status) queryParams.append('status', params.status);
   if (params?.start_date) queryParams.append('start_date', params.start_date);
   if (params?.end_date) queryParams.append('end_date', params.end_date);
 
-  const url = `${getApiUrl(API_CONFIG.ENDPOINTS.PAYOUTS)}${
-    queryParams.toString() ? `?${queryParams.toString()}` : ''
-  }`;
+  const url = `${getApiUrl(API_CONFIG.ENDPOINTS.PAYOUTS)}${queryParams.toString() ? `?${queryParams.toString()}` : ''
+    }`;
 
   const response = await apiClient(url, {
     method: 'GET',
@@ -273,7 +274,7 @@ export async function getAdminPayouts(params?: {
   end_date?: string;
 }): Promise<PayoutsResponse> {
   const queryParams = new URLSearchParams();
-  
+
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
   if (params?.user_id) queryParams.append('user_id', params.user_id);
@@ -281,9 +282,8 @@ export async function getAdminPayouts(params?: {
   if (params?.start_date) queryParams.append('start_date', params.start_date);
   if (params?.end_date) queryParams.append('end_date', params.end_date);
 
-  const url = `${getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_PAYOUTS)}${
-    queryParams.toString() ? `?${queryParams.toString()}` : ''
-  }`;
+  const url = `${getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_PAYOUTS)}${queryParams.toString() ? `?${queryParams.toString()}` : ''
+    }`;
 
   const response = await apiClient(url, {
     method: 'GET',
@@ -301,13 +301,12 @@ export async function getPayoutStats(params?: {
   end_date?: string;
 }): Promise<PayoutStatsResponse> {
   const queryParams = new URLSearchParams();
-  
+
   if (params?.start_date) queryParams.append('start_date', params.start_date);
   if (params?.end_date) queryParams.append('end_date', params.end_date);
 
-  const url = `${getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_PAYOUT_STATS)}${
-    queryParams.toString() ? `?${queryParams.toString()}` : ''
-  }`;
+  const url = `${getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_PAYOUT_STATS)}${queryParams.toString() ? `?${queryParams.toString()}` : ''
+    }`;
 
   const response = await apiClient(url, {
     method: 'GET',

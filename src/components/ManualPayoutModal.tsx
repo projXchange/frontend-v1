@@ -27,7 +27,7 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
   const [notesError, setNotesError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  
+
   // Payment methods for the selected user
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
@@ -74,12 +74,11 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
     try {
       setLoadingPaymentMethods(true);
       setPaymentMethodsError('');
-      
-      // Note: This assumes the backend supports fetching payment methods for a specific user
-      // If not available, we'll need to handle this differently
-      const methods = await getPaymentMethods();
+
+      // Fetch payment methods for the specific user (Admin capability)
+      const methods = await getPaymentMethods(userId.trim());
       setPaymentMethods(methods);
-      
+
       // Auto-select primary payment method (Requirements: 7.5)
       const primaryMethod = methods.find(pm => pm.is_primary);
       if (primaryMethod) {
@@ -183,15 +182,13 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-0 sm:px-4 transition-opacity duration-300 ease-out ${
-        isClosing ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-0 sm:px-4 transition-opacity duration-300 ease-out ${isClosing ? 'opacity-0' : 'opacity-100'
+        }`}
       onClick={handleClose}
     >
       <div
-        className={`bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] overflow-hidden relative transform transition-all duration-300 ease-in-out ${
-          isClosing ? 'translate-y-full sm:translate-y-0 sm:scale-95 opacity-0' : 'translate-y-0 sm:scale-100 opacity-100'
-        }`}
+        className={`bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] overflow-hidden relative transform transition-all duration-300 ease-in-out ${isClosing ? 'translate-y-full sm:translate-y-0 sm:scale-95 opacity-0' : 'translate-y-0 sm:scale-100 opacity-100'
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -226,7 +223,7 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
                   Bypass Email Verification
                 </h4>
                 <p className="text-xs text-yellow-700 dark:text-yellow-400">
-                  Manual payouts bypass email verification and are queued for immediate processing. 
+                  Manual payouts bypass email verification and are queued for immediate processing.
                   Use this feature carefully and only when necessary.
                 </p>
               </div>
@@ -249,11 +246,10 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
                 }}
                 onBlur={handleUserIdBlur}
                 placeholder="Enter user ID"
-                className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-colors ${
-                  userIdError
+                className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-colors ${userIdError
                     ? 'border-red-500 dark:border-red-500'
                     : 'border-gray-300 dark:border-slate-700'
-                }`}
+                  }`}
               />
             </div>
             {userIdError && (
@@ -278,11 +274,10 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0.00"
-                className={`w-full pl-8 pr-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-colors ${
-                  amountError
+                className={`w-full pl-8 pr-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-colors ${amountError
                     ? 'border-red-500 dark:border-red-500'
                     : 'border-gray-300 dark:border-slate-700'
-                }`}
+                  }`}
               />
             </div>
             {amountError && (
@@ -355,11 +350,10 @@ const ManualPayoutModal: React.FC<ManualPayoutModalProps> = ({
               }}
               placeholder="Provide a reason for this manual payout (required)..."
               rows={4}
-              className={`w-full px-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-colors resize-none ${
-                notesError
+              className={`w-full px-4 py-3 border rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-colors resize-none ${notesError
                   ? 'border-red-500 dark:border-red-500'
                   : 'border-gray-300 dark:border-slate-700'
-              }`}
+                }`}
             />
             {notesError && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{notesError}</p>

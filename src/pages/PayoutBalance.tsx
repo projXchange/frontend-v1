@@ -57,12 +57,12 @@ export default function PayoutBalance() {
     try {
       setLoading(true);
       setError('');
-      
+
       // Fetch balance and settings
       const balanceData = await getBalanceAndSettings();
       setBalance(balanceData.balance);
       setSettings(balanceData.settings);
-      
+
       // Fetch payment methods
       const methods = await getPaymentMethods();
       setPaymentMethods(methods);
@@ -77,7 +77,7 @@ export default function PayoutBalance() {
     setMinimumAmount(value);
     setMinimumAmountError('');
     setSettingsSuccess(false);
-    
+
     // Validate minimum amount
     const amount = parseFloat(value);
     if (isNaN(amount) || amount < 100) {
@@ -97,16 +97,16 @@ export default function PayoutBalance() {
       setSavingSettings(true);
       setSettingsError('');
       setSettingsSuccess(false);
-      
+
       const updatedSettings = await updatePayoutSettings({
         auto_payout_enabled: autoPayoutEnabled,
         minimum_payout_amount: amount,
       });
-      
+
       setSettings(updatedSettings);
       setSettingsSuccess(true);
       toast.success('Settings saved successfully');
-      
+
       // Hide success message after 3 seconds
       setTimeout(() => setSettingsSuccess(false), 3000);
     } catch (err: any) {
@@ -157,8 +157,8 @@ export default function PayoutBalance() {
 
         {/* Error Message */}
         {error && (
-          <div 
-            role="alert" 
+          <div
+            role="alert"
             aria-live="polite"
             className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3"
           >
@@ -250,7 +250,7 @@ export default function PayoutBalance() {
 
         {/* Last Payout Info */}
         {balance?.last_payout_at && (
-          <aside 
+          <aside
             className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl flex items-center gap-3"
             aria-label="Last payout information"
           >
@@ -270,8 +270,8 @@ export default function PayoutBalance() {
 
             {/* Settings Error */}
             {settingsError && (
-              <div 
-                role="alert" 
+              <div
+                role="alert"
                 aria-live="polite"
                 className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-2"
               >
@@ -282,8 +282,8 @@ export default function PayoutBalance() {
 
             {/* Settings Success */}
             {settingsSuccess && (
-              <div 
-                role="status" 
+              <div
+                role="status"
                 aria-live="polite"
                 className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-start gap-2"
               >
@@ -313,16 +313,14 @@ export default function PayoutBalance() {
                     setSettingsSuccess(false);
                   }}
                   disabled={loading}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
-                    autoPayoutEnabled
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${autoPayoutEnabled
                       ? 'bg-blue-600 dark:bg-blue-500'
                       : 'bg-gray-300 dark:bg-slate-700'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      autoPayoutEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${autoPayoutEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
                   />
                 </button>
               </div>
@@ -351,11 +349,10 @@ export default function PayoutBalance() {
                   value={minimumAmount}
                   onChange={(e) => handleMinimumAmountChange(e.target.value)}
                   disabled={loading}
-                  className={`w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-slate-800 border ${
-                    minimumAmountError
+                  className={`w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-slate-800 border ${minimumAmountError
                       ? 'border-red-300 dark:border-red-700'
                       : 'border-gray-300 dark:border-slate-600'
-                  } rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed`}
+                    } rounded-xl text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed`}
                 />
               </div>
               {minimumAmountError && (
@@ -451,6 +448,7 @@ export default function PayoutBalance() {
           availableBalance={availableBalance}
           paymentMethods={paymentMethods}
           onSuccess={handleRequestPayoutSuccess}
+          minimumAmount={minimumAmountNum}
         />
       </div>
     </main>
