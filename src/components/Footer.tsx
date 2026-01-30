@@ -17,7 +17,7 @@ const Footer = () => {
               <span className="text-xl font-bold">projXchange</span>
             </div>
             <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed">
-              Empowering Indian students to share knowledge, build skills, and create opportunities in tech.
+              Empowering students, freelancers, and developers to share knowledge, build skills, and create opportunities in tech.
             </p>
           </div>
 
