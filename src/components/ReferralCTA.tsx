@@ -18,7 +18,8 @@ const ReferralCTA: React.FC = () => {
 
   // Check if user has reached the referral credit cap (Requirements: 7.5)
   const hasReachedReferralCap =
-    (balance?.referral_credits_earned ?? 0) >= (balance?.max_referral_credits ?? 6);
+    (balance?.referral_credits_earned ?? 0) >= (balance?.max_referral_credits ?? 6) ||
+    (balance?.referral_credits?.used ?? 0) >= (balance?.referral_credits?.max ?? 6);
 
   /**
    * Navigate to referral dashboard

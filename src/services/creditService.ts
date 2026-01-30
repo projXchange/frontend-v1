@@ -68,9 +68,9 @@ class CreditService {
       download_credits: data.download_credits,
       lifetime_monthly_credits: data.lifetime_monthly_credits,
       lifetime_referral_credits: data.lifetime_referral_credits,
-      total_available_credits: data.total_available_credits,
+      total_available_credits: data.total_available_credits || data.download_credits,
       // Computed values for UI
-      available_credits: data.total_available_credits,
+      available_credits: data.total_available_credits || data.download_credits,
       credits_used: totalUsed + signupBonusUsed,
       signup_bonus_received: signupBonusUsed > 0,
       monthly_credits_received: data.lifetime_monthly_credits,
@@ -79,6 +79,22 @@ class CreditService {
       max_monthly_credits: 3,
       max_referral_credits: 6,
       max_total_credits: 10,
+      
+      // Additional context from new API structure
+      monthly_credits: data.monthly_credits || {
+        used: data.lifetime_monthly_credits,
+        max: 3,
+        remaining: Math.max(0, 3 - data.lifetime_monthly_credits),
+        display: `${data.lifetime_monthly_credits}/3`,
+        can_receive_more: data.lifetime_monthly_credits < 3
+      },
+      referral_credits: data.referral_credits || {
+        used: data.lifetime_referral_credits,
+        max: 6,
+        remaining: Math.max(0, 6 - data.lifetime_referral_credits),
+        display: `${data.lifetime_referral_credits}/6`,
+        can_receive_more: data.lifetime_referral_credits < 6
+      }
     };
   }
 

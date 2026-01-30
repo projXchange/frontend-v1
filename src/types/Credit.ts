@@ -35,6 +35,22 @@ export interface CreditBalance {
   max_monthly_credits: 3;
   max_referral_credits: 6;
   max_total_credits: 10; // 1 signup + 3 monthly + 6 referral
+  
+  // Additional context from new API structure
+  monthly_credits?: {
+    used: number;
+    max: number;
+    remaining: number;
+    display: string;
+    can_receive_more: boolean;
+  };
+  referral_credits?: {
+    used: number;
+    max: number;
+    remaining: number;
+    display: string;
+    can_receive_more: boolean;
+  };
 }
 
 export interface CreditDownloadRequest {
