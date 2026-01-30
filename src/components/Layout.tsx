@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   // Routes where providers should NOT mount
-  const excludedPaths = ['/auth/reset-password', '/auth/verify-email'];
+  const excludedPaths = ['/auth/reset-password', '/auth/verify-email', '/signup'];
   const isExcluded = excludedPaths.some(path => location.pathname.startsWith(path)) || location.pathname === '*';
 
   const Content = (

@@ -12,7 +12,7 @@ const ReferralDashboard = () => {
 
   // Load user's referral code on mount
   React.useEffect(() => {
-    loadUserReferralCode();
+    loadUserReferralCode().catch(console.error);
   }, [loadUserReferralCode]);
 
   const handleShareCode = () => {

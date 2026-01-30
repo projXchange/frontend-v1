@@ -7,21 +7,21 @@ export const API_CONFIG = {
     CREATE_ORDER: '/orders/create',
     VERIFY_PAYMENT: '/orders/verify-payment',
     PAYMENT_FAILED: '/orders/payment-failed',
-    
+
     // Cart
     CART: '/cart',
-    
+
     // Projects
     PROJECTS: '/projects',
-    
+
     // Transactions
     TRANSACTIONS: '/transactions',
-    
+
     // Payment Methods
     PAYMENT_METHODS: '/api/payment-methods',
     PAYMENT_METHOD_BY_ID: (id: string) => `/api/payment-methods/${id}`,
     SET_PRIMARY_PAYMENT: (id: string) => `/api/payment-methods/${id}/set-primary`,
-    
+
     // Payouts
     PAYOUT_BALANCE: '/api/payouts/balance',
     PAYOUT_SETTINGS: '/api/payouts/settings',
@@ -30,31 +30,32 @@ export const API_CONFIG = {
     RESEND_VERIFICATION: (id: string) => `/api/payouts/${id}/resend-verification`,
     PAYOUTS: '/api/payouts',
     PAYOUT_BY_ID: (id: string) => `/api/payouts/${id}`,
-    
+
     // Admin Payouts
     ADMIN_PAYOUTS: '/api/admin/payouts',
     ADMIN_PAYOUT_STATS: '/api/admin/payouts/stats',
     ADMIN_RETRY_PAYOUT: (id: string) => `/api/admin/payouts/${id}/retry`,
     ADMIN_CANCEL_PAYOUT: (id: string) => `/api/admin/payouts/${id}/cancel`,
     ADMIN_MANUAL_PAYOUT: '/api/admin/payouts/manual',
-    
+
     // Field Permissions
     PROJECT_PERMISSIONS: (id: string) => `/projects/${id}/permissions`,
     UPDATE_PROJECT_FIELDS: (id: string) => `/projects/${id}`,
-    
-    // Referral endpoints (Note: REFERRAL_CODE is generated on frontend, not backend)
+
+    // Referral endpoints
+    REFERRAL_CODE: '/referrals/code', // Get user's referral code
     REFERRAL_DASHBOARD: '/referrals/dashboard',
     REFERRAL_HISTORY: '/referrals/history',
     REFERRAL_UNLOCK_OPTIONS: (projectId: string) => `/referrals/unlock-options/${projectId}`,
     REFERRAL_SHARE: (platform: string) => `/referrals/share/${platform}`,
-    
+
     // Credit endpoints
     DOWNLOADS_CREDITS: '/downloads/credits',
     CREDITS_BALANCE: '/credits/balance',
     CREDITS_DOWNLOAD: '/downloads/consume-credit',
     REFERRALS_STATUS: '/referrals/status',
     TRACKING_PROJECT_VIEW: '/tracking/project-view',
-    
+
     // Admin referral endpoints
     ADMIN_REFERRAL_STATS: '/admin/referrals/stats',
     ADMIN_REFERRAL_SUSPICIOUS: '/admin/referrals/suspicious',

@@ -36,6 +36,7 @@ import PayoutBalance from './pages/PayoutBalance';
 import PayoutHistory from './pages/PayoutHistory';
 import AdminPayouts from './pages/AdminPayouts';
 import UploadProjectNew from './pages/UploadProjectNew';
+import SignupPage from './pages/SignupPage';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
                 <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/projects" element={<ProjectListing />} />
             <Route path="/project/:id" element={<ProjectDetail />} />

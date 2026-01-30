@@ -13,7 +13,7 @@ interface ReferralContextType {
   error: string | null;
   loadDashboard: () => Promise<void>;
   loadHistory: () => Promise<void>;
-  loadUserReferralCode: () => void;
+  loadUserReferralCode: () => Promise<void>;
   refreshCredits: () => Promise<void>;
 }
 
@@ -108,20 +108,48 @@ export const ReferralProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }, []);
 
-  const loadUserReferralCode = useCallback(() => {
+  const loadUserReferralCode = useCallback(async () => {
     if (!user) {
       setError('User not authenticated');
       return;
     }
 
+    setLoading(true);
+    setError(null);
     try {
-      const result = referralService.getUserReferralCode(user);
+      const result = await referralService.getUserReferralCode();
       setUserReferralCode(result);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load referral code';
       setError(errorMessage);
-      toast.error(errorMessage);
+      
+      // Check if error is retryable
+      const isRetryable = (err as any).retryable ?? false;
+      
+      if (isRetryable) {
+        toast.error(
+          (t) => (
+            <div className="flex items-center gap-3">
+              <span>{errorMessage}</span>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  loadUserReferralCode();
+                }}
+                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ),
+          { duration: 5000 }
+        );
+      } else {
+        toast.error(errorMessage);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [user]);
 

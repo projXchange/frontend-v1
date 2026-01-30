@@ -1,7 +1,6 @@
 import { apiClient } from '../utils/apiClient';
 import { API_CONFIG, getApiUrl } from '../config/api';
 import { mapReferralError } from '../utils/referralErrors';
-import { ensureReferralCode } from '../utils/referralCodeGenerator';
 import type {
   ReferralDashboardData,
   ReferralCode,
@@ -10,7 +9,6 @@ import type {
   AdminReferralStats,
   SuspiciousReferral,
 } from '../types/Referral';
-import type { User } from '../types/User';
 
 /**
  * Get authentication token from localStorage
@@ -64,31 +62,44 @@ async function handleResponse<T>(response: Response): Promise<T> {
 // ============================================================================
 
 /**
- * Get user's static referral code (generated locally on frontend)
- * @param user - Current user object
+ * Get user's referral code from backend (creates one if doesn't exist)
  * @returns User's referral code data with shareable link
  */
-export function getUserReferralCode(user: User): {
+export async function getUserReferralCode(): Promise<{
   referral_code: string;
   shareable_link: string;
   created_at: string;
-} {
-  // Generate or retrieve the referral code
-  const referralCode = ensureReferralCode(
-    user.id,
-    user.full_name || user.email.split('@')[0],
-    user.created_at
-  );
+}> {
+  try {
+    const response = await apiClient(
+      getApiUrl(API_CONFIG.ENDPOINTS.REFERRAL_CODE),
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      }
+    );
 
-  // Create shareable link
-  const baseUrl = window.location.origin;
-  const shareableLink = `${baseUrl}/signup?ref=${referralCode}`;
+    const data = await handleResponse(response);
+    
+    // Create shareable link
+    const baseUrl = window.location.origin;
+    const shareableLink = `${baseUrl}/signup?ref=${data.referral_code}`;
 
-  return {
-    referral_code: referralCode,
-    shareable_link: shareableLink,
-    created_at: user.created_at,
-  };
+    return {
+      referral_code: data.referral_code,
+      shareable_link: shareableLink,
+      created_at: data.created_at,
+    };
+  } catch (error) {
+    if (error instanceof Error && (error as any).code) {
+      throw error;
+    }
+    const mappedError = mapReferralError(error);
+    const newError = new Error(mappedError.userMessage);
+    (newError as any).code = mappedError.code;
+    (newError as any).retryable = mappedError.retryable;
+    throw newError;
+  }
 }
 
 /**
