@@ -12,6 +12,25 @@ export interface CreditBalanceResponse {
     lifetime_monthly_credits: number;
     lifetime_referral_credits: number;
     total_available_credits: number;
+    // Additional structured data from backend
+    monthly_credits: {
+      used: number;
+      max: number;
+      remaining: number;
+      display: string;
+      can_receive_more: boolean;
+    };
+    referral_credits: {
+      used: number;
+      max: number;
+      remaining: number;
+      display: string;
+      can_receive_more: boolean;
+    };
+    monthly_referrals: {
+      current: number;
+      remaining: number;
+    };
   };
 }
 
@@ -31,11 +50,10 @@ export interface CreditBalance {
   signup_bonus_received: boolean; // Computed from download_credits > 0
   monthly_credits_received: number; // Alias for lifetime_monthly_credits
   referral_credits_earned: number; // Alias for lifetime_referral_credits
-  days_until_next_credit: number | null; // Days until next monthly credit
   max_monthly_credits: 3;
   max_referral_credits: 6;
   max_total_credits: 10; // 1 signup + 3 monthly + 6 referral
-  
+
   // Additional context from new API structure
   monthly_credits?: {
     used: number;

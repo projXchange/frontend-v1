@@ -3,7 +3,6 @@
 import { apiClient } from '../utils/apiClient';
 import { getApiUrl } from '../config/api';
 import { CreditBalance, CreditBalanceResponse, CreditDownloadResponse } from '../types/Credit';
-import { ReferralWithStatus } from '../types/Referral';
 import { parseCreditError } from '../utils/creditErrors';
 
 /**
@@ -75,11 +74,10 @@ class CreditService {
       signup_bonus_received: signupBonusUsed > 0,
       monthly_credits_received: data.lifetime_monthly_credits,
       referral_credits_earned: data.lifetime_referral_credits,
-      days_until_next_credit: null, // TODO: Calculate from last credit date if API provides it
       max_monthly_credits: 3,
       max_referral_credits: 6,
       max_total_credits: 10,
-      
+
       // Additional context from new API structure
       monthly_credits: data.monthly_credits || {
         used: data.lifetime_monthly_credits,

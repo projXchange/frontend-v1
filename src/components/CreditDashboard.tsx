@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coins, TrendingUp, Clock, Users } from 'lucide-react';
+import { Coins, TrendingUp, Users } from 'lucide-react';
 import { useCredits } from '../hooks/useCredits';
 import { useReferrals } from '../hooks/useReferrals';
 
@@ -18,7 +18,7 @@ import { useReferrals } from '../hooks/useReferrals';
 const CreditDashboard: React.FC = () => {
   const { balance, loading: creditsLoading, error: creditsError } = useCredits();
   const { dashboardData, loading: referralsLoading } = useReferrals();
-  
+
   const loading = creditsLoading || referralsLoading;
   const error = creditsError;
 
@@ -63,17 +63,12 @@ const CreditDashboard: React.FC = () => {
     available_credits,
     referral_credits_earned,
     max_referral_credits,
-    monthly_credits_received,
-    max_monthly_credits,
-    days_until_next_credit,
   } = balance;
 
   // Get accurate download count from ReferralContext
   // This comes from the backend's total_free_downloads.allocated field
   const displayDownloads = dashboardData?.credits?.total_free_downloads?.allocated ?? 0;
 
-  // Determine if all monthly credits have been received
-  const allMonthlyCreditsReceived = monthly_credits_received >= max_monthly_credits;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
@@ -117,27 +112,6 @@ const CreditDashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Monthly Timer Card - Hide if all monthly credits received */}
-      {!allMonthlyCreditsReceived && (
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg sm:shadow-xl border border-purple-100 dark:border-purple-800 hover:shadow-2xl hover:scale-[1.02] sm:hover:scale-105 transition-all duration-300 group">
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300 font-medium mb-1 truncate">
-                Next Credit In
-              </p>
-              <p className="text-3xl sm:text-4xl font-bold text-purple-900 dark:text-purple-100">
-                {days_until_next_credit !== null ? days_until_next_credit : '--'}
-              </p>
-            </div>
-            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0 ml-2">
-              <Clock className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-            </div>
-          </div>
-          <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300 truncate">
-            {days_until_next_credit === 1 ? 'day remaining' : 'days remaining'}
-          </p>
-        </div>
-      )}
 
       {/* Referral Stats Card */}
       <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg sm:shadow-xl border border-orange-100 dark:border-orange-800 hover:shadow-2xl hover:scale-[1.02] sm:hover:scale-105 transition-all duration-300 group">
