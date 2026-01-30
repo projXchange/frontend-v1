@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Upload, 
-  Search, 
-  ShoppingCart, 
-  Download, 
-  DollarSign, 
-  Users, 
-  CheckCircle, 
+import {
+  Upload,
+  Search,
+  ShoppingCart,
+  Download,
+  DollarSign,
+  Users,
+  CheckCircle,
   ArrowRight,
   FileText,
   Star,
@@ -21,7 +21,7 @@ const HowItWorks = () => {
     {
       icon: Upload,
       title: "Upload Your Project",
-      description: "Create an account and upload your academic project with detailed documentation, screenshots, and source code.",
+      description: "Create an account and upload your development project with detailed documentation, screenshots, and source code.",
       color: "from-blue-500 to-blue-600"
     },
     {
@@ -33,13 +33,13 @@ const HowItWorks = () => {
     {
       icon: Users,
       title: "Get Discovered",
-      description: "Your project gets listed on our marketplace where thousands of students search daily for quality projects.",
+      description: "Your project gets listed on our marketplace where thousands of students, freelancers, and developers search daily for quality projects.",
       color: "from-green-500 to-green-600"
     },
     {
       icon: DollarSign,
       title: "Earn Money",
-      description: "Receive payments directly to your account when students purchase your projects. Track your earnings in real-time.",
+      description: "Receive payments directly to your account when buyers purchase your projects. Track your earnings in real-time.",
       color: "from-orange-500 to-orange-600"
     }
   ];
@@ -48,7 +48,7 @@ const HowItWorks = () => {
     {
       icon: Search,
       title: "Browse Projects",
-      description: "Search through our curated collection of academic projects across various technologies and categories.",
+      description: "Search through our curated collection of development projects across various technologies and categories.",
       color: "from-cyan-500 to-cyan-600"
     },
     {
@@ -99,7 +99,7 @@ const HowItWorks = () => {
       {/* Hero Section */}
       <section className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-teal-600 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -110,7 +110,7 @@ const HowItWorks = () => {
               How ProjXchange Works
             </h1>
             <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl mx-auto mb-8">
-              A simple, secure platform connecting student developers with those seeking quality academic projects
+              A simple, secure platform connecting students, freelancers, and developers with quality projects
             </p>
           </motion.div>
         </div>
@@ -130,7 +130,7 @@ const HowItWorks = () => {
               For Sellers: Monetize Your Work
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Turn your academic projects into a source of income in 4 simple steps
+              Turn your development projects into a source of income in 4 simple steps
             </p>
           </motion.div>
 
@@ -201,7 +201,7 @@ const HowItWorks = () => {
               For Buyers: Find Quality Projects
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Discover and purchase academic projects that accelerate your learning
+              Discover and purchase quality projects that accelerate your development
             </p>
           </motion.div>
 
@@ -272,7 +272,7 @@ const HowItWorks = () => {
               Why Choose ProjXchange?
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              We provide a safe, reliable platform for academic project exchange
+              We provide a safe, reliable platform for students, freelancers, and developers
             </p>
           </motion.div>
 
@@ -316,7 +316,7 @@ const HowItWorks = () => {
               Ready to Get Started?
             </h2>
             <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-              Join thousands of students already using ProjXchange to learn, earn, and grow
+              Join thousands of students, freelancers, and developers already using ProjXchange to learn, earn, and grow
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

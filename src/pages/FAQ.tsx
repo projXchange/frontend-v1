@@ -11,11 +11,11 @@ const FAQ = () => {
       questions: [
         {
           question: "What is ProjXchange?",
-          answer: "ProjXchange is a marketplace platform that connects student developers with those seeking quality academic projects. Students can upload their projects to earn money, while others can purchase well-documented projects to learn and accelerate their academic journey."
+          answer: "ProjXchange is a marketplace platform that connects students, freelancers, and developers with those seeking quality projects. Anyone can upload their projects to earn money, while others can purchase well-documented projects to learn and accelerate their journey."
         },
         {
           question: "Who can use ProjXchange?",
-          answer: "ProjXchange is designed for students, developers, and anyone interested in academic projects. Whether you're looking to monetize your work or find quality projects to learn from, our platform is open to all."
+          answer: "ProjXchange is designed for students, freelancers, developers, and anyone interested in professional development projects. Whether you're looking to monetize your work or find quality projects to learn from, our platform is open to all."
         },
         {
           question: "Is ProjXchange free to use?",
@@ -49,7 +49,7 @@ const FAQ = () => {
       questions: [
         {
           question: "How do I upload a project?",
-          answer: "After creating an account, click on 'Upload Project' in the navigation menu. Fill in the project details, upload your files, set your price, and submit for review. Once approved, your project will be live on the marketplace."
+          answer: "After creating an account, click on 'Upload Project' in the navigation menu. Fill in the project details, upload your files, set your price, and submit for review. Once approved, your project will be live on the marketplace for buyers to discover."
         },
         {
           question: "What commission does ProjXchange charge?",
@@ -61,7 +61,7 @@ const FAQ = () => {
         },
         {
           question: "What types of projects can I sell?",
-          answer: "You can sell any academic or personal project including web applications, mobile apps, machine learning models, data analysis projects, and more. Projects must be original work and include proper documentation."
+          answer: "You can sell any development project including web applications, mobile apps, machine learning models, data analysis projects, APIs, and more. Projects must be original work and include proper documentation."
         }
       ]
     },
@@ -124,12 +124,12 @@ const FAQ = () => {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
                 {category.category}
               </h2>
-              
+
               <div className="space-y-4">
                 {category.questions.map((faq, questionIndex) => {
                   const index = categoryIndex * 100 + questionIndex;
                   const isOpen = openIndex === index;
-                  
+
                   return (
                     <div
                       key={questionIndex}
@@ -148,7 +148,7 @@ const FAQ = () => {
                           <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
                         )}
                       </button>
-                      
+
                       {isOpen && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}

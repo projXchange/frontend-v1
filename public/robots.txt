@@ -1,0 +1,11 @@
+# Sitemap
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /admin/
+Disallow: /dashboard/settings/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://projxchange.com/sitemap.xml

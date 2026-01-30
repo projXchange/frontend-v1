@@ -229,23 +229,23 @@ const Home = () => {
             <div className="text-center lg:text-left">
               <div className="animate-slideInDown">
                 <p className="text-xs sm:text-sm uppercase tracking-widest text-white/70 mb-3 font-medium">
-                  Empowering student innovation
+                  Empowering students, freelancers & developers
                 </p>
 
                 <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
                   <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-yellow-400" />
-                  Trusted by 10,000+ students worldwide
+                  Trusted by 10,000+ students, freelancers & developers worldwide
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight tracking-tight">
-                  <span className="block animate-fadeIn">Explore & Contribute to</span>
+                  <span className="block animate-fadeIn">Buy & Sell Quality</span>
                   <span className="block bg-gradient-to-r from-blue-400 via-teal-300 to-green-300 bg-clip-text text-transparent animate-slideInLeft" style={{ animationDelay: '0.5s' }}>
-                    Real Academic Projects
+                    Development Projects
                   </span>
                 </h1>
 
                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-10 text-blue-100 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-slideInUp" style={{ animationDelay: '1s' }}>
-                  Discover high-quality student projects, learn from expert code, and accelerate your academic journey with our curated marketplace.
+                  A marketplace connecting students, freelancers, and developers with quality projects. Browse thousands of projects or sell your own work and start earning today.
                 </p>
               </div>
               {/* CTA Buttons */}
@@ -295,7 +295,7 @@ const Home = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">10K+</div>
-                    <div className="text-blue-200 dark:text-blue-300 text-sm">Students</div>
+                    <div className="text-blue-200 dark:text-blue-300 text-sm">Users</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">{projects.length}+</div>
@@ -323,9 +323,9 @@ const Home = () => {
               Monetize Your Skills, Build Your Future
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 max-w-3xl mx-auto">
-              Turn your academic projects into a source of income.{' '}
+              Turn your development projects into a source of income.{' '}
               <span className="text-blue-600 dark:text-blue-400 font-semibold">projXchange</span>{' '}
-              empowers you to showcase or talent and earn from your creations.
+              empowers you to showcase your talent and earn from your creations.
             </p>
           </motion.div>
 
@@ -355,7 +355,7 @@ const Home = () => {
                 Earn from Your Projects
               </h3>
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 leading-relaxed">
-                Get paid for the hard work you put into academic assignments and side projects.
+                Get paid for the hard work you put into your development projects and side work.
               </p>
             </motion.div>
 
@@ -375,7 +375,7 @@ const Home = () => {
                 Global Exposure
               </h3>
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 leading-relaxed">
-                Reach or worldwide audience of potential employers looking innovative solutions.
+                Reach a worldwide audience of buyers and potential clients looking for innovative solutions.
               </p>
             </motion.div>
 
@@ -395,7 +395,7 @@ const Home = () => {
                 Build Your Portfolio
               </h3>
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 dark:text-gray-400 leading-relaxed">
-                Enhance resume with real-world and positive feedback.
+                Enhance your portfolio with real-world projects and positive feedback.
               </p>
             </motion.div>
 
@@ -415,7 +415,7 @@ const Home = () => {
                 Flexible Income
               </h3>
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 dark:text-gray-400 leading-relaxed">
-                Work on own terms and set or own prices.
+                Work on your own terms and set your own prices.
               </p>
             </motion.div>
           </motion.div>
@@ -453,8 +453,8 @@ const Home = () => {
                 {
                   src: imgMain,
                   alt: "Platform Showcase",
-                  title: "Unlock Your Academic Potential",
-                  description: "Discover, share, and monetize your academic projects with ProjXchange."
+                  title: "Unlock Your Development Potential",
+                  description: "Discover, share, and monetize your development projects with ProjXchange."
                 },
                 {
                   src: imgEarn,
@@ -466,7 +466,7 @@ const Home = () => {
                   src: imgCommunity,
                   alt: "Community",
                   title: "Join a Thriving Community",
-                  description: "Connect with thousands of students, mentors, and developers worldwide."
+                  description: "Connect with thousands of students, freelancers, and developers worldwide."
                 },
                 {
                   src: imgHowItWorks,
@@ -761,10 +761,10 @@ const Home = () => {
             className="text-center mb-12 sm:mb-16"
           >
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-4 sm:mb-6">
-              Everything students need in one place
+              Everything you need in one place
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 dark:text-gray-400 max-w-3xl mx-auto">
-              Join thousands of students who are already accelerating their learning journey
+              Join thousands of students, freelancers, and developers who are already accelerating their journey
             </p>
           </motion.div>
 
@@ -852,7 +852,7 @@ const Home = () => {
               viewport={{ once: true }}
               className="text-base sm:text-lg md:text-xl text-blue-100 mb-6 sm:mb-8 lg:mb-10 max-w-2xl mx-auto text-center leading-relaxed px-4"
             >
-              Join thousands of students transforming their future with&nbsp;
+              Join thousands of students, freelancers, and developers building their future with&nbsp;
               <strong className="text-white font-semibold">projXchange</strong> — one project at a time.
             </motion.p>
 
