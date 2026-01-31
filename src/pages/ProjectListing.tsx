@@ -258,7 +258,7 @@ const ProjectListing = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
+          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 animate-slideInUp" style={{ animationDelay: '400ms' }}>
             <div className="text-center">
               <div className="text-3xl font-bold text-white mb-2">{projects.length}+</div>
               <div className="text-blue-200 font-medium">Projects</div>
@@ -275,14 +275,14 @@ const ProjectListing = () => {
               <div className="text-3xl font-bold text-white mb-2">24/7</div>
               <div className="text-blue-200 font-medium">Support</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         {/* Launch Period Banner */}
         {flags.REFERRAL_ONLY_MODE && <LaunchPeriodBanner />}
-        
+
         {/* Filters */}
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-2xl mb-10 border border-white/30 dark:border-slate-700/30 relative z-10 transition-colors">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 overflow-visible">
