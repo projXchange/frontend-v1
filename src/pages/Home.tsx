@@ -508,9 +508,9 @@ const Home = () => {
 
           {/* Technologies Grid */}
           <div className="mb-12 sm:mb-16 lg:mb-20">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
-              {loading ? (
-                Array.from({ length: 6 }).map((_, idx) => (
+            {loading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
+                {Array.from({ length: 6 }).map((_, idx) => (
                   <div
                     key={idx}
                     className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 text-center border border-gray-100 dark:border-slate-700 animate-pulse"
@@ -520,9 +520,11 @@ const Home = () => {
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                     <div className="h-5 bg-gray-200 rounded"></div>
                   </div>
-                ))
-              ) : (
-                categories.map((category) => (
+                ))}
+              </div>
+            ) : categories.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
+                {categories.map((category) => (
                   <motion.div
                     key={category.name}
                     initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -559,9 +561,62 @@ const Home = () => {
                       </div>
                     </Link>
                   </motion.div>
-                ))
-              )}
-            </div>
+                ))}
+
+                {/* Placeholder cards to fill the grid */}
+                {categories.length < 6 && Array.from({ length: 6 - categories.length }).map((_, idx) => (
+                  <motion.div
+                    key={`placeholder-${idx}`}
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: (categories.length + idx) * 0.1,
+                      ease: "easeOut",
+                    }}
+                    viewport={{ once: true }}
+                    className="bg-white/50 dark:bg-slate-800/50 rounded-2xl p-4 sm:p-6 text-center border-2 border-dashed border-gray-300 dark:border-slate-600 h-full flex flex-col items-center justify-center"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-700 dark:to-slate-600 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4 opacity-50">
+                      <Code className="w-6 h-6 sm:w-8 sm:h-8 text-gray-500 dark:text-gray-400" />
+                    </div>
+                    <h3 className="text-sm sm:text-base font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Coming Soon
+                    </h3>
+                    <p className="text-gray-400 dark:text-gray-500 text-xs">
+                      More categories
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center py-12 sm:py-16"
+              >
+                <div className="max-w-md mx-auto">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-100 to-teal-100 dark:from-blue-900/30 dark:to-teal-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Code className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                    Projects Coming Soon
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    We're building an amazing collection of projects across various technologies. Check back soon!
+                  </p>
+                  <Link
+                    to="/upload"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                  >
+                    Be the First to Upload
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </motion.div>
+            )}
           </div>
 
 
