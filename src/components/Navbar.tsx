@@ -16,6 +16,9 @@ import {
   LogIn,
   UserPlus,
   MessageSquare,
+  Users,
+  Award,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
@@ -27,6 +30,7 @@ import CreditBalance from "./CreditBalance";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -135,15 +139,13 @@ const Navbar = () => {
                 <span>Projects</span>
               </Link>
 
-              <Link
-                to="/contact"
-                className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive("/contact")
-                  ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
-                  : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
-                  }`}
+              <button
+                onClick={() => setIsCommunityModalOpen(true)}
+                className="flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
               >
-                <span>Contact Us</span>
-              </Link>
+                <Users className="w-5 h-5" />
+                <span className="hidden xl:inline">Community</span>
+              </button>
 
               {/* Credit Balance - Only for authenticated users */}
               {isAuthenticated && (
@@ -263,14 +265,14 @@ const Navbar = () => {
                               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
                               }`}
                           >
-                            <User className="w-4 h-4 mr-3 flex-shrink-0" /> 
+                            <User className="w-4 h-4 mr-3 flex-shrink-0" />
                             <span className="truncate">Profile</span>
                           </Link>
                           <button
                             onClick={handleLogout}
                             className="flex items-center w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                           >
-                            <LogOut className="w-4 h-4 mr-3 flex-shrink-0" /> 
+                            <LogOut className="w-4 h-4 mr-3 flex-shrink-0" />
                             <span className="truncate">Logout</span>
                           </button>
                         </div>
@@ -334,17 +336,16 @@ const Navbar = () => {
                 Projects
               </Link>
 
-              <Link
-                to="/contact"
-                className={`flex items-center px-4 py-3 transition-colors ${isActive("/contact")
-                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
-                  }`}
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsCommunityModalOpen(true);
+                }}
+                className="flex items-center w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
               >
-                <MessageSquare className={`w-5 h-5 mr-2 ${isActive("/contact") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
-                Contact Us
-              </Link>
+                <Users className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
+                <span>Community</span>
+              </button>
 
               {/* Credit Balance - Only for authenticated users */}
               {isAuthenticated && (
@@ -491,6 +492,114 @@ const Navbar = () => {
         initialMode={isLoginMode ? "login" : "signup"}
         onSuccess={closeAuthModal}
       />
+
+      {/* Community Coming Soon Modal */}
+      {isCommunityModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={() => setIsCommunityModalOpen(false)}>
+          <div
+            className="relative bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 dark:from-purple-900/40 dark:via-indigo-900/40 dark:to-blue-900/40 backdrop-blur-xl rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl border border-purple-200/50 dark:border-purple-700/30 max-w-2xl w-full animate-slideInUp overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Decorative background gradients */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
+
+            {/* Close button */}
+            <button
+              onClick={() => setIsCommunityModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-colors z-10"
+            >
+              <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </button>
+
+            <div className="relative z-10">
+              {/* Coming Soon Badge */}
+              <div className="flex justify-center mb-6">
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold rounded-full shadow-lg">
+                  <span className="w-2 h-2 bg-white rounded-full animate-ping"></span>
+                  COMING SOON
+                </span>
+              </div>
+
+              {/* Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl">
+                  <Users className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                </div>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
+                Join Our Thriving Community
+              </h2>
+
+              {/* Subtitle */}
+              <p className="text-center text-gray-600 dark:text-gray-300 text-base sm:text-lg mb-8 max-w-xl mx-auto">
+                Connect, learn, and grow together with thousands of students, developers, and freelancers worldwide!
+              </p>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-start gap-3 p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-purple-200/50 dark:border-purple-700/30">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MessageSquare className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Discussion Forums</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Ask questions and share knowledge</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-purple-200/50 dark:border-purple-700/30">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Networking</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Connect with like-minded developers</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-purple-200/50 dark:border-purple-700/30">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Showcase Work</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Share your projects and get feedback</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-purple-200/50 dark:border-purple-700/30">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Learning Resources</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Access tutorials and guides</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  We're working hard to bring you an amazing community experience, once we hit next milestone.
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Stay tuned!
+                </p>
+                <button
+                  onClick={() => setIsCommunityModalOpen(false)}
+                  className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  Got it!
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
