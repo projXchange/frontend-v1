@@ -234,7 +234,7 @@ const Home = () => {
 
                 <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
                   <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-yellow-400" />
-                  Trusted by 10,000+ students, freelancers & developers worldwide
+                  Trusted by students, freelancers & developers worldwide
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight tracking-tight">
@@ -294,12 +294,12 @@ const Home = () => {
               <div className="bg-white/10 dark:bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-2xl float-animation" style={{ animationDelay: '0.5s' }}>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">10K+</div>
-                    <div className="text-blue-200 dark:text-blue-300 text-sm">Users</div>
+                    <div className="text-2xl font-bold text-white">{projects.length}+</div>
+                    <div className="text-blue-200 dark:text-blue-300 text-sm">Featured</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{projects.length}+</div>
-                    <div className="text-blue-200 dark:text-blue-300 text-sm">Projects</div>
+                    <div className="text-2xl font-bold text-white">{topprojects.length}+</div>
+                    <div className="text-blue-200 dark:text-blue-300 text-sm">Top Rated</div>
                   </div>
                 </div>
               </div>
@@ -889,9 +889,9 @@ const Home = () => {
             >
               {[
                 { label: '24/7', sub: 'Expert Support' },
-                { label: '100%', sub: 'Money-back Guarantee' },
-                { label: '500+', sub: 'Verified Projects' },
-                { label: '10K+', sub: 'Happy Learners' },
+                { label: '100%', sub: 'Secure Payments' },
+                { label: 'Quality', sub: 'Verified Projects' },
+                { label: 'Growing', sub: 'Community' },
               ].map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center">
                   <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">{item.label}</div>

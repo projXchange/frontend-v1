@@ -26,10 +26,10 @@ const Community = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {[
-              { icon: Users, label: "10,000+", desc: "Active Members" },
-              { icon: MessageSquare, label: "50,000+", desc: "Discussions" },
-              { icon: Award, label: "5,000+", desc: "Projects Shared" },
-              { icon: TrendingUp, label: "Growing", desc: "Daily" }
+              { icon: Users, label: "Growing", desc: "Active Members" },
+              { icon: MessageSquare, label: "Active", desc: "Discussions" },
+              { icon: Award, label: "Quality", desc: "Projects Shared" },
+              { icon: TrendingUp, label: "Expanding", desc: "Daily" }
             ].map((stat, i) => (
               <motion.div
                 key={i}

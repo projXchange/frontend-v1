@@ -329,7 +329,6 @@ const CartPage = () => {
                       <li>• Documentation & setup guide</li>
                       <li>• Lifetime access</li>
                       <li>• Free updates</li>
-                      <li>• 30-day money-back guarantee</li>
                     </ul>
                   </div>
 
