@@ -53,7 +53,7 @@ const FAQ = () => {
         },
         {
           question: "What commission does ProjXchange charge?",
-          answer: "We charge a 15% commission on each sale. This helps us maintain the platform, provide customer support, and continue improving our services."
+          answer: "We charge a 10% commission on each sale. This helps us maintain the platform, provide customer support, and continue improving our services."
         },
         {
           question: "How do I receive payments?",

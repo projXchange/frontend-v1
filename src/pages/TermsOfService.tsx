@@ -91,7 +91,7 @@ const TermsOfService = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">7. Payment Terms</h2>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  All payments are processed securely through our payment partners. We charge a 15% commission on all sales. Sellers will receive payments within 7 business days of a successful transaction.
+                  All payments are processed securely through our payment partners. We charge a 10% commission on all sales. Sellers will receive payments within 7 business days of a successful transaction.
                 </p>
               </div>
 
