@@ -79,6 +79,13 @@ const Footer = () => {
             © {new Date().getFullYear()} projXchange. All rights reserved.
           </div>
         </div>
+
+        {/* AI Disclaimer */}
+        <div className="mt-6 pt-6 border-t border-gray-800 dark:border-slate-900">
+          <p className="text-xs text-gray-500 dark:text-gray-600 text-center">
+            Note: Hero banner videos and carousel images are AI-generated for promotional purposes and are not related to actual projects on the platform.
+          </p>
+        </div>
       </div>
     </footer>
   );
