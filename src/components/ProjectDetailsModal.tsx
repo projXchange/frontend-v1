@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Edit, Save, Send, Calendar, User } from 'lucide-react';
+import { X, Edit, Save, Send, Calendar, User, Upload, Trash2 } from 'lucide-react';
 import { Project } from '../types/Project';
 interface ProjectDetailsModalProps {
   isOpen: boolean;
@@ -33,6 +33,11 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'basic' | 'technical' | 'media'>('basic');
 
+  // State for file uploads
+  const [newThumbnailFile, setNewThumbnailFile] = useState<File | null>(null);
+  const [newGalleryFiles, setNewGalleryFiles] = useState<File[]>([]);
+  const [removedGalleryImages, setRemovedGalleryImages] = useState<string[]>([]);
+
   useEffect(() => {
     if (project && canEditAll && onEditDataChange && !projectEditData) {
       onEditDataChange(project);
@@ -42,6 +47,101 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   if (!isOpen || !project) return null;
 
   const currentData = canEditAll && projectEditData ? projectEditData : project;
+
+  // Helper function to convert file to base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Handle thumbnail file selection
+  const handleThumbnailFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && canEditAll && onEditDataChange && projectEditData) {
+      setNewThumbnailFile(file);
+      const base64 = await convertFileToBase64(file);
+      onEditDataChange({
+        ...projectEditData,
+        thumbnail: base64
+      });
+    }
+  };
+
+  // Handle thumbnail removal
+  const handleThumbnailRemove = () => {
+    if (canEditAll && onEditDataChange && projectEditData) {
+      setNewThumbnailFile(null);
+      onEditDataChange({
+        ...projectEditData,
+        thumbnail: ''
+      });
+    }
+  };
+
+  // Handle gallery files selection
+  const handleGalleryFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0 && canEditAll && onEditDataChange && projectEditData) {
+      setNewGalleryFiles(prev => [...prev, ...files]);
+
+      // Convert all files to base64
+      const base64Files = await Promise.all(files.map(file => convertFileToBase64(file)));
+
+      // Get existing images (excluding removed ones)
+      const existingImages = (currentData.images || []).filter(
+        img => !removedGalleryImages.includes(img)
+      );
+
+      // Combine existing and new images
+      onEditDataChange({
+        ...projectEditData,
+        images: [...existingImages, ...base64Files]
+      });
+    }
+  };
+
+  // Remove existing gallery image
+  const removeExistingGalleryImage = (imageUrl: string) => {
+    if (canEditAll && onEditDataChange && projectEditData) {
+      setRemovedGalleryImages(prev => [...prev, imageUrl]);
+
+      // Update images array to exclude this image
+      const updatedImages = (currentData.images || []).filter(img => img !== imageUrl);
+      onEditDataChange({
+        ...projectEditData,
+        images: updatedImages
+      });
+    }
+  };
+
+  // Remove newly selected gallery file (before upload)
+  const removeNewGalleryImage = (index: number) => {
+    if (canEditAll && onEditDataChange && projectEditData) {
+      const updatedNewFiles = newGalleryFiles.filter((_, i) => i !== index);
+      setNewGalleryFiles(updatedNewFiles);
+
+      // Recalculate images array
+      const existingImages = (project.images || []).filter(
+        img => !removedGalleryImages.includes(img)
+      );
+
+      // Remove the corresponding base64 from the end of the array
+      const currentImages = currentData.images || [];
+      const updatedImages = [
+        ...existingImages,
+        ...currentImages.slice(existingImages.length).filter((_, i) => i !== index)
+      ];
+
+      onEditDataChange({
+        ...projectEditData,
+        images: updatedImages
+      });
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     if (canEditAll && onEditDataChange && projectEditData) {
@@ -76,7 +176,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         <div className="relative flex items-center justify-between p-4 sm:p-5 border-b border-gray-200/50 dark:border-slate-700/50 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex-shrink-0 overflow-hidden">
           {/* Animated Background Pattern */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-          
+
           <div className="relative flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
             <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-white/30 transform hover:scale-105 transition-transform duration-300">
               <span className="text-white font-bold text-lg sm:text-2xl drop-shadow-lg">{project.title?.charAt(0) || 'P'}</span>
@@ -518,56 +618,152 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               {/* Thumbnail */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">🖼️ Project Thumbnail</label>
+
+                {/* File Upload Button */}
+                {canEditAll && (
+                  <div className="mb-3">
+                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold cursor-pointer hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg">
+                      <Upload className="w-4 h-4" />
+                      <span>Upload Thumbnail</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleThumbnailFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                )}
+
+                {/* URL Input (fallback) */}
                 <input
                   type="text"
-                  placeholder="https://example.com/thumbnail.jpg"
-                  value={currentData.thumbnail || ''}
+                  placeholder="Or paste image URL: https://example.com/thumbnail.jpg"
+                  value={currentData.thumbnail && !currentData.thumbnail.startsWith('data:') ? currentData.thumbnail : ''}
                   onChange={(e) => handleInputChange('thumbnail', e.target.value)}
                   disabled={!canEditAll}
                   className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 transition-colors"
                 />
+
+                {/* Thumbnail Preview with Remove Button */}
                 {currentData.thumbnail && (
-                  <div className="mt-3">
+                  <div className="mt-3 relative group">
                     <img
-                      src={currentData.thumbnail}
+                      src={newThumbnailFile ? URL.createObjectURL(newThumbnailFile) : currentData.thumbnail}
                       alt="Thumbnail preview"
                       className="w-full max-w-lg h-40 sm:h-48 object-cover rounded-lg border border-gray-200 dark:border-slate-700"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=Invalid+Image';
                       }}
                     />
+                    {canEditAll && (
+                      <button
+                        onClick={handleThumbnailRemove}
+                        className="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-1"
+                        title="Remove thumbnail"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="text-xs font-semibold">Remove</span>
+                      </button>
+                    )}
+                    {newThumbnailFile && (
+                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded">
+                        New Upload
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
               {/* Images */}
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">📷 Gallery</label>
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">📷 Image Gallery</label>
+
+                {/* File Upload Button */}
+                {canEditAll && (
+                  <div className="mb-3">
+                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-semibold cursor-pointer hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg">
+                      <Upload className="w-4 h-4" />
+                      <span>Upload Images</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleGalleryFilesChange}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">You can select multiple images at once</p>
+                  </div>
+                )}
+
+                {/* URL Input (fallback) */}
                 <textarea
                   rows={2}
-                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                  value={currentData.images?.join(', ') || ''}
+                  placeholder="Or paste image URLs (comma separated): https://example.com/image1.jpg, https://example.com/image2.jpg"
+                  value={currentData.images?.filter(img => !img.startsWith('data:')).join(', ') || ''}
                   onChange={(e) => handleArrayChange('images', e.target.value)}
                   disabled={!canEditAll}
                   className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-50 dark:disabled:bg-slate-800 resize-none transition-colors"
                 />
+
+                {/* Gallery Preview with Remove Buttons */}
                 {currentData.images && currentData.images.length > 0 && (
-                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                    {currentData.images.map((img, idx) => (
-                      <div key={idx} className="relative group">
-                        <img
-                          src={img}
-                          alt={`Gallery ${idx + 1}`}
-                          className="w-full h-24 sm:h-28 object-cover rounded-lg border border-gray-200 dark:border-slate-700"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Invalid';
-                          }}
-                        />
-                        <div className="absolute top-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                          {idx + 1}
-                        </div>
-                      </div>
-                    ))}
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                      {currentData.images.length} image{currentData.images.length !== 1 ? 's' : ''} in gallery
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {currentData.images.map((img, idx) => {
+                        // Check if this is a new upload (base64) or existing image
+                        const isNewUpload = img.startsWith('data:');
+                        const isExistingImage = !isNewUpload;
+                        const existingImageCount = (project.images || []).filter(i => !removedGalleryImages.includes(i)).length;
+                        const newImageIndex = isNewUpload ? idx - existingImageCount : -1;
+
+                        return (
+                          <div key={idx} className="relative group">
+                            <img
+                              src={img}
+                              alt={`Gallery ${idx + 1}`}
+                              className="w-full h-24 sm:h-28 object-cover rounded-lg border border-gray-200 dark:border-slate-700"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Invalid';
+                              }}
+                            />
+
+                            {/* Image Number Badge */}
+                            <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                              {idx + 1}
+                            </div>
+
+                            {/* New Upload Badge */}
+                            {isNewUpload && (
+                              <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-green-600 text-white text-xs font-semibold rounded">
+                                New
+                              </div>
+                            )}
+
+                            {/* Remove Button */}
+                            {canEditAll && (
+                              <button
+                                onClick={() => {
+                                  if (isExistingImage) {
+                                    removeExistingGalleryImage(img);
+                                  } else {
+                                    removeNewGalleryImage(newImageIndex);
+                                  }
+                                }}
+                                className="absolute top-1 right-1 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                title="Remove image"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
