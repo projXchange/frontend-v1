@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Send, Calendar, User, DollarSign, Package, Code, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Save, Send, Calendar, User, DollarSign, Package, Code, Image as ImageIcon, CheckCircle, AlertCircle, Upload, Trash2 } from 'lucide-react';
 import { Project } from '../types/Project';
 
 interface ProjectDetailsModalNewProps {
@@ -34,6 +34,11 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState<'info' | 'pricing' | 'technical' | 'media' | 'status'>('info');
 
+  // State for file uploads
+  const [newThumbnailFile, setNewThumbnailFile] = useState<File | null>(null);
+  const [newGalleryFiles, setNewGalleryFiles] = useState<File[]>([]);
+  const [removedGalleryImages, setRemovedGalleryImages] = useState<string[]>([]);
+
   useEffect(() => {
     if (project && canEditAll && onEditDataChange && !projectEditData) {
       onEditDataChange(project);
@@ -43,6 +48,101 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
   if (!isOpen || !project) return null;
 
   const currentData = canEditAll && projectEditData ? projectEditData : project;
+
+  // Helper function to convert file to base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Handle thumbnail file selection
+  const handleThumbnailFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && canEditAll && onEditDataChange && projectEditData) {
+      setNewThumbnailFile(file);
+      const base64 = await convertFileToBase64(file);
+      onEditDataChange({
+        ...projectEditData,
+        thumbnail: base64
+      });
+    }
+  };
+
+  // Handle thumbnail removal
+  const handleThumbnailRemove = () => {
+    if (canEditAll && onEditDataChange && projectEditData) {
+      setNewThumbnailFile(null);
+      onEditDataChange({
+        ...projectEditData,
+        thumbnail: ''
+      });
+    }
+  };
+
+  // Handle gallery files selection
+  const handleGalleryFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0 && canEditAll && onEditDataChange && projectEditData) {
+      setNewGalleryFiles(prev => [...prev, ...files]);
+
+      // Convert all files to base64
+      const base64Files = await Promise.all(files.map(file => convertFileToBase64(file)));
+
+      // Get existing images (excluding removed ones)
+      const existingImages = (currentData.images || []).filter(
+        img => !removedGalleryImages.includes(img)
+      );
+
+      // Combine existing and new images
+      onEditDataChange({
+        ...projectEditData,
+        images: [...existingImages, ...base64Files]
+      });
+    }
+  };
+
+  // Remove existing gallery image
+  const removeExistingGalleryImage = (imageUrl: string) => {
+    if (canEditAll && onEditDataChange && projectEditData) {
+      setRemovedGalleryImages(prev => [...prev, imageUrl]);
+
+      // Update images array to exclude this image
+      const updatedImages = (currentData.images || []).filter(img => img !== imageUrl);
+      onEditDataChange({
+        ...projectEditData,
+        images: updatedImages
+      });
+    }
+  };
+
+  // Remove newly selected gallery file (before upload)
+  const removeNewGalleryImage = (index: number) => {
+    if (canEditAll && onEditDataChange && projectEditData) {
+      const updatedNewFiles = newGalleryFiles.filter((_, i) => i !== index);
+      setNewGalleryFiles(updatedNewFiles);
+
+      // Recalculate images array
+      const existingImages = (project.images || []).filter(
+        img => !removedGalleryImages.includes(img)
+      );
+
+      // Remove the corresponding base64 from the end of the array
+      const currentImages = currentData.images || [];
+      const updatedImages = [
+        ...existingImages,
+        ...currentImages.slice(existingImages.length).filter((_, i) => i !== index)
+      ];
+
+      onEditDataChange({
+        ...projectEditData,
+        images: updatedImages
+      });
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     if (canEditAll && onEditDataChange && projectEditData) {
@@ -86,13 +186,13 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-lg flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
       <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-7xl shadow-2xl flex flex-col lg:flex-row max-h-[95vh] overflow-hidden border border-gray-200/20 dark:border-slate-700/50 animate-in zoom-in-95 duration-300">
-        
+
         {/* Sidebar Navigation */}
         <div className="lg:w-64 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-6 flex-shrink-0 relative overflow-hidden">
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div>
-          
+
           <div className="relative z-10">
             {/* Project Header */}
             <div className="mb-8">
@@ -112,11 +212,10 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id as any)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                      isActive
-                        ? 'bg-white text-blue-600 shadow-lg scale-105'
-                        : 'text-white/80 hover:bg-white/10 hover:text-white'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
+                      ? 'bg-white text-blue-600 shadow-lg scale-105'
+                      : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      }`}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? 'animate-pulse' : ''}`} />
                     <span className="font-semibold text-sm">{section.label}</span>
@@ -128,12 +227,11 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
             {/* Status Badge */}
             <div className="mt-8 p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
               <p className="text-white/70 text-xs mb-2">Current Status</p>
-              <span className={`inline-block px-3 py-1.5 rounded-full text-xs font-bold ${
-                project.status === 'approved' ? 'bg-green-500 text-white' :
+              <span className={`inline-block px-3 py-1.5 rounded-full text-xs font-bold ${project.status === 'approved' ? 'bg-green-500 text-white' :
                 project.status === 'pending' ? 'bg-yellow-500 text-white' :
-                project.status === 'suspended' ? 'bg-red-500 text-white' :
-                'bg-gray-500 text-white'
-              }`}>
+                  project.status === 'suspended' ? 'bg-red-500 text-white' :
+                    'bg-gray-500 text-white'
+                }`}>
                 {project.status?.toUpperCase()}
               </span>
               {isStudent && !canStudentEdit && project.status !== 'approved' && (
@@ -171,7 +269,7 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50 dark:bg-slate-900/50">
             <div className="max-w-4xl mx-auto">
-              
+
               {/* Status notification for students */}
               {isStudent && project.status === 'approved' && canStudentEdit && (
                 <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl">
@@ -183,7 +281,7 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
                   </p>
                 </div>
               )}
-              
+
               {/* Read-only warning for non-editable statuses */}
               {isStudent && !canStudentEdit && (
                 <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-xl">
@@ -195,150 +293,150 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
                   </p>
                 </div>
               )}
-              
+
               {/* Basic Info Section */}
               {activeSection === 'info' && (
                 <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
-                      {/* Title */}
-                      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                          Project Title <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={currentData.title || ''}
-                          onChange={(e) => handleInputChange('title', e.target.value)}
-                          disabled={!effectiveCanEdit}
-                          className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
-                          placeholder="Enter project title"
-                        />
+                  {/* Title */}
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Project Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={currentData.title || ''}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      disabled={!effectiveCanEdit}
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
+                      placeholder="Enter project title"
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Description <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      rows={5}
+                      value={currentData.description || ''}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      disabled={!effectiveCanEdit}
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none transition-all"
+                      placeholder="Describe your project in detail..."
+                    />
+                  </div>
+
+                  {/* Key Features */}
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Key Features
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={currentData.key_features || ''}
+                      onChange={(e) => handleInputChange('key_features', e.target.value)}
+                      disabled={!effectiveCanEdit}
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none transition-all"
+                      placeholder="List the main features of your project..."
+                    />
+                  </div>
+
+                  {/* Category and Difficulty */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={currentData.category || 'web_development'}
+                        onChange={(e) => handleInputChange('category', e.target.value)}
+                        disabled={!effectiveCanEdit}
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
+                      >
+                        <option value="web_development">Web Development</option>
+                        <option value="mobile_development">Mobile Development</option>
+                        <option value="desktop_application">Desktop Application</option>
+                        <option value="machine_learning">Machine Learning</option>
+                        <option value="data_science">Data Science</option>
+                        <option value="game_development">Game Development</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Difficulty Level <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={currentData.difficulty_level || 'beginner'}
+                        onChange={(e) => handleInputChange('difficulty_level', e.target.value)}
+                        disabled={!effectiveCanEdit}
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
+                      >
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Delivery Time and Author */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Delivery Time (days)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={currentData.delivery_time || 0}
+                        onChange={(e) => handleInputChange('delivery_time', Number(e.target.value))}
+                        disabled={!effectiveCanEdit}
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
+                      />
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Author ID
+                      </label>
+                      <input
+                        type="text"
+                        value={project.author_id || ''}
+                        disabled
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Dates */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                      <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-white" />
                       </div>
-
-                      {/* Description */}
-                      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                          Description <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          rows={5}
-                          value={currentData.description || ''}
-                          onChange={(e) => handleInputChange('description', e.target.value)}
-                          disabled={!effectiveCanEdit}
-                          className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none transition-all"
-                          placeholder="Describe your project in detail..."
-                        />
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Created Date</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">
+                          {new Date(project.created_at).toLocaleDateString()}
+                        </p>
                       </div>
-
-                      {/* Key Features */}
-                      <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                          Key Features
-                        </label>
-                        <textarea
-                          rows={4}
-                          value={currentData.key_features || ''}
-                          onChange={(e) => handleInputChange('key_features', e.target.value)}
-                          disabled={!effectiveCanEdit}
-                          className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none transition-all"
-                          placeholder="List the main features of your project..."
-                        />
+                    </div>
+                    <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                      <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-white" />
                       </div>
-
-                      {/* Category and Difficulty */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Category <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            value={currentData.category || 'web_development'}
-                            onChange={(e) => handleInputChange('category', e.target.value)}
-                            disabled={!effectiveCanEdit}
-                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
-                          >
-                            <option value="web_development">Web Development</option>
-                            <option value="mobile_development">Mobile Development</option>
-                            <option value="desktop_application">Desktop Application</option>
-                            <option value="machine_learning">Machine Learning</option>
-                            <option value="data_science">Data Science</option>
-                            <option value="game_development">Game Development</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </div>
-
-                        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Difficulty Level <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            value={currentData.difficulty_level || 'beginner'}
-                            onChange={(e) => handleInputChange('difficulty_level', e.target.value)}
-                            disabled={!effectiveCanEdit}
-                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
-                          >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                            <option value="expert">Expert</option>
-                          </select>
-                        </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Last Updated</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">
+                          {new Date(project.updated_at).toLocaleDateString()}
+                        </p>
                       </div>
-
-                      {/* Delivery Time and Author */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Delivery Time (days)
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={currentData.delivery_time || 0}
-                            onChange={(e) => handleInputChange('delivery_time', Number(e.target.value))}
-                            disabled={!effectiveCanEdit}
-                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
-                          />
-                        </div>
-
-                        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            Author ID
-                          </label>
-                          <input
-                            type="text"
-                            value={project.author_id || ''}
-                            disabled
-                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-mono"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Dates */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                          <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <Calendar className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Created Date</p>
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">
-                              {new Date(project.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-                          <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <Calendar className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Last Updated</p>
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">
-                              {new Date(project.updated_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -354,22 +452,20 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
                       <button
                         onClick={() => handleNestedChange('pricing', 'currency', 'INR')}
                         disabled={!effectiveCanEdit}
-                        className={`px-4 py-3 rounded-xl font-semibold transition-all ${
-                          currentData.pricing?.currency === 'INR'
-                            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg scale-105'
-                            : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-slate-600 hover:border-green-500'
-                        } disabled:opacity-50`}
+                        className={`px-4 py-3 rounded-xl font-semibold transition-all ${currentData.pricing?.currency === 'INR'
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg scale-105'
+                          : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-slate-600 hover:border-green-500'
+                          } disabled:opacity-50`}
                       >
                         🇮🇳 INR (₹)
                       </button>
                       <button
                         onClick={() => handleNestedChange('pricing', 'currency', 'USD')}
                         disabled={!effectiveCanEdit}
-                        className={`px-4 py-3 rounded-xl font-semibold transition-all ${
-                          currentData.pricing?.currency === 'USD'
-                            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg scale-105'
-                            : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-slate-600 hover:border-green-500'
-                        } disabled:opacity-50`}
+                        className={`px-4 py-3 rounded-xl font-semibold transition-all ${currentData.pricing?.currency === 'USD'
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg scale-105'
+                          : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-slate-600 hover:border-green-500'
+                          } disabled:opacity-50`}
                       >
                         🇺🇸 USD ($)
                       </button>
@@ -584,24 +680,59 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                       Project Thumbnail
                     </label>
+
+                    {/* File Upload Button */}
+                    {effectiveCanEdit && (
+                      <div className="mb-3">
+                        <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold cursor-pointer hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg">
+                          <Upload className="w-4 h-4" />
+                          <span>Upload Thumbnail</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleThumbnailFileChange}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    )}
+
+                    {/* URL Input (fallback) */}
                     <input
                       type="text"
-                      placeholder="https://example.com/thumbnail.jpg"
-                      value={currentData.thumbnail || ''}
+                      placeholder="Or paste image URL: https://example.com/thumbnail.jpg"
+                      value={currentData.thumbnail && !currentData.thumbnail.startsWith('data:') ? currentData.thumbnail : ''}
                       onChange={(e) => handleInputChange('thumbnail', e.target.value)}
                       disabled={!effectiveCanEdit}
                       className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 transition-all"
                     />
+
+                    {/* Thumbnail Preview with Remove Button */}
                     {currentData.thumbnail && (
-                      <div className="mt-4">
+                      <div className="mt-4 relative group">
                         <img
-                          src={currentData.thumbnail}
+                          src={newThumbnailFile ? URL.createObjectURL(newThumbnailFile) : currentData.thumbnail}
                           alt="Thumbnail preview"
                           className="w-full max-w-2xl h-64 object-cover rounded-xl border-2 border-gray-200 dark:border-slate-700 shadow-lg"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=Invalid+Image';
                           }}
                         />
+                        {effectiveCanEdit && (
+                          <button
+                            onClick={handleThumbnailRemove}
+                            className="absolute top-2 right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-1"
+                            title="Remove thumbnail"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="text-xs font-semibold">Remove</span>
+                          </button>
+                        )}
+                        {newThumbnailFile && (
+                          <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded">
+                            New Upload
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -609,33 +740,94 @@ const ProjectDetailsModalNew: React.FC<ProjectDetailsModalNewProps> = ({
                   {/* Gallery */}
                   <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-slate-700">
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                      Image Gallery (comma separated URLs)
+                      Image Gallery
                     </label>
+
+                    {/* File Upload Button */}
+                    {effectiveCanEdit && (
+                      <div className="mb-3">
+                        <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl text-sm font-semibold cursor-pointer hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg">
+                          <Upload className="w-4 h-4" />
+                          <span>Upload Images</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleGalleryFilesChange}
+                            className="hidden"
+                          />
+                        </label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">You can select multiple images at once</p>
+                      </div>
+                    )}
+
+                    {/* URL Input (fallback) */}
                     <textarea
                       rows={3}
-                      placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                      value={currentData.images?.join(', ') || ''}
+                      placeholder="Or paste image URLs (comma separated): https://example.com/image1.jpg, https://example.com/image2.jpg"
+                      value={currentData.images?.filter(img => !img.startsWith('data:')).join(', ') || ''}
                       onChange={(e) => handleArrayChange('images', e.target.value)}
                       disabled={!effectiveCanEdit}
                       className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 disabled:bg-gray-50 dark:disabled:bg-slate-800/50 resize-none transition-all"
                     />
+
+                    {/* Gallery Preview with Remove Buttons */}
                     {currentData.images && currentData.images.length > 0 && (
-                      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {currentData.images.map((img, idx) => (
-                          <div key={idx} className="relative group">
-                            <img
-                              src={img}
-                              alt={`Gallery ${idx + 1}`}
-                              className="w-full h-32 object-cover rounded-xl border-2 border-gray-200 dark:border-slate-700 shadow-sm group-hover:shadow-lg transition-shadow"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Invalid';
-                              }}
-                            />
-                            <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-lg font-bold">
-                              #{idx + 1}
-                            </div>
-                          </div>
-                        ))}
+                      <div className="mt-4">
+                        <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                          {currentData.images.length} image{currentData.images.length !== 1 ? 's' : ''} in gallery
+                        </p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {currentData.images.map((img, idx) => {
+                            // Check if this is a new upload (base64) or existing image
+                            const isNewUpload = img.startsWith('data:');
+                            const isExistingImage = !isNewUpload;
+                            const existingImageCount = (project.images || []).filter(i => !removedGalleryImages.includes(i)).length;
+                            const newImageIndex = isNewUpload ? idx - existingImageCount : -1;
+
+                            return (
+                              <div key={idx} className="relative group">
+                                <img
+                                  src={img}
+                                  alt={`Gallery ${idx + 1}`}
+                                  className="w-full h-32 object-cover rounded-xl border-2 border-gray-200 dark:border-slate-700 shadow-sm group-hover:shadow-lg transition-shadow"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Invalid';
+                                  }}
+                                />
+
+                                {/* Image Number Badge */}
+                                <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-lg font-bold">
+                                  #{idx + 1}
+                                </div>
+
+                                {/* New Upload Badge */}
+                                {isNewUpload && (
+                                  <div className="absolute bottom-2 left-2 px-1.5 py-0.5 bg-green-600 text-white text-xs font-semibold rounded">
+                                    New
+                                  </div>
+                                )}
+
+                                {/* Remove Button */}
+                                {effectiveCanEdit && (
+                                  <button
+                                    onClick={() => {
+                                      if (isExistingImage) {
+                                        removeExistingGalleryImage(img);
+                                      } else {
+                                        removeNewGalleryImage(newImageIndex);
+                                      }
+                                    }}
+                                    className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                    title="Remove image"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
