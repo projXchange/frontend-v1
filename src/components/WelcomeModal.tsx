@@ -45,15 +45,13 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-4 transition-opacity duration-300 ease-out ${
-        isClosing ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md px-4 py-6 transition-opacity duration-300 ease-out overflow-y-auto ${isClosing ? 'opacity-0' : 'opacity-100'
+        }`}
       onClick={handleClose}
     >
       <div
-        className={`bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-5xl relative transform transition-all duration-500 ease-in-out ${
-          isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-        }`}
+        className={`bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden relative transform transition-all duration-500 ease-in-out my-auto ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+          } flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -65,48 +63,48 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
         </button>
 
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 px-8 py-6 text-white rounded-t-3xl">
+        <div className="bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 px-6 sm:px-8 py-5 sm:py-6 text-white rounded-t-3xl flex-shrink-0">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white/20 rounded-full">
-              <Gift className="w-7 h-7" />
+            <div className="p-2 bg-white/20 rounded-full flex-shrink-0">
+              <Gift className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <h2 className="text-2xl font-bold">Welcome to ProjXchange!</h2>
+            <h2 className="text-xl sm:text-2xl font-bold">Welcome to ProjXchange!</h2>
           </div>
-          <p className="text-blue-100 text-base">
+          <p className="text-blue-100 text-sm sm:text-base">
             You've received <span className="font-bold text-white">1 free credit</span> to get started!
           </p>
         </div>
 
         {/* Content - Two Column Layout */}
-        <div className="px-8 py-6">
+        <div className="px-6 sm:px-8 py-5 sm:py-6 overflow-y-auto flex-1">
           {/* Launch Period Notice */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-5">
-            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">
-              🚀 <span className="font-bold">Launch Period:</span> We're in credit-only mode for our first 3 months. 
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 sm:p-4 mb-4 sm:mb-5">
+            <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 font-medium leading-relaxed">
+              🚀 <span className="font-bold">Launch Period:</span> We're in credit-only mode for our first 3 months.
               This creates a premium, ethical experience while we build our community.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
             {/* Left Column - How to Earn Credits */}
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
                 How to Earn More Credits
               </h3>
-              
-              <div className="space-y-4">
+
+              <div className="space-y-3 sm:space-y-4">
                 {/* Monthly Drip */}
                 <div className="flex gap-3">
                   <div className="flex-shrink-0">
                     <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                      <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
                     </div>
                   </div>
-                  <div>
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
                       Monthly Bonus
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                       Receive <span className="font-semibold text-gray-900 dark:text-gray-100">1 credit every month</span> for your first 3 months (3 credits total)
                     </p>
                   </div>
@@ -116,14 +114,14 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                 <div className="flex gap-3">
                   <div className="flex-shrink-0">
                     <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                      <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
                     </div>
                   </div>
-                  <div>
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
                       Invite Friends
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                       Earn <span className="font-semibold text-gray-900 dark:text-gray-100">1 credit per confirmed referral</span>, up to 6 credits
                     </p>
                   </div>
@@ -131,9 +129,9 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Total Credits Available */}
-              <div className="bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 mt-4">
-                <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
-                  <span className="font-bold text-gray-900 dark:text-gray-100">Total Available:</span> Up to 10 credits 
+              <div className="bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-xl p-3 sm:p-4 border border-blue-200 dark:border-blue-800 mt-3 sm:mt-4">
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center leading-relaxed">
+                  <span className="font-bold text-gray-900 dark:text-gray-100">Total Available:</span> Up to 10 credits<br className="sm:hidden" />
                   <span className="text-gray-600 dark:text-gray-400"> (1 signup + 3 monthly + 6 referrals)</span>
                 </p>
               </div>
@@ -141,17 +139,17 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
 
             {/* Right Column - Referral Confirmation */}
             <div>
-              <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700 h-full">
-                <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  When Does a Referral Get Confirmed?
+              <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-slate-700 h-full">
+                <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                  <span>When Does a Referral Get Confirmed?</span>
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
                   Your friend needs to complete the following action:
                 </p>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-start gap-2">
-                    <span className="text-green-600 dark:text-green-400 mt-0.5">•</span>
+                    <span className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0">•</span>
                     <span>Download 1 project</span>
                   </div>
                 </div>
@@ -162,7 +160,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
           {/* Got it button */}
           <button
             onClick={handleClose}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 text-white text-base font-bold rounded-xl shadow-lg hover:scale-105 transition-transform mt-6"
+            className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-500 dark:to-teal-500 text-white text-sm sm:text-base font-bold rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform mt-5 sm:mt-6"
           >
             Got it, let's explore!
           </button>
@@ -181,14 +179,14 @@ export default WelcomeModal;
 export const useShouldShowWelcomeModal = (): boolean => {
   const { flags } = useFeatureFlags();
   const { balance } = useCredits();
-  
+
   // Don't show if not in referral-only mode
   if (!flags.REFERRAL_ONLY_MODE) return false;
-  
+
   // Don't show if already dismissed
   const dismissed = localStorage.getItem(WELCOME_MODAL_DISMISSED_KEY);
   if (dismissed === 'true') return false;
-  
+
   // Show if user has received signup bonus (indicates new user)
   return balance?.signup_bonus_received === true;
 };
