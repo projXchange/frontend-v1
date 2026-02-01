@@ -19,6 +19,7 @@ import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
 import { DEMO_PROJECTS } from "../constants/demoProjects"
 import { getUserCredits } from "../services/referralService"
+import { mixpanel } from "../services/mixpanelService"
 
 interface UserStatus {
   has_purchased: boolean
@@ -186,6 +187,18 @@ const ProjectDetail = () => {
       fetchProjectData();
     }
   }, [id, fetchProjectData]);
+
+  // Track project view when project data is loaded
+  useEffect(() => {
+    if (project && !loading) {
+      mixpanel.trackProjectView(
+        project.id,
+        project.title,
+        project.pricing?.sale_price ?? 0,
+        project.category
+      );
+    }
+  }, [project, loading]);
 
   const fetchReviews = async () => {
     if (!id) return;
@@ -555,6 +568,8 @@ const ProjectDetail = () => {
       } else {
         await addToWishlist(project)
         setUserStatus((prev) => (prev ? { ...prev, in_wishlist: true } : prev))
+        // Track add to wishlist in Mixpanel
+        mixpanel.trackAddToWishlist(project.id, project.title, project.pricing?.sale_price ?? 0);
       }
     } catch (e) {
       console.error("Wishlist toggle failed", e)
@@ -603,6 +618,8 @@ const ProjectDetail = () => {
         const addedSuccessfully = await addToCart(project) // should return true/false
         if (addedSuccessfully) {
           setUserStatus((prev) => (prev ? { ...prev, in_cart: true } : prev))
+          // Track add to cart in Mixpanel
+          mixpanel.trackAddToCart(project.id, project.title, project.pricing?.sale_price ?? 0);
         }
       }
     } catch (error: any) {

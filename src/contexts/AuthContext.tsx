@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { AuthResult, User } from '../types/User';
 import { getApiUrl } from '../config/api';
 import { registerTokenExpirationHandler } from '../utils/apiClient';
+import { mixpanel } from '../services/mixpanelService';
 
 
 interface AuthContextType {
@@ -33,8 +34,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
-  
-  
+
+
 
   const [loading, setLoading] = useState(true);
 
@@ -76,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     registerTokenExpirationHandler(handleTokenExpiration);
   }, []);
-  
+
 
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
@@ -94,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const loggedInUser = data.user;
-      
+
       // Fetch full profile data to merge with auth data
       try {
         const profileRes = await fetch(getApiUrl('/users/profile/me'), {
@@ -103,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (profileRes.ok) {
           const profileData = await profileRes.json();
           // Merge profile data into user object
@@ -120,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             total_sales: profileData.profile?.total_sales || 0,
             total_purchases: profileData.profile?.total_purchases || 0
           };
-          
+
           setUser(fullUserData);
           localStorage.setItem('studystack_user', JSON.stringify(fullUserData));
         } else {
@@ -137,7 +138,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       localStorage.setItem('token', data.refreshToken);
 
-      
+      // Track login event in Mixpanel
+      mixpanel.trackLogin(loggedInUser);
+
       toast.success('User Logged In Successfully');
       return { success: true, user: loggedInUser };
     } catch {
@@ -189,10 +192,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // localStorage.setItem('studystack_user', JSON.stringify(newUser));
       // localStorage.setItem('token', data.accessToken);
 
-      const successMessage = referralCode 
+      const successMessage = referralCode
         ? 'Account created! Please check your email to verify. You\'ll receive bonus credits after verification and your first purchase or upload.'
         : 'Account created! Please check your email to verify.';
-      
+
+      // Track signup event in Mixpanel
+      mixpanel.trackSignup(role, !!referralCode);
+
       toast.success(successMessage);
       return { success: true, message: successMessage };
     } catch (error) {
@@ -203,7 +209,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      
+
       const res = await fetch(getApiUrl('/auth/logout'), {
         method: 'POST',
         headers: {
@@ -218,6 +224,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast.error(data.message || 'Logout failed');
         return;
       }
+
+      // Track logout event in Mixpanel
+      mixpanel.trackLogout();
 
       setUser(null);
       localStorage.removeItem('studystack_user');
@@ -294,40 +303,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         toast.error(data.error || 'Email verification failed');
+        mixpanel.trackEmailVerification(false);
         return { success: false, message: data.error || 'Email verification failed' };
       }
-     
+
       toast.success('Email verified successfully');
+      mixpanel.trackEmailVerification(true);
       return { success: true, message: "Email verified successfully" };
-  
+
     } catch (error) {
       console.error('Email verification error:', error);
       toast.error('Something went wrong. Please try again.');
+      mixpanel.trackEmailVerification(false);
       return { success: false, message: 'Something went wrong. Please try again.' };
     }
   };
-    
 
-// Resend verification email
-const resendVerificationEmail = async (email: string): Promise<void> => {
-  try {
-    await fetch(getApiUrl('/auth/resend-verification'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
-  } catch (error: any) {
-    console.error('Failed to resend verification email:', error);
-    throw error;
-  }
-};
+
+  // Resend verification email
+  const resendVerificationEmail = async (email: string): Promise<void> => {
+    try {
+      await fetch(getApiUrl('/auth/resend-verification'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+    } catch (error: any) {
+      console.error('Failed to resend verification email:', error);
+      throw error;
+    }
+  };
 
   const openAuthModal = (isLogin: boolean = true) => {
     setIsLoginMode(isLogin);
@@ -339,7 +351,7 @@ const resendVerificationEmail = async (email: string): Promise<void> => {
   // Update user data (useful for profile updates)
   const updateUser = (userData: Partial<User>) => {
     if (!user) return;
-    
+
     const updatedUser = { ...user, ...userData };
     setUser(updatedUser);
     localStorage.setItem('studystack_user', JSON.stringify(updatedUser));

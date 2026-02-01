@@ -12,6 +12,7 @@ import {
     openRazorpayCheckout,
 } from '../services/razorpayService';
 import { CreateOrderRequest, RazorpayPaymentResponse } from '../types/Order';
+import { mixpanel } from '../services/mixpanelService';
 
 export const useRazorpayCheckout = () => {
     const [isProcessing, setIsProcessing] = useState(false);
@@ -56,6 +57,14 @@ export const useRazorpayCheckout = () => {
             const orderResponse = await createOrder(orderData, token);
             toast.dismiss('order-creation');
 
+            // Track purchase initiation in Mixpanel
+            const projectIds = cart.map(item => item.project_id);
+            mixpanel.trackPurchaseInitiated(
+                orderResponse.razorpay_order_id,
+                orderResponse.amount / 100, // Convert paise to rupees
+                projectIds
+            );
+
             // Step 5: Open Razorpay checkout
             openRazorpayCheckout({
                 key: orderResponse.key_id,
@@ -65,7 +74,7 @@ export const useRazorpayCheckout = () => {
                 description: `Purchase of ${cart.length} project${cart.length > 1 ? 's' : ''}`,
                 order_id: orderResponse.razorpay_order_id,
                 handler: async (response: RazorpayPaymentResponse) => {
-                    await handlePaymentSuccess(response, token);
+                    await handlePaymentSuccess(response, token, orderResponse.amount);
                 },
                 prefill: {
                     name: user.full_name || '',
@@ -90,7 +99,8 @@ export const useRazorpayCheckout = () => {
 
     const handlePaymentSuccess = async (
         response: RazorpayPaymentResponse,
-        token: string
+        token: string,
+        amount: number
     ) => {
         try {
             toast.loading('Verifying payment...', { id: 'payment-verification' });
@@ -110,6 +120,15 @@ export const useRazorpayCheckout = () => {
             if (verificationResult.success) {
                 toast.success('Payment successful! 🎉');
 
+                // Track purchase success in Mixpanel
+                const projectIds = cart.map(item => item.project_id);
+                mixpanel.trackPurchaseSuccess(
+                    response.razorpay_order_id,
+                    amount / 100, // Convert paise to rupees
+                    response.razorpay_payment_id,
+                    projectIds
+                );
+
                 // Backend now handles purchase record creation in verify-payment endpoint
                 // Clear cart after successful payment
                 clearCart();
@@ -120,6 +139,12 @@ export const useRazorpayCheckout = () => {
                 }, 1500);
             } else {
                 toast.error('Payment verification failed. Please contact support.');
+                // Track purchase failure
+                mixpanel.trackPurchaseFailed(
+                    response.razorpay_order_id,
+                    0,
+                    'Payment verification failed'
+                );
             }
         } catch (error: any) {
             console.error('Payment verification error:', error);

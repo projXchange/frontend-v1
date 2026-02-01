@@ -1,9 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CreditProvider } from './contexts/CreditContext';
 import { ReferralProvider } from './contexts/ReferralContext';
 import { PermissionProvider } from './contexts/PermissionContext';
+import { useEffect } from 'react';
+import { mixpanel } from './services/mixpanelService';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
@@ -38,6 +40,21 @@ import AdminPayouts from './pages/AdminPayouts';
 import UploadProjectNew from './pages/UploadProjectNew';
 import SignupPage from './pages/SignupPage';
 
+// Component to track page views
+function PageViewTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Track page view on route change
+    mixpanel.trackPageView(location.pathname, {
+      search: location.search,
+      hash: location.hash,
+    });
+  }, [location]);
+
+  return null;
+}
+
 function App() {
   return (
     <ThemeProvider>
@@ -47,92 +64,93 @@ function App() {
             <PermissionProvider>
               <Toaster position="top-right" reverseOrder={false} />
               <Router>
+                <PageViewTracker />
                 <ScrollToTop />
                 <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/projects" element={<ProjectListing />} />
-            <Route path="/project/:id" element={<ProjectDetail />} />
-            <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
-            <Route path="/payouts/verify/:token" element={<PayoutVerification />} />
-            
-            {/* Support Pages */}
-            <Route path="/help" element={<HelpCenter />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/community" element={<Community />} />
-            
-            {/* Legal Pages */}
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/refund" element={<RefundPolicy />} />
-            <Route path="/guidelines" element={<CommunityGuidelines />} />
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/how-it-works" element={<HowItWorks />} />
+                    <Route path="/projects" element={<ProjectListing />} />
+                    <Route path="/project/:id" element={<ProjectDetail />} />
+                    <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
+                    <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
+                    <Route path="/payouts/verify/:token" element={<PayoutVerification />} />
 
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <StudentDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              <ProtectedRoute requireAdmin>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/upload" element={
-              <ProtectedRoute>
-                {/* <UploadProject /> */}
-                <UploadProjectNew/>
-              </ProtectedRoute>
-            } />
-            <Route path="/wishlist" element={
-              <ProtectedRoute>
-                <WishlistPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/cart" element={
-              <ProtectedRoute>
-                <CartPage />
-              </ProtectedRoute>
-            } />
-            
-            {/* Payout Routes */}
-            <Route path="/payouts/methods" element={
-              <ProtectedRoute>
-                <PaymentMethods />
-              </ProtectedRoute>
-            } />
-            <Route path="/payouts/balance" element={
-              <ProtectedRoute>
-                <PayoutBalance />
-              </ProtectedRoute>
-            } />
-            <Route path="/payouts/history" element={
-              <ProtectedRoute>
-                <PayoutHistory />
-              </ProtectedRoute>
-            } />
-            
-            {/* Admin Payout Route */}
-            <Route path="/admin/payouts" element={
-              <ProtectedRoute requireAdmin>
-                <AdminPayouts />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Layout>
-      </Router>
-        </PermissionProvider>
-        </ReferralProvider>
+                    {/* Support Pages */}
+                    <Route path="/help" element={<HelpCenter />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/community" element={<Community />} />
+
+                    {/* Legal Pages */}
+                    <Route path="/terms" element={<TermsOfService />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/refund" element={<RefundPolicy />} />
+                    <Route path="/guidelines" element={<CommunityGuidelines />} />
+
+                    <Route path="/dashboard" element={
+                      <ProtectedRoute>
+                        <StudentDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/profile" element={
+                      <ProtectedRoute>
+                        <ProfilePage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/admin" element={
+                      <ProtectedRoute requireAdmin>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/upload" element={
+                      <ProtectedRoute>
+                        {/* <UploadProject /> */}
+                        <UploadProjectNew />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/wishlist" element={
+                      <ProtectedRoute>
+                        <WishlistPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/cart" element={
+                      <ProtectedRoute>
+                        <CartPage />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* Payout Routes */}
+                    <Route path="/payouts/methods" element={
+                      <ProtectedRoute>
+                        <PaymentMethods />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/payouts/balance" element={
+                      <ProtectedRoute>
+                        <PayoutBalance />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/payouts/history" element={
+                      <ProtectedRoute>
+                        <PayoutHistory />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* Admin Payout Route */}
+                    <Route path="/admin/payouts" element={
+                      <ProtectedRoute requireAdmin>
+                        <AdminPayouts />
+                      </ProtectedRoute>
+                    } />
+
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </Layout>
+              </Router>
+            </PermissionProvider>
+          </ReferralProvider>
         </CreditProvider>
       </AuthProvider>
     </ThemeProvider>

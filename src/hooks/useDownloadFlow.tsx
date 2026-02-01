@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useCredits } from './useCredits';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { mixpanel } from '../services/mixpanelService';
 
 /**
  * Custom hook for managing the complete download flow with credit checking
@@ -14,7 +15,7 @@ import toast from 'react-hot-toast';
 export const useDownloadFlow = () => {
   const { isAuthenticated, openAuthModal } = useAuth();
   const { availableCredits, downloadWithCredit, refresh: refreshCredits } = useCredits();
-  
+
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -49,6 +50,9 @@ export const useDownloadFlow = () => {
             link.click();
             document.body.removeChild(link);
 
+            // Track download completion in Mixpanel
+            mixpanel.trackDownloadCompleted(projectId, 'Project', 'credit');
+
             // Show success message with remaining credits
             toast.success(`Download started! Credits remaining: ${availableCredits - 1}`);
 
@@ -72,16 +76,19 @@ export const useDownloadFlow = () => {
           // Handle price limit exceeded (403 Forbidden)
           const errorMessage = error instanceof Error ? error.message : 'This project exceeds the free download limit.';
           toast.error(errorMessage, { duration: 5000 });
+          mixpanel.trackDownloadFailed(projectId, errorMessage);
           setShowUnlockModal(true);
         } else {
           const errorMessage = error instanceof Error ? error.message : 'Download failed. Please try again.';
-          
+
           // Check if error is about price limit
           if (errorMessage.toLowerCase().includes('price limit') || errorMessage.toLowerCase().includes('2000')) {
             toast.error(errorMessage, { duration: 5000 });
+            mixpanel.trackDownloadFailed(projectId, errorMessage);
             setShowUnlockModal(true);
           } else {
             toast.error(errorMessage);
+            mixpanel.trackDownloadFailed(projectId, errorMessage);
           }
         }
       } finally {
@@ -99,7 +106,7 @@ export const useDownloadFlow = () => {
     setShowUnlockModal(false);
     // Navigate to purchase flow or open payment modal
     // This will be implemented by the component using this hook
-    toast.info('Redirecting to purchase...');
+    toast('Redirecting to purchase...', { icon: 'ℹ️' });
   }, []);
 
   /**
@@ -110,7 +117,7 @@ export const useDownloadFlow = () => {
     setShowUnlockModal(false);
     // Navigate to referrals page
     // This will be implemented by the component using this hook
-    toast.info('Navigating to referrals...');
+    toast('Navigating to referrals...', { icon: 'ℹ️' });
   }, []);
 
   /**

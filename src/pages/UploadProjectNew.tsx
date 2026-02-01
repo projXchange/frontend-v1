@@ -26,6 +26,7 @@ import {
 import toast from "react-hot-toast"
 import { apiClient } from "../utils/apiClient"
 import { getApiUrl } from "../config/api"
+import { mixpanel } from "../services/mixpanelService"
 
 const UploadProjectNew = () => {
   const navigate = useNavigate()
@@ -448,6 +449,9 @@ const UploadProjectNew = () => {
 
     setIsSubmitting(true)
 
+    // Track project upload started
+    mixpanel.trackProjectUploadStarted();
+
     try {
       const token = localStorage.getItem("token")
 
@@ -613,6 +617,14 @@ const UploadProjectNew = () => {
 
       toast.success("Project submitted for review!")
 
+      // Track project upload completion in Mixpanel
+      mixpanel.trackProjectUploadCompleted(
+        backendProjectId,
+        formData.title,
+        Number.parseFloat(formData.price),
+        formData.category === "other" ? formData.customCategory : formData.category
+      );
+
       // Reset form
       setFormData({
         title: "",
@@ -653,7 +665,11 @@ const UploadProjectNew = () => {
       navigate("/dashboard")
     } catch (error) {
       console.error("Error submitting project:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to submit project. Please try again.")
+      const errorMessage = error instanceof Error ? error.message : "Failed to submit project. Please try again.";
+      toast.error(errorMessage)
+
+      // Track project upload failure
+      mixpanel.trackProjectUploadFailed(errorMessage);
     } finally {
       setIsSubmitting(false)
     }
