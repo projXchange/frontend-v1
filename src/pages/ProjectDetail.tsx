@@ -1519,7 +1519,7 @@ const ProjectDetail = () => {
                                       <span
                                         className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${review.is_approved ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400"}`}
                                       >
-                                        {review.is_approved ? "✓ Verified Review" : "⏳ Yet to Verify"}
+                                        {review.is_approved ? "✓ Verified Review" : "⏳ Yet to Verify by Admin"}
                                       </span>
                                     </div>
                                   </div>
