@@ -1,0 +1,36 @@
+// Enquiry Types
+
+export interface Enquiry {
+  id: string;
+  user_id: string;
+  project_title: string;
+  project_description: string;
+  budget_range: string | null;
+  timeline: string | null;
+  tech_preferences: string[];
+  additional_requirements: string | null;
+  status: 'pending' | 'reviewing' | 'contacted' | 'closed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEnquiryRequest {
+  project_title: string;
+  project_description: string;
+  budget_range?: string;
+  timeline?: string;
+  tech_preferences?: string[];
+  additional_requirements?: string;
+}
+
+export interface EnquiryResponse {
+  success: boolean;
+  data: Enquiry;
+  message?: string;
+}
+
+export interface EnquiriesListResponse {
+  success: boolean;
+  data: Enquiry[];
+  message?: string;
+}

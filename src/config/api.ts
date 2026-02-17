@@ -62,6 +62,11 @@ export const API_CONFIG = {
     ADMIN_REFERRAL_CONFIRMATION_STATS: '/admin/referrals/confirmation-stats',
     ADMIN_REFERRAL_APPROVE: (referralId: string) => `/admin/referrals/${referralId}/approve`,
     ADMIN_REFERRAL_BLOCK: (referralId: string) => `/admin/referrals/${referralId}/block`,
+
+    // Enquiries endpoints
+    ENQUIRIES: '/api/enquiries',
+    ENQUIRY_BY_ID: (id: string) => `/api/enquiries/${id}`,
+    ADMIN_ENQUIRIES: '/api/admin/enquiries',
   },
 };
 

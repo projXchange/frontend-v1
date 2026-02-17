@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -7,7 +7,6 @@ import {
   Upload,
   Home,
   Grid3X3,
-  Settings,
   LogOut,
   Heart,
   ShoppingCart,
@@ -19,6 +18,7 @@ import {
   Users,
   Award,
   BookOpen,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
@@ -137,6 +137,17 @@ const Navbar = () => {
                   }`}
               >
                 <span>Projects</span>
+              </Link>
+
+              <Link
+                to="/submit-project"
+                className={`flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive("/submit-project")
+                  ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                  : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800"
+                  }`}
+              >
+                <FileText className="w-5 h-5" />
+                <span className="hidden xl:inline">Request Project</span>
               </Link>
 
               <button
@@ -334,6 +345,18 @@ const Navbar = () => {
               >
                 <FolderOpenDot className={`w-5 h-5 mr-2 ${isActive("/projects") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
                 Projects
+              </Link>
+
+              <Link
+                to="/submit-project"
+                className={`flex items-center px-4 py-3 transition-colors ${isActive("/submit-project")
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                  }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <FileText className={`w-5 h-5 mr-2 ${isActive("/submit-project") ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`} />
+                Request Project
               </Link>
 
               <button

@@ -28,6 +28,7 @@ const Footer = () => {
               {/* <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li> */}
               <li><Link to="/projects" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-200 transition-colors">Browse Projects</Link></li>
               <li><Link to="/upload" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-200 transition-colors">Upload Project</Link></li>
+              <li><Link to="/submit-project" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-200 transition-colors">Submit Project Enquiry</Link></li>
               <li><Link to="/how-it-works" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-200 transition-colors">How It Works</Link></li>
               <li><Link to="/dashboard" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-200 transition-colors">Dashboard</Link></li>
 

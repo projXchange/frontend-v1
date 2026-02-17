@@ -39,6 +39,7 @@ import PayoutHistory from './pages/PayoutHistory';
 import AdminPayouts from './pages/AdminPayouts';
 import UploadProjectNew from './pages/UploadProjectNew';
 import SignupPage from './pages/SignupPage';
+import EnquiryPage from './pages/EnquiryPage';
 
 // Component to track page views
 function PageViewTracker() {
@@ -82,6 +83,7 @@ function App() {
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/community" element={<Community />} />
+                    <Route path="/submit-project" element={<EnquiryPage />} />
 
                     {/* Legal Pages */}
                     <Route path="/terms" element={<TermsOfService />} />
