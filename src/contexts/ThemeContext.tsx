@@ -24,9 +24,9 @@ const getInitialTheme = (): Theme => {
     if (storedTheme === 'light' || storedTheme === 'dark') {
       return storedTheme;
     }
-    return getSystemTheme();
+    return 'dark'; //getSystemTheme() // Default to dark mode for first-time visitors
   } catch {
-    return 'light';
+    return 'dark';
   }
 };
 
