@@ -14,6 +14,12 @@ export interface Enquiry {
   updated_at: string;
 }
 
+export interface AdminEnquiry extends Enquiry {
+  user_full_name: string | null;
+  user_email: string;
+  user_phone_number: string | null;
+}
+
 export interface CreateEnquiryRequest {
   project_title: string;
   project_description: string;
@@ -33,4 +39,14 @@ export interface EnquiriesListResponse {
   success: boolean;
   data: Enquiry[];
   message?: string;
+}
+
+export interface AdminEnquiriesListResponse {
+  success: boolean;
+  data: AdminEnquiry[];
+  message?: string;
+}
+
+export interface UpdateEnquiryStatusRequest {
+  status: 'pending' | 'reviewing' | 'contacted' | 'closed';
 }

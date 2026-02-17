@@ -62,8 +62,8 @@ export async function getUserEnquiries(): Promise<Enquiry[]> {
     headers: getAuthHeaders(),
   });
 
-  const result = await handleResponse<EnquiriesListResponse>(response);
-  return result.data;
+  const result = await response.json();
+  return result.enquiries || [];
 }
 
 /**
@@ -80,4 +80,41 @@ export async function getEnquiryById(id: string): Promise<Enquiry> {
 
   const result = await handleResponse<EnquiryResponse>(response);
   return result.data;
+}
+
+/**
+ * Get all enquiries (Admin only)
+ * @param status - Optional status filter
+ * @returns Promise resolving to array of all enquiries with user details
+ * @throws Error if request fails or user is not admin
+ */
+export async function getAllEnquiries(status?: string): Promise<any[]> {
+  const url = status 
+    ? `${getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_ENQUIRIES)}?status=${status}`
+    : getApiUrl(API_CONFIG.ENDPOINTS.ADMIN_ENQUIRIES);
+    
+  const response = await apiClient(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const result = await response.json();
+  return result.enquiries || [];
+}
+
+/**
+ * Update enquiry status (Admin only)
+ * @param id - The enquiry ID
+ * @param status - New status value
+ * @returns Promise resolving to the updated Enquiry object
+ * @throws Error if update fails or user is not admin
+ */
+export async function updateEnquiryStatus(id: string, status: string): Promise<any> {
+  const response = await apiClient(getApiUrl(API_CONFIG.ENDPOINTS.ENQUIRY_BY_ID(id)), {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+
+  return await handleResponse<any>(response);
 }

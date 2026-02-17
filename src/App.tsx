@@ -40,6 +40,8 @@ import AdminPayouts from './pages/AdminPayouts';
 import UploadProjectNew from './pages/UploadProjectNew';
 import SignupPage from './pages/SignupPage';
 import EnquiryPage from './pages/EnquiryPage';
+import EnquiryManagement from './pages/admin/EnquiryManagement';
+import MyEnquiries from './pages/MyEnquiries';
 
 // Component to track page views
 function PageViewTracker() {
@@ -84,6 +86,13 @@ function App() {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/submit-project" element={<EnquiryPage />} />
+                    
+                    {/* My Enquiries Page */}
+                    <Route path="/my-enquiries" element={
+                      <ProtectedRoute>
+                        <MyEnquiries />
+                      </ProtectedRoute>
+                    } />
 
                     {/* Legal Pages */}
                     <Route path="/terms" element={<TermsOfService />} />
@@ -144,6 +153,13 @@ function App() {
                     <Route path="/admin/payouts" element={
                       <ProtectedRoute requireAdmin>
                         <AdminPayouts />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* Admin Enquiries Route */}
+                    <Route path="/admin/enquiries" element={
+                      <ProtectedRoute requireAdmin>
+                        <EnquiryManagement />
                       </ProtectedRoute>
                     } />
 

@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Wallet,
   Award,
+  FileText,
 } from "lucide-react"
 import { useAuth } from "../contexts/AuthContext"
 import type { User, UsersApiResponse } from "../types/User"
@@ -933,6 +934,7 @@ const AdminDashboard = () => {
                 { id: "approval", label: "Pending", icon: AlertCircle },
                 { id: "transactions", label: "Transactions", icon: DollarSign },
                 { id: "reviews", label: "Reviews", icon: MessageSquare },
+                { id: "enquiries", label: "Enquiries", icon: FileText },
                 { id: "referrals", label: "Referrals", icon: Award },
                 { id: "payouts", label: "Payouts", icon: Wallet },
               ].map((tab) => (
@@ -2004,6 +2006,72 @@ const AdminDashboard = () => {
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Filter and manage payouts by user
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "enquiries" && (
+              <div className="animate-slideInUp">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
+                    Project Enquiries Management
+                  </h2>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-8 text-center">
+                  <div className="max-w-2xl mx-auto">
+                    <div className="w-20 h-20 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <FileText className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                      Full Enquiry Management Dashboard
+                    </h3>
+                    <p className="text-gray-700 dark:text-gray-300 mb-6">
+                      View and manage all project enquiry requests with user contact information,
+                      update statuses, and respond to client needs.
+                    </p>
+                    <button
+                      onClick={() => navigate("/admin/enquiries")}
+                      className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                    >
+                      <FileText className="w-5 h-5" />
+                      Open Enquiry Dashboard
+                      <TrendingUp className="w-5 h-5" />
+                    </button>
+
+                    <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
+                      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-md">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Eye className="w-5 h-5 text-blue-600" />
+                          <h4 className="font-semibold text-gray-900 dark:text-white">View All</h4>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          See all enquiries with user details and contact info
+                        </p>
+                      </div>
+
+                      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-md">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Settings className="w-5 h-5 text-teal-600" />
+                          <h4 className="font-semibold text-gray-900 dark:text-white">Manage Status</h4>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Update enquiry status and track progress
+                        </p>
+                      </div>
+
+                      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-md">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Users className="w-5 h-5 text-purple-600" />
+                          <h4 className="font-semibold text-gray-900 dark:text-white">Contact Users</h4>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Access user email and phone for direct contact
                         </p>
                       </div>
                     </div>
